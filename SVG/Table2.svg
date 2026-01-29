@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24px"
+    height="24px" viewBox="0 0 24 24">
+    <defs>
+        <linearGradient id="growRedYellow" x1="100%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" class="red" />
+            <stop offset="100%" class="yellow" />
+        </linearGradient>
+    </defs>
+    <style>
+        .red {
+            stop-color: #303030;
+        }
+
+        .yellow {
+            stop-color: #303030;
+        }
+
+        svg:hover .red {
+            stop-color: #ff0000;
+        }
+
+        svg:hover .yellow {
+            stop-color: #ffff00;
+        }
+    </style>
+    <g>
+        <rect x="4" y="4" width="16" height="16" rx="2.4" ry="2.4" fill="none" stroke="url(#growRedYellow)" pointer-events="all"/>
+        <rect x="4" y="8.5" width="16" height="1" fill="url(#growRedYellow)" stroke="none" pointer-events="all"/>
+        <rect x="4" y="14.5" width="16" height="1" fill="url(#growRedYellow)" stroke="none" pointer-events="all"/>
+        <rect x="11.5" y="4" width="1" height="16" fill="url(#growRedYellow)" stroke="none" pointer-events="all"/>
+    </g>
+</svg>

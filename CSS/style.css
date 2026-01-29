@@ -1,0 +1,289 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: poppins, sans-serif;
+    color: white;
+}
+
+body {
+    position: relative;
+    background-color: #060000;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.SvgGridTemplate {
+    display: grid;
+    grid-template-rows: repeat(auto-fit, minmax(125px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+    place-items: center;
+    margin: 2em;
+    transition: all 0.5s linear;
+}
+
+img {
+    height: 100%;
+    width: 100%;
+}
+
+.SvgBlock {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    row-gap: 0.3rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.addSvg {
+    background:
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(145deg, #060000, #060000) border-box;
+    border: 0.3rem solid transparent;
+    border-radius: 1rem;
+    padding: 0.5em;
+}
+
+.addSvg:hover {
+    background:
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+}
+
+.addSvg .red {
+    stop-color: #303030;
+}
+
+.addSvg .yellow {
+    stop-color: #303030;
+}
+
+.addSvg:hover .red {
+    stop-color: #ff0000;
+}
+
+.addSvg:hover .yellow {
+    stop-color: #ffff00;
+}
+
+.tooltip {
+    background:
+        linear-gradient(#080808, #101010) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    padding: 0.5em;
+    font-size: 0.7rem;
+    opacity: 0;
+    transition: opacity 0.2s linear 0.5s;
+}
+
+.SvgBlock:hover .tooltip, .SvgBlock:hover .deleteSvg {
+    opacity: 1;
+}
+
+.fromDisplay {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    column-gap: 1rem;
+    position: absolute;
+    top: 32vh;
+}
+
+#NameInput {
+    background:
+        linear-gradient(#101010, #101010) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    padding: 0.7em;
+    width: 0rem;
+    opacity: 0;
+    transition: all 1s ease-in-out 0.5s;
+    z-index: 1;
+}
+
+#nameInput {
+    background-color: #101010;
+    color: white;
+    outline: none;
+    border: transparent;
+    width: -webkit-fill-available;
+    caret-color: white;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: inset 0 0 0 1000px #101010;
+    -webkit-text-fill-color: white;
+    caret-color: white;
+}
+
+.CloseCross:hover .red {
+    stop-color: #ff0000;
+}
+
+.CloseCross:hover .yellow {
+    stop-color: #ffff00;
+}
+
+.CloseCross {
+    transform: rotate(45deg);
+    width: 2rem;
+    height: 2rem;
+    opacity: 0;
+    transition: opacity 1s linear 1s;
+}
+
+.CloseCross .red {
+    stop-color: #303030;
+}
+
+.CloseCross .yellow {
+    stop-color: #303030;
+}
+
+.tooltipWrapper {
+    display: flex;
+    position: sticky;
+    column-gap: 1rem;
+    z-index: 1;
+}
+
+.deleteSvg {
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.2s linear 0.5s;
+}
+
+.searchBar {
+    width: 100%;
+    margin: 1.3rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.searchBar input {
+    width: 60%;
+    max-width: 400px;
+    padding: 0.6em 1em;
+    border-radius: 1rem;
+    border: 0.2rem solid #303030;
+    background-color: #060000;
+    color: white;
+    outline: none;
+}
+
+.searchBar input::placeholder {
+    color: #888;
+}
+
+.searchBar input:focus {
+    background:
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+}
+
+.popUpWindow {
+    display: none;
+    grid-template-rows: 1fr 0.3fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "meg meg"
+        "btn1 btn2";
+    place-items: center;
+    width: 25%;
+    background: linear-gradient(#060000, #060000) padding-box, linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    position: absolute;
+    left: 37vw;
+    top: 24vh;
+}
+
+.message {
+    grid-area: meg;
+    padding: 2em;
+    font-size: 0.8rem;
+}
+
+.no {
+    background-color: #060000;
+    grid-area: btn1;
+    outline: none;
+    border: none;
+    width: 100%;
+    height: 3rem;
+    border-bottom-left-radius: 1rem;
+}
+
+.yes {
+    background-color: #060000;
+    grid-area: btn2;
+    outline: none;
+    border: none;
+    width: 100%;
+    height: 3rem;
+    border-bottom-right-radius: 1rem;
+}
+
+.no:hover, .yes:hover {
+    background-color: #181818;
+    font-size: 1.1rem;
+}
+
+.fromDisplay2 {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    position: absolute;
+    top: 1vh;
+}
+
+#tableCreation {
+    position: relative;
+    background:
+        linear-gradient(#101010, #101010) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    padding: 0.7em;
+    width: 85vw;
+    height: 85vh;
+    opacity: 1;
+    /* transition: all 1s ease-in-out 0.5s; */
+    z-index: 1;
+}
+
+.CloseCross2:hover .red {
+    stop-color: #ff0000;
+}
+
+.CloseCross2:hover .yellow {
+    stop-color: #ffff00;
+}
+
+.CloseCross2 {
+    position: absolute;
+    right: 1rem;
+    transform: rotate(45deg);
+    width: 2rem;
+    height: 2rem;
+    opacity: 1;
+    /* transition: opacity 1s linear 1s; */
+}
+
+.CloseCross2 .red {
+    stop-color: #303030;
+}
+
+.CloseCross2 .yellow {
+    stop-color: #303030;
+}

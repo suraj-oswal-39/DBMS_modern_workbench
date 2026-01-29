@@ -1,0 +1,3 @@
+TableName
+let TableName = Object.values(Tb)[0].replaceAll(" ","_");
+ stroke="url(#${TableName}SvgGrow)"

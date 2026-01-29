@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" pointer-events="all">
+	<defs>
+        <linearGradient id="growRedYellow" x1="100%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" class="red" />
+            <stop offset="100%" class="yellow" />
+        </linearGradient>
+    </defs>
+    <style>
+        .red {
+            stop-color: #303030;
+        }
+        .yellow {
+            stop-color: #303030;
+        }
+        svg:hover .red {
+            stop-color: #ff0000;
+        }
+
+        svg:hover .yellow {
+            stop-color: #ffff00;
+        }
+    </style>
+    <g>
+        <path d="M 3.75 5 C 3.75 9 20.25 9 20.25 5" fill="none" stroke="url(#growRedYellow)" stroke-miterlimit="10"/>
+        <path d="M 3.75 5 C 3.75 -0.33 20.25 -0.33 20.25 5 L 20.25 19 C 20.25 24.33 3.75 24.33 3.75 19 Z" fill="none"
+            stroke="url(#growRedYellow)" stroke-miterlimit="10"/>
+    </g>
+</svg>
