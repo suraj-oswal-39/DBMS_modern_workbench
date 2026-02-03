@@ -381,3 +381,10 @@ li[value="BOOLEAN"]:hover {
     outline: none;
     border: 0.2rem solid #202020;
 }
+
+.row1 input[type="checkbox"] {
+    appearance: none;
+}
+.row1 input[type="checkbox"]:checked {
+    appearance: auto;
+}
