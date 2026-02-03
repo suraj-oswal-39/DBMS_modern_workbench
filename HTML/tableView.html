@@ -1,64 +1,92 @@
-<div class="searchBar">
-    <input type="text" placeholder="Search…" id="svgSearchInput" autocomplete="off" />
-</div>
-<div class="SvgGridTemplate">
-    <div class="SvgBlock">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" pointer-events="all" class="addSvg">
-            <defs>
-                <linearGradient id="growRedYellow" x1="100%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" class="red" />
-                    <stop offset="100%" class="yellow" />
-                </linearGradient>
-            </defs>
-            <style>
-                .red {
-                    stop-color: #303030;
-                }
-
-                .yellow {
-                    stop-color: #303030;
-                }
-
-                svg:hover .red {
-                    stop-color: #ff0000;
-                }
-
-                svg:hover .yellow {
-                    stop-color: #ffff00;
-                }
-            </style>
-            <pap d="M11 4H15.8002C16.9203 4 17.4801 4 17.9079 4.21799C18.2842 4.40973 18.5905 4.71547 18.7822 5.0918C19 5.5192 19 6.07899 19 7.19691V9.0002L11.0001 9.0001M11 4H6.2002C5.08009 4 4.51962 4 4.0918 4.21799C3.71547 4.40973 3.40973 4.71547 3.21799 5.0918C3 5.51962 3 6.08009 3 7.2002V9M11 4L11.0001 9.0001M3 9V15M3 9L11.0001 9.0001M3 15V16.8002C3 17.9203 3 18.4801 3.21799 18.9079C3.40973 19.2842 3.71547 19.5905 4.0918 19.7822C4.5192 20 5.07899 20 6.19691 20H11.0002L11.0001 9.0001M3 15H11M15 16H18M18 16H21M18 16V19M18 16V13"
-                stroke="url(#growRedYellow)" stroke-widp="1" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <div class="tooltip">Create Table</div>
+<body>
+    <div class="searchBar">
+        <input type="text" placeholder="Search…" id="svgSearchInput" autocomplete="off" />
     </div>
-</div>
-<div class="fromDisplay2">
-    <form id="tableCreation">
-        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" widp="24px" height="24px" viewBox="0 0 24 24"
-            pointer-events="all" class="CloseCross2">
-            <defs>
-                <linearGradient id="CloseSvgGrow" x1="100%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" class="red" />
-                    <stop offset="100%" class="yellow" />
-                </linearGradient>
-            </defs>
-            <pap d="M 0 9.6 L 9.6 9.6 L 9.6 0 L 14.4 0 L 14.4 9.6 L 24 9.6 L 24 14.4 L 14.4 14.4 L 14.4 24 L 9.6 24 L 9.6 14.4 L 0 14.4 Z"
-                fill="url(#CloseSvgGrow)" stroke="none" />
-        </svg>
-        <p class="formTitle">Create New Table</p>
-        <div class="tableNameInputDiv">
-            <label for="tableNameInput">Table Name</label>
-            <input type="text" id="tableNameInput" name="tableName" placeholder="Enter Table Name" required>
+    <div class="SvgGridTemplate">
+        <div class="SvgBlock">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" pointer-events="all" class="addSvg">
+                <defs>
+                    <linearGradient id="growRedYellow" x1="100%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" class="red" />
+                        <stop offset="100%" class="yellow" />
+                    </linearGradient>
+                </defs>
+                <style>
+                    .red {
+                        stop-color: #303030;
+                    }
+
+                    .yellow {
+                        stop-color: #303030;
+                    }
+
+                    svg:hover .red {
+                        stop-color: #ff0000;
+                    }
+
+                    svg:hover .yellow {
+                        stop-color: #ffff00;
+                    }
+                </style>
+                <path
+                    d="M11 4H15.8002C16.9203 4 17.4801 4 17.9079 4.21799C18.2842 4.40973 18.5905 4.71547 18.7822 5.0918C19 5.5192 19 6.07899 19 7.19691V9.0002L11.0001 9.0001M11 4H6.2002C5.08009 4 4.51962 4 4.0918 4.21799C3.71547 4.40973 3.40973 4.71547 3.21799 5.0918C3 5.51962 3 6.08009 3 7.2002V9M11 4L11.0001 9.0001M3 9V15M3 9L11.0001 9.0001M3 15V16.8002C3 17.9203 3 18.4801 3.21799 18.9079C3.40973 19.2842 3.71547 19.5905 4.0918 19.7822C4.5192 20 5.07899 20 6.19691 20H11.0002L11.0001 9.0001M3 15H11M15 16H18M18 16H21M18 16V19M18 16V13"
+                    stroke="url(#growRedYellow)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div class="tooltip">Create Table</div>
         </div>
-        <div class="columnHeader">
-            <p>Column Name</p>
-            <p>Data type</p>
-            <p>Primary key</p>
-            <p>Not Null</p>
-            <p>Unique</p>
-            <p>Unsigned</p>
-            <p>Auto Increment</p>
-        </div>
-    </form>
-</div>
+    </div>
+    <div class="fromDisplay2">
+        <form id="tableCreation">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="24px" height="24px" viewBox="0 0 24 24"
+                pointer-events="all" class="CloseCross2">
+                <defs>
+                    <linearGradient id="CloseSvgGrow" x1="100%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" class="red" />
+                        <stop offset="100%" class="yellow" />
+                    </linearGradient>
+                </defs>
+                <path
+                    d="M 0 9.6 L 9.6 9.6 L 9.6 0 L 14.4 0 L 14.4 9.6 L 24 9.6 L 24 14.4 L 14.4 14.4 L 14.4 24 L 9.6 24 L 9.6 14.4 L 0 14.4 Z"
+                    fill="url(#CloseSvgGrow)" stroke="none" />
+            </svg>
+            <p class="formTitle">Create New Table</p>
+            <div class="tableNameInputDiv">
+                <label for="tableNameInput">
+                    Table Name
+                    <input type="text" id="tableNameInput" name="tableName" placeholder="Enter Table Name" required style="margin-left: 1rem;">
+                </label>
+            </div>
+            
+            <div>
+                Column Name
+            </div>
+            <div class="row1">
+                <div class="columnNameInputDiv">
+                    <input type="text" id="columnName" name="columnName" placeholder="Enter Column Name" required>
+                </div>
+                <div class="dataType">
+                    <p>Select Data Type</p>
+                    <ul class="selectedOption">
+                        <li value="INT">INT</li>
+                        <li value="BIGINT">BIGINT</li>
+                        <li value="DECIMAL">DECIMAL</li>
+                        <li value="FLOAT">FLOAT</li>
+                        <li value="DOUBLE">DOUBLE</li>
+                        <li value="VARCHAR">VARCHAR</li>
+                        <li value="CHAR">CHAR</li>
+                        <li value="TEXT">TEXT</li>
+                        <li value="DATE">DATE</li>
+                        <li value="DATETIME">DATETIME</li>
+                        <li value="TIMESTAMP">TIMESTAMP</li>
+                        <li value="BOOLEAN">BOOLEAN</li>
+                    </ul>
+                </div>
+                <label for="PrimaryKey">Primary key<input type="checkbox" id="PrimaryKey"></label>
+                <label for="NotNull">Not Null<input type="checkbox" id="NotNull"></label>
+                <label for="Unique">Unique<input type="checkbox" id="Unique"></label>
+                <label for="Unsigned">Unsigned<input type="checkbox" id="Unsigned"></label>
+                <label for="AutoIncrement">Auto Increment<input type="checkbox" id="AutoIncrement"></label>
+            </div>
+        </form>
+    </div>
+</body>
