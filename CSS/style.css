@@ -180,7 +180,7 @@ input:-webkit-autofill:active {
     outline: none;
 }
 
-.searchBar input::placeholder {
+input::placeholder {
     color: #888;
 }
 
@@ -287,3 +287,44 @@ input:-webkit-autofill:active {
 .CloseCross2 .yellow {
     stop-color: #303030;
 }
+
+.formTitle {
+    padding-left: 3em;
+    font-weight: bold;
+}
+
+.tableNameInputDiv {
+    display: flex;
+}
+
+.columnHeader {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* .tableInput {
+    background:
+        linear-gradient(#101010, #101010) padding-box,
+        linear-gradient(145deg, #303030, #303030) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    padding: 0.5em;
+    outline: none;
+}
+
+#tableNameInput,
+#columnName {
+    background-color: #101010;
+    color: white;
+    outline: none;
+    border: transparent;
+    width: -webkit-fill-available;
+    caret-color: white;
+}
+
+#tableNameInput:focus .tableInput,
+#columnName:focus .tableInput {
+    background:
+        linear-gradient(#101010, #101010) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+} */
