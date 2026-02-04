@@ -53,10 +53,10 @@
             <div class="tableNameInputDiv">
                 <label for="tableNameInput">
                     Table Name
-                    <input type="text" id="tableNameInput" name="tableName" placeholder="Enter Table Name" required style="margin-left: 1rem;">
+                    <input type="text" id="tableNameInput" name="tableName" placeholder="Enter Table Name" required
+                        style="margin-left: 1rem;">
                 </label>
             </div>
-            
             <div>
                 Column Name
             </div>
@@ -64,7 +64,7 @@
                 <div class="columnNameInputDiv">
                     <input type="text" id="columnName" name="columnName" placeholder="Enter Column Name" required>
                 </div>
-                <div class="dataType">
+                <button class="dataType">
                     <p>Select Data Type</p>
                     <ul class="selectedOption">
                         <li value="INT">INT</li>
@@ -80,12 +80,17 @@
                         <li value="TIMESTAMP">TIMESTAMP</li>
                         <li value="BOOLEAN">BOOLEAN</li>
                     </ul>
-                </div>
-                <label for="PrimaryKey">Primary key<input type="checkbox" id="PrimaryKey"></label>
-                <label for="NotNull">Not Null<input type="checkbox" id="NotNull"></label>
-                <label for="Unique">Unique<input type="checkbox" id="Unique"></label>
-                <label for="Unsigned">Unsigned<input type="checkbox" id="Unsigned"></label>
-                <label for="AutoIncrement">Auto Increment<input type="checkbox" id="AutoIncrement"></label>
+                </button>
+                <input type="checkbox" id="pk" hidden>
+                <label for="pk" class="btn">Primary Key</label>
+                <input type="checkbox" id="nn" hidden>
+                <label for="nn" class="btn">Not Null</label>
+                <input type="checkbox" id="uq" hidden>
+                <label for="uq" class="btn">Unique</label>
+                <input type="checkbox" id="us" hidden>
+                <label for="us" class="btn">Unsigned</label>
+                <input type="checkbox" id="ai" hidden>
+                <label for="ai" class="btn">Auto Increment</label>
             </div>
         </form>
     </div>

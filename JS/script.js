@@ -10,16 +10,6 @@ function removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGri
     NameInput.removeAttribute("style");
     CloseCross.removeAttribute("style");
 }
-function removeStyle2(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross) {
-    nameInput.value = "";
-    addSvg.removeAttribute("style");
-    tooltip.removeAttribute("style");
-    red.removeAttribute("style");
-    yellow.removeAttribute("style");
-    SvgGridTemplate.removeAttribute("style");
-    NameInput.removeAttribute("style");
-    CloseCross.removeAttribute("style");
-}
 function enableSvgSearch(containerSelector) {
     const searchInput = document.getElementById("svgSearchInput");
     const container = document.querySelector(containerSelector);
@@ -409,10 +399,6 @@ function initTableView(dbName) {
         NameInput.style.opacity = 1;
         NameInput.style.width = "10rem";
         CloseCross.style.opacity = 1;
-    });
-    // Close input field on click event
-    CloseCross.addEventListener("click", () => {
-        removeStyle2(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross);
     });
     // Delete database on click event
     SvgGridTemplate.addEventListener("click", function (event) {
