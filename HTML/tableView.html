@@ -57,14 +57,15 @@
                         style="margin-left: 1rem;">
                 </label>
             </div>
-            <div>
-                Column Name
+            <div class="columnHeader" style="padding-bottom: 0.3rem;">
+                <p>Column Name</p>
+                <p>Expression</p>
             </div>
             <div class="row1">
                 <div class="columnNameInputDiv">
                     <input type="text" id="columnName" name="columnName" placeholder="Enter Column Name" required>
                 </div>
-                <button class="dataType">
+                <button type="button" class="dataType">
                     <p>Select Data Type</p>
                     <ul class="selectedOption">
                         <li value="INT">INT</li>
@@ -91,7 +92,9 @@
                 <label for="us" class="btn">Unsigned</label>
                 <input type="checkbox" id="ai" hidden>
                 <label for="ai" class="btn">Auto Increment</label>
-            </div>
+                <div id="defaultValueDiv">
+                    <input type="text" id="expression" name="expression" placeholder="Enter Default Value">
+                </div>
         </form>
     </div>
 </body>
