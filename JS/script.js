@@ -384,6 +384,7 @@ function initTableView(dbName) {
     const no = document.querySelector(".no");
     const yes = document.querySelector(".yes");
     const message = document.querySelector(".message");
+    const rowContainer = document.querySelector(".rowContainer");
     message.textContent = "Are you sure you want to permanently delete this table? This will remove all data in the table and cannot be undone.";
     let realTbNameForDel = "";
     let TbSvgForRemove = "";
