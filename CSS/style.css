@@ -359,6 +359,10 @@ li[value="BOOLEAN"]:hover {
     border-bottom-right-radius: 0.2rem;
 }
 
+.columnNameInputDiv, .defaultValueDiv {
+    width: 24%;
+}
+
 #columnName, #tableNameInput, #expression {
     background-color: #202020;
     color: white;
@@ -369,7 +373,11 @@ li[value="BOOLEAN"]:hover {
 }
 
 #columnName {
-    width: 100%;
+    width: -webkit-fill-available;
+}
+
+#expression {
+    width: -webkit-fill-available;
 }
 
 #columnName:active, #tableNameInput:active, #expression:active {
@@ -395,8 +403,8 @@ li[value="BOOLEAN"]:hover {
 .columnHeader {
     display: flex;
     justify-content: space-between;
-    padding: 1rem 0rem 0.3rem 0rem;
-    font-weight: bold;
+    padding: 0.5rem 0rem 0.3rem 0rem;
+    width: 84%;
 }
 
 .btn {
