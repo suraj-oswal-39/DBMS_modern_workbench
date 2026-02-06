@@ -25,7 +25,7 @@ function enableSvgSearch(containerSelector) {
         const items = container.querySelectorAll(".DBSvg, .SvgBlock");
 
         items.forEach(item => {
-            
+
             const realName =
                 item.dataset.databaseName ||
                 item.dataset.tableName ||
@@ -36,7 +36,7 @@ function enableSvgSearch(containerSelector) {
             } else {
                 item.style.display = "none";
             }
-        
+
         });
     });
 }
@@ -296,12 +296,12 @@ function initDatabaseView($location, $rootScope) {
     const message = document.querySelector(".message");
 
     message.textContent = "This will permanently delete the selected database. All tables, records, and related data will be removed. This action cannot be undone.";
-    
+
     let dbSvgForRemove = "";
     let dbNameForDel = "";
-    
+
     fetchDatabases(SvgGridTemplate);
-    
+
     // open input field on click event
     addSvg.addEventListener("click", () => {
         addSvg.style = `background:
@@ -315,23 +315,23 @@ function initDatabaseView($location, $rootScope) {
         NameInput.style.width = "10rem";
         CloseCross.style.opacity = 1;
     });
-    
+
     // add (create) database on enter keydown event 
     nameInput.addEventListener("keydown", function (event) {
         if (event.key === "Enter") {
-    
+
             event.preventDefault();
-    
+
             let newDBname = document.getElementById("nameInput").value.trim();
             let tooltipNodeList = document.querySelectorAll(".tooltip");
-    
+
             if (newDBname === "") {
                 console.log("Database name cannot be empty!");
                 return
             }
-    
+
             const invalidPattern = /(^[0-9])|[\s\-@#%&*!]|[^\x00-\x7F]/;
-    
+
             if (invalidPattern.test(newDBname)) {
                 console.log(
                     "Invalid database name!\n\n" +
@@ -344,39 +344,39 @@ function initDatabaseView($location, $rootScope) {
                 );
                 return;
             }
-    
+
             const existingDBNames = Array.from(tooltipNodeList).map(oneTooltip => oneTooltip.textContent);
-    
+
             if (existingDBNames.includes(newDBname)) {
                 console.log("Database name already exists!");
                 return;
             }
-    
+
             createDatabases(newDBname);
-    
+
             newDBname = "";
-    
+
             removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross);
         }
     });
-    
+
     // Close input field on click event
     CloseCross.addEventListener("click", () => {
         removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross);
     });
-    
+
     // Delete database on click event
     SvgGridTemplate.addEventListener("click", function (event) {
         const deleteBtn = event.target.closest(".deleteSvg");
         if (!deleteBtn) return;
-    
+
         event.stopPropagation();
-    
+
         dbSvgForRemove = deleteBtn.closest(".SvgBlock");
         if (!dbSvgForRemove) return;
         dbNameForDel = dbSvgForRemove.id;
         console.log("Deleted DB:", dbNameForDel);
-    
+
         SvgGridTemplate.style.filter = "blur(3px)";
         popUpWindow.style.display = "grid";
     });
@@ -385,25 +385,25 @@ function initDatabaseView($location, $rootScope) {
     SvgGridTemplate.addEventListener("click", function (event) {
         const svg = event.target.closest(".SvgBlock > svg[id]");
         if (!svg) return;
-    
+
         if (event.target.closest(".deleteSvg")) return;
         console.log("Clicked DB:", svg.id.replace(/Svg$/, ""));
-    
+
         const dbName = svg.id.replace(/Svg$/, "");
         svgId = dbName;
-    
+
         $rootScope.$apply(() => {
             $location.path(`/table/${dbName}`);
         });
     });
-    
+
     enableSvgSearch(".SvgGridTemplate");
-    
+
     no.onclick = () => {
         SvgGridTemplate.removeAttribute("style");
         popUpWindow.removeAttribute("style");
     };
-    
+
     yes.onclick = () => {
         deletionPopUpMessage("databaseViewPage", dbNameForDel, dbSvgForRemove);
         SvgGridTemplate.removeAttribute("style");
@@ -411,74 +411,86 @@ function initDatabaseView($location, $rootScope) {
     };
 }
 function initTableView(dbName) {
-    const nameInput = document.getElementById("nameInput");
     const addSvg = document.querySelector(".addSvg");
-    const tooltip = document.querySelector(".tooltip");
-    const red = document.querySelector(".red");
-    const yellow = document.querySelector(".yellow");
-    const NameInput = document.getElementById("NameInput");
     const SvgGridTemplate = document.querySelector(".SvgGridTemplate");
-    const CloseCross = document.querySelector(".CloseCross");
+    const CloseCross2 = document.querySelector(".CloseCross2");
     const popUpWindow = document.querySelector(".popUpWindow");
     const no = document.querySelector(".no");
     const yes = document.querySelector(".yes");
     const message = document.querySelector(".message");
     const fromDisplay2 = document.querySelector(".fromDisplay2");
     const rowContainer = document.querySelector(".rowContainer");
-    
+    const dataType = document.querySelector(".dataType");
+    const selectedOption = document.querySelector(".selectedOption");
+
     message.textContent = "Are you sure you want to permanently delete this table? This will remove all data in the table and cannot be undone.";
-    
+
     let realTbNameForDel = "";
     let TbSvgForRemove = "";
-    
+
     // open table creation form on click event
     addSvg.addEventListener("click", () => {
         SvgGridTemplate.style.filter = "blur(3px)";
         fromDisplay2.style.display = "flex";
     });
-    
+
     // Delete database on click event
     SvgGridTemplate.addEventListener("click", function (event) {
         const deleteBtn = event.target.closest(".deleteSvg");
         if (!deleteBtn) return;
-    
+
         event.stopPropagation();
-    
+
         TbSvgForRemove = deleteBtn.closest(".SvgBlock");
         if (!TbSvgForRemove) return;
         realTbNameForDel = TbSvgForRemove.dataset.tableName;
-    
+
         console.log("Deleted Tb:", realTbNameForDel);
-    
+
         SvgGridTemplate.style.filter = "blur(3px)";
         popUpWindow.style.display = "grid";
     });
-    
+
     // Redirect to table data page
     SvgGridTemplate.addEventListener("click", function (event) {
         const svg = event.target.closest(".SvgBlock > svg[id]");
         if (!svg) return;
-    
+
         if (event.target.closest(".deleteSvg")) return;
         console.log("Clicked Tb:", svg.id);
         window.location.hash = "#!/tableData";
     });
-    
+
     enableSvgSearch(".SvgGridTemplate");
-    
+
     no.onclick = () => {
         SvgGridTemplate.removeAttribute("style");
         popUpWindow.removeAttribute("style");
     };
-    
+
     yes.onclick = () => {
         SvgGridTemplate.removeAttribute("style");
         popUpWindow.removeAttribute("style");
         deletionPopUpMessage("tableViewPage", realTbNameForDel, TbSvgForRemove, dbName);
     };
-    
-    fromDisplay2.addEventListener("click", () => {
+
+    CloseCross2.addEventListener("click", () => {
         fromDisplay2.style.display = "none";
         SvgGridTemplate.removeAttribute("style");
+    });
+
+    dataType.addEventListener("click", function (event) {
+        // setTimeout(() => {
+        //     selectedOption.style.opacity = "1";
+        // }, 1000);
+        // setTimeout(() => {
+        //     selectedOption.style.width = "7.52rem";
+        // }, 2000);
+        // setTimeout(() => {
+        //     selectedOption.style.height = "18.3rem";
+        // }, 3000);
+        selectedOption.style.opacity = "1";
+        selectedOption.style.width = "7.52rem"; //105.600px
+        selectedOption.style.height = "18.3rem";
     });
 }
