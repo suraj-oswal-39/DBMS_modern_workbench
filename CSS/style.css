@@ -240,7 +240,7 @@ input::placeholder {
 }
 
 .fromDisplay2 {
-    display: flex;
+    display: none;
     width: 100%;
     justify-content: center;
     position: absolute;
@@ -258,7 +258,6 @@ input::placeholder {
     width: 85vw;
     height: 85vh;
     opacity: 1;
-    /* transition: all 1s ease-in-out 0.5s; */
     z-index: 1;
 }
 
@@ -332,10 +331,14 @@ input::placeholder {
     border: 0.2rem solid transparent;
     border-radius: 0.5em;
     font-size: 0.8rem;
-    /* height: 18.3rem; */;
+    /* width: 7.52rem; */
+    width: 0rem;
+    /* height: 18.3rem; */
     height: 0rem;
+    /* opacity: 1; */
     opacity: 0;
     overflow: auto;
+    transition: all 0.5s linear 1s;
 }
 
 li {
