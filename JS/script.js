@@ -428,12 +428,26 @@ function OptionSelection(selectedOption) {
     });
 }
 
-function rulerChecker() {
+function ruleChecker() {
+    // Rule A2: Table name must be valid
+    const tableNameInput = document.querySelector("#tableNameInput");
+    tableNameInput.addEventListener("change", () => {
+        const tableName = tableNameInput.value.trim();
+        if (!/^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/.test(tableName)) {
+            console.log("Invalid table name");
+            return;
+        }
+    });
+
     let columnNames = document.querySelectorAll(".columnName");
     let names = [];
-    let selectedDataType = document.querySelectorAll(".selectedDataType");
-
     columnNames.forEach((columnName) => {
+        // Rule B1: Column name is mandatory
+        if (columnName.value === "") {
+            alert("Column name is mandatory");
+            return;
+        }
+        // Rule B2: Column names must be unique
         const name = columnName.value.trim();
         if (names.includes(name)) {
             alert("Duplicate column name");
@@ -444,12 +458,30 @@ function rulerChecker() {
         names.push(name);  
     });
 
+    let selectedDataType = document.querySelectorAll(".selectedDataType");
+    // Rule B3: Data type is mandatory
     selectedDataType.forEach((dataType) => {
         if (dataType.innerText === "Select Data Type") {
             alert("you must select data type");
             return;
         }
     });
+
+    // Rule C1: AUTO_INCREMENT MUST be with PRIMARY KEY
+
+    // Rule C3: DEFAULT is NOT allowed with AUTO_INCREMENT
+
+    // Rule C4: BOOLEAN cannot be UNSIGNED
+
+    // Rule C5: PRIMARY KEY implies NOT NULL
+
+    // Rule C6: UNSIGNED allowed only for numeric types
+
+    // Rule D1: DEFAULT must match data type 
+    // Allowed : INT, BIGINT, SMALLINT, TINY_INT, DECIMAL, FLOAT / DOUBLE
+    // Not Allowed: VARCHAR, TEXT, DATE, BOOLEAN
+
+    // Rule D2: "DEFAULT" "NULL" allowed only if not "NOT NULL"
 }
 
 function initTableView(dbName) {
@@ -471,7 +503,6 @@ function initTableView(dbName) {
     let rowCount = 0;
     const RemoveRow = document.querySelector("#RemoveRow");
     const resetBtn = document.querySelector("#resetBtn");
-    const tableNameInput = document.querySelector("#tableNameInput");
 
     message.textContent = "Are you sure you want to permanently delete this table? This will remove all data in the table and cannot be undone.";
 
@@ -526,14 +557,6 @@ function initTableView(dbName) {
         SvgGridTemplate.removeAttribute("style");
     };
 
-    tableNameInput.addEventListener("change", () => {
-        const tableName = tableNameInput.value.trim();
-        if (!/^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/.test(tableName)) {
-            console.log("Invalid table name");
-            return;
-        }
-    });
-
     rowContainer.addEventListener("click", function (event) {
         btn = event.target.closest(".dataType");
         if (!btn) return;
@@ -572,9 +595,10 @@ function initTableView(dbName) {
                             <li>BOOLEAN</li>
                         </ul>
                     </button>
-
-                    <input type="checkbox" id="pk${rowCount}" hidden />
-                    <label for="pk${rowCount}" class="btn">Primary Key</label>
+                    
+                    <!-- Rule E1: Only one PRIMARY KEY per table -->
+                    <input type="radio" id="pk${rowCount}" name="pk" value="pk${rowCount}" hidden />
+                    <label for="pk${rowCount}" class="btn Pk">Primary Key</label>
 
                     <input type="checkbox" id="nn${rowCount}" hidden />
                     <label for="nn${rowCount}" class="btn">Not Null</label>
@@ -585,8 +609,9 @@ function initTableView(dbName) {
                     <input type="checkbox" id="us${rowCount}" hidden />
                     <label for="us${rowCount}" class="btn">Unsigned</label>
 
-                    <input type="checkbox" id="ai${rowCount}" hidden />
-                    <label for="ai${rowCount}" class="btn">Auto Increment</label>
+                    <!-- Rule C2: Only ONE AUTO_INCREMENT column per table -->
+                    <input type="radio" id="ai${rowCount}" name="ai" value="ai${rowCount}" hidden />
+                    <label for="ai${rowCount}" class="btn Ai">Auto Increment</label>
 
                     <div class="defaultValueDiv">
                         <input type="text" class="expression" name="expression" placeholder="Enter Default Value" />
@@ -597,6 +622,7 @@ function initTableView(dbName) {
     });
 
     RemoveRow.addEventListener("click", () => {
+        // Rule A1: Table must have at least one row
         if (rowCount <= 0) {
             console.log("at least have 1 row");
             return;
@@ -621,6 +647,6 @@ function initTableView(dbName) {
 
     const createBtn = document.querySelector("#createBtn");
     createBtn.addEventListener("click", () => {
-        rulerChecker();
+        ruleChecker();
     });
 }

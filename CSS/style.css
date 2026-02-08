@@ -441,8 +441,16 @@ li[value="BOOLEAN"]:hover {
     font-size: 0.84rem;
 }
 
-input[type="checkbox"]:checked + .btn {
+/* Rule E1: Only one PRIMARY KEY per table*/
+/* Rule C2: Only ONE AUTO_INCREMENT column per table */
+input[type="checkbox"]:checked + label.btn,
+input[type="radio"]:checked + label.Pk,
+input[type="radio"]:checked + label.Ai {
     border: 0.2rem solid #ffff00;
+}
+
+input[type="checkbox"]:not(:checked) + label.btn {
+    border: 0.2rem solid #202020;
 }
 
 .AddRemoveRow {
@@ -488,3 +496,4 @@ input[type="checkbox"]:checked + .btn {
 #resetBtn:active, #createBtn:active {
     border-color: #202020;
 }
+

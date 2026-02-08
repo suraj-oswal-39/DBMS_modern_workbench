@@ -94,8 +94,9 @@
                         </ul>
                     </button>
 
-                    <input type="checkbox" id="pk0" hidden />
-                    <label for="pk0" class="btn">Primary Key</label>
+                    <!-- Rule E1: Only one PRIMARY KEY per table -->
+                    <input type="radio" id="pk0" name="pk" value="pk0" hidden />
+                    <label for="pk0" class="btn Pk">Primary Key</label>
 
                     <input type="checkbox" id="nn0" hidden />
                     <label for="nn0" class="btn">Not Null</label>
@@ -106,11 +107,12 @@
                     <input type="checkbox" id="us0" hidden />
                     <label for="us0" class="btn">Unsigned</label>
 
-                    <input type="checkbox" id="ai0" hidden />
-                    <label for="ai0" class="btn">Auto Increment</label>
+                    <!-- Rule C2: Only ONE AUTO_INCREMENT column per table -->
+                    <input type="radio" id="ai0" name="ai" value="ai0" hidden />
+                    <label for="ai0" class="btn Ai">Auto Increment</label>
 
                     <div class="defaultValueDiv">
-                        <input type="text" class="expression" name="expression" placeholder="Enter Default Value" />
+                        <input type="text" class="expression" name="expression" placeholder="Enter Default Value"/>
                     </div>
 
                 </div>
