@@ -428,16 +428,27 @@ function OptionSelection(selectedOption) {
     });
 }
 
-function columnNameChecks () {
+function rulerChecker() {
     let columnNames = document.querySelectorAll(".columnName");
     let names = [];
+    let selectedDataType = document.querySelectorAll(".selectedDataType");
+
     columnNames.forEach((columnName) => {
         const name = columnName.value.trim();
         if (names.includes(name)) {
-            console.log("Duplicate column name");
+            alert("Duplicate column name");
+            names = [];
+            columnName.value = "";
             return;
         }
-        names.push(name);
+        names.push(name);  
+    });
+
+    selectedDataType.forEach((dataType) => {
+        if (dataType.innerText === "Select Data Type") {
+            alert("you must select data type");
+            return;
+        }
     });
 }
 
@@ -589,7 +600,7 @@ function initTableView(dbName) {
         if (rowCount <= 0) {
             console.log("at least have 1 row");
             return;
-        }       
+        }
 
         let lastRow = rowContainer.lastChild;
         rowContainer.removeChild(lastRow);
@@ -599,11 +610,17 @@ function initTableView(dbName) {
 
     resetBtn.addEventListener("click", () => {
         let selectedDataTypeList = document.querySelectorAll(".selectedDataType");
-        
+
         selectedDataTypeList.forEach((selectedDT) => {
             selectedDT.innerText = "Select Data Type";
             selectedOption.removeAttribute("style");
+
             OptionSelection(selectedOption);
         });
+    });
+
+    const createBtn = document.querySelector("#createBtn");
+    createBtn.addEventListener("click", () => {
+        rulerChecker();
     });
 }
