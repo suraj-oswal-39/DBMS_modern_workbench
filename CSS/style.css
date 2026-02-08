@@ -293,11 +293,13 @@ input::placeholder {
     font-weight: bold;
 }
 
-.row1 {
+.row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     width: 100%;
+    gap: 0.2rem;
+    padding-bottom: 0.2rem;
 }
 
 .dataType {
@@ -309,6 +311,7 @@ input::placeholder {
     border: 0.2rem solid #202020;
     cursor: default;
     padding: 0.4rem;
+    width: 7.53rem;
 }
 
 .dataType:hover {
@@ -343,6 +346,7 @@ input::placeholder {
     transition:  
         width 0.2s linear 0.2s,
         height 0.2s linear 0.4s;
+    z-index: 999;
 }
 
 li {
@@ -367,10 +371,10 @@ li[value="BOOLEAN"]:hover {
 }
 
 .columnNameInputDiv, .defaultValueDiv {
-    width: 24%;
+    width: 15.2rem;
 }
 
-#columnName, #tableNameInput, #expression {
+.columnName, .expression {
     background-color: #202020;
     color: white;
     caret-color: white;
@@ -379,31 +383,42 @@ li[value="BOOLEAN"]:hover {
     outline: none;
 }
 
-#columnName {
+#tableNameInput {
+    background-color: #202020;
+    color: white;
+    caret-color: white;
+    padding: 0.4rem;
+    border: 0.2rem solid #202020;
+    outline: none;
+    margin-left: 1rem;
+    width: 16rem;
+}
+
+.columnName {
     width: -webkit-fill-available;
 }
 
-#expression {
+.expression {
     width: -webkit-fill-available;
 }
 
-#columnName:hover, #tableNameInput:hover, #expression:hover {
+.columnName:hover, #tableNameInput:hover, .expression:hover {
     border-color:#ffff00;
 }
 
-#columnName:active, #tableNameInput:active, #expression:active {
+.columnName:active, #tableNameInput:active, .expression:active {
     border-color:#202020;
 }
 
-#columnName:-webkit-autofill, 
+.columnName:-webkit-autofill, 
 #tableNameInput:-webkit-autofill,
-#expression:-webkit-autofill,
-#columnName:-webkit-autofill:focus, 
+.expression:-webkit-autofill,
+.columnName:-webkit-autofill:focus, 
 #tableNameInput:-webkit-autofill:focus,
-#expression:-webkit-autofill:focus,
-#columnName:-webkit-autofill:active, 
+.expression:-webkit-autofill:focus,
+.columnName:-webkit-autofill:active, 
 #tableNameInput:-webkit-autofill:active,
-#expression:-webkit-autofill:active {
+.expression:-webkit-autofill:active {
     -webkit-box-shadow: inset 0 0 0 1000px #202020;
     -webkit-text-fill-color: white;
     caret-color: white;
@@ -432,10 +447,11 @@ input[type="checkbox"]:checked + .btn {
 
 .AddRemoveRow {
     display: flex;
+    width: 100%;
 }
 
 #AddRow, #RemoveRow {
-    width: 49.5%;
+    width: 50%;
     background-color: #101010;
     border: 0.2rem solid #202020;
     font-size: 2rem;

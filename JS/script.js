@@ -281,6 +281,7 @@ function deletionPopUpMessage(containerSelector, NameForDel, SvgForRemove, dbNam
         deleteTables(NameForDel, SvgForRemove, dbName);
     }
 }
+
 function initDatabaseView($location, $rootScope) {
     const nameInput = document.getElementById("nameInput");
     const addSvg = document.querySelector(".addSvg");
@@ -303,7 +304,7 @@ function initDatabaseView($location, $rootScope) {
     fetchDatabases(SvgGridTemplate);
 
     // open input field on click event
-    addSvg.addEventListener("click", () => {
+    addSvg.onclick = () => {
         addSvg.style = `background:
             linear-gradient(#060000, #060000) padding-box,
             linear-gradient(145deg, #ffff00, #ff0000) border-box;`;
@@ -314,7 +315,7 @@ function initDatabaseView($location, $rootScope) {
         NameInput.style.opacity = 1;
         NameInput.style.width = "10rem";
         CloseCross.style.opacity = 1;
-    });
+    };
 
     // add (create) database on enter keydown event 
     nameInput.addEventListener("keydown", function (event) {
@@ -361,9 +362,9 @@ function initDatabaseView($location, $rootScope) {
     });
 
     // Close input field on click event
-    CloseCross.addEventListener("click", () => {
+    CloseCross.onclick = () => {
         removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross);
-    });
+    };
 
     // Delete database on click event
     SvgGridTemplate.addEventListener("click", function (event) {
@@ -410,7 +411,38 @@ function initDatabaseView($location, $rootScope) {
         popUpWindow.removeAttribute("style");
     };
 }
+
+function OptionSelection(selectedOption) {
+    const optionList = document.querySelectorAll(".selectedOption li");
+    optionList.forEach((option) => {
+        option.addEventListener("click", (event) => {
+            event.stopPropagation();
+
+            const dataTypeBtn = option.closest(".dataType");
+            const dt = dataTypeBtn.querySelector(".selectedDataType");
+            const selectedOption = dataTypeBtn.querySelector(".selectedOption");
+
+            dt.innerText = option.innerText;
+            selectedOption.removeAttribute("style");
+        });
+    });
+}
+
+function columnNameChecks () {
+    let columnNames = document.querySelectorAll(".columnName");
+    let names = [];
+    columnNames.forEach((columnName) => {
+        const name = columnName.value.trim();
+        if (names.includes(name)) {
+            console.log("Duplicate column name");
+            return;
+        }
+        names.push(name);
+    });
+}
+
 function initTableView(dbName) {
+
     const addSvg = document.querySelector(".addSvg");
     const SvgGridTemplate = document.querySelector(".SvgGridTemplate");
     const CloseCross2 = document.querySelector(".CloseCross2");
@@ -420,19 +452,23 @@ function initTableView(dbName) {
     const message = document.querySelector(".message");
     const fromDisplay2 = document.querySelector(".fromDisplay2");
     const rowContainer = document.querySelector(".rowContainer");
-    const dataType = document.querySelector(".dataType");
-    const selectedOption = document.querySelector(".selectedOption");
+    let btn;
+    let selectedOption;
+    let realTbNameForDel = "";
+    let TbSvgForRemove = "";
+    const AddRow = document.querySelector("#AddRow");
+    let rowCount = 0;
+    const RemoveRow = document.querySelector("#RemoveRow");
+    const resetBtn = document.querySelector("#resetBtn");
+    const tableNameInput = document.querySelector("#tableNameInput");
 
     message.textContent = "Are you sure you want to permanently delete this table? This will remove all data in the table and cannot be undone.";
 
-    let realTbNameForDel = "";
-    let TbSvgForRemove = "";
-
     // open table creation form on click event
-    addSvg.addEventListener("click", () => {
+    addSvg.onclick = () => {
         SvgGridTemplate.style.filter = "blur(3px)";
         fromDisplay2.style.display = "flex";
-    });
+    };
 
     // Delete database on click event
     SvgGridTemplate.addEventListener("click", function (event) {
@@ -474,23 +510,100 @@ function initTableView(dbName) {
         deletionPopUpMessage("tableViewPage", realTbNameForDel, TbSvgForRemove, dbName);
     };
 
-    CloseCross2.addEventListener("click", () => {
+    CloseCross2.onclick = () => {
         fromDisplay2.style.display = "none";
         SvgGridTemplate.removeAttribute("style");
+    };
+
+    tableNameInput.addEventListener("change", () => {
+        const tableName = tableNameInput.value.trim();
+        if (!/^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/.test(tableName)) {
+            console.log("Invalid table name");
+            return;
+        }
     });
 
-    dataType.addEventListener("click", function (event) {
-        // setTimeout(() => {
-        //     selectedOption.style.opacity = "1";
-        // }, 1000);
-        // setTimeout(() => {
-        //     selectedOption.style.width = "7.52rem";
-        // }, 2000);
-        // setTimeout(() => {
-        //     selectedOption.style.height = "18.3rem";
-        // }, 3000);
+    rowContainer.addEventListener("click", function (event) {
+        btn = event.target.closest(".dataType");
+        if (!btn) return;
+
+        selectedOption = btn.querySelector(".selectedOption");
         selectedOption.style.opacity = "1";
-        selectedOption.style.width = "7.52rem"; //105.600px
+        selectedOption.style.width = "7rem";
         selectedOption.style.height = "18.3rem";
+    });
+
+    OptionSelection(selectedOption);
+
+    AddRow.addEventListener("click", () => {
+        rowCount++;
+        const newRow = document.createElement("div");
+        newRow.classList.add("row");
+        newRow.innerHTML = `
+            <div class="columnNameInputDiv">
+                        <input type="text" class="columnName" name="columnName" placeholder="Enter Column Name" required />
+                    </div>
+
+                    <button type="button" class="dataType">
+                        <p class="selectedDataType">Select Data Type</p>
+                        <ul class="selectedOption">
+                            <li>INT</li>
+                            <li>BIGINT</li>
+                            <li>DECIMAL</li>
+                            <li>FLOAT</li>
+                            <li>DOUBLE</li>
+                            <li>VARCHAR</li>
+                            <li>CHAR</li>
+                            <li>TEXT</li>
+                            <li>DATE</li>
+                            <li>DATETIME</li>
+                            <li>TIMESTAMP</li>
+                            <li>BOOLEAN</li>
+                        </ul>
+                    </button>
+
+                    <input type="checkbox" id="pk${rowCount}" hidden />
+                    <label for="pk${rowCount}" class="btn">Primary Key</label>
+
+                    <input type="checkbox" id="nn${rowCount}" hidden />
+                    <label for="nn${rowCount}" class="btn">Not Null</label>
+
+                    <input type="checkbox" id="uq${rowCount}" hidden />
+                    <label for="uq${rowCount}" class="btn">Unique</label>
+
+                    <input type="checkbox" id="us${rowCount}" hidden />
+                    <label for="us${rowCount}" class="btn">Unsigned</label>
+
+                    <input type="checkbox" id="ai${rowCount}" hidden />
+                    <label for="ai${rowCount}" class="btn">Auto Increment</label>
+
+                    <div class="defaultValueDiv">
+                        <input type="text" class="expression" name="expression" placeholder="Enter Default Value" />
+                    </div>
+        `;
+        rowContainer.appendChild(newRow);
+        OptionSelection(selectedOption);
+    });
+
+    RemoveRow.addEventListener("click", () => {
+        if (rowCount <= 0) {
+            console.log("at least have 1 row");
+            return;
+        }       
+
+        let lastRow = rowContainer.lastChild;
+        rowContainer.removeChild(lastRow);
+        rowCount--;
+        OptionSelection(selectedOption);
+    });
+
+    resetBtn.addEventListener("click", () => {
+        let selectedDataTypeList = document.querySelectorAll(".selectedDataType");
+        
+        selectedDataTypeList.forEach((selectedDT) => {
+            selectedDT.innerText = "Select Data Type";
+            selectedOption.removeAttribute("style");
+            OptionSelection(selectedOption);
+        });
     });
 }

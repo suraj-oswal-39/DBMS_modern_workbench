@@ -1,42 +1,45 @@
-<div class="searchBar">
-    <input type="text" placeholder="Search…" id="svgSearchInput" autocomplete="off" />
-</div>
-<div class="SvgGridTemplate">
-    <div class="SvgBlock">
-        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" pointer-events="all" class="addSvg">
+<body>
+    <div class="searchBar">
+        <input type="text" placeholder="Search…" id="svgSearchInput" autocomplete="off" />
+    </div>
+    <div class="SvgGridTemplate">
+        <div class="SvgBlock">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" pointer-events="all"
+                class="addSvg">
+                <defs>
+                    <linearGradient id="addSvgGrow" x1="100%" y1="100%" x2="0%" y2="0%">
+                        <stop offset="0%" class="red" />
+                        <stop offset="100%" class="yellow" />
+                    </linearGradient>
+                </defs>
+                <g>
+                    <path d="M 3.75 5 C 3.75 9 20.25 9 20.25 5" fill="none" stroke="url(#addSvgGrow)"
+                        stroke-miterlimit="10" />
+                    <path d="M 3.75 5 C 3.75 -0.33 20.25 -0.33 20.25 5 L 20.25 19 C 20.25 24.33 3.75 24.33 3.75 19 Z"
+                        fill="none" stroke="url(#addSvgGrow)" stroke-miterlimit="10" />
+                    <path
+                        d="M 8 13.2 L 11.2 13.2 L 11.2 10 L 12.8 10 L 12.8 13.2 L 16 13.2 L 16 14.8 L 12.8 14.8 L 12.8 18 L 11.2 18 L 11.2 14.8 L 8 14.8 Z"
+                        fill="url(#addSvgGrow)" stroke="none" />
+                </g>
+            </svg>
+            <div class="tooltip">Create database</div>
+        </div>
+    </div>
+    <div class="fromDisplay">
+        <form id="NameInput">
+            <input type="text" id="nameInput" name="name" placeholder="Enter Database Name">
+        </form>
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="24px" height="24px" viewBox="0 0 24 24"
+            pointer-events="all" class="CloseCross">
             <defs>
-                <linearGradient id="addSvgGrow" x1="100%" y1="100%" x2="0%" y2="0%">
+                <linearGradient id="CloseSvgGrow" x1="100%" y1="100%" x2="0%" y2="0%">
                     <stop offset="0%" class="red" />
                     <stop offset="100%" class="yellow" />
                 </linearGradient>
             </defs>
-            <g>
-                <path d="M 3.75 5 C 3.75 9 20.25 9 20.25 5" fill="none" stroke="url(#addSvgGrow)"
-                    stroke-miterlimit="10" />
-                <path d="M 3.75 5 C 3.75 -0.33 20.25 -0.33 20.25 5 L 20.25 19 C 20.25 24.33 3.75 24.33 3.75 19 Z"
-                    fill="none" stroke="url(#addSvgGrow)" stroke-miterlimit="10" />
-                <path
-                    d="M 8 13.2 L 11.2 13.2 L 11.2 10 L 12.8 10 L 12.8 13.2 L 16 13.2 L 16 14.8 L 12.8 14.8 L 12.8 18 L 11.2 18 L 11.2 14.8 L 8 14.8 Z"
-                    fill="url(#addSvgGrow)" stroke="none" />
-            </g>
+            <path
+                d="M 0 9.6 L 9.6 9.6 L 9.6 0 L 14.4 0 L 14.4 9.6 L 24 9.6 L 24 14.4 L 14.4 14.4 L 14.4 24 L 9.6 24 L 9.6 14.4 L 0 14.4 Z"
+                fill="url(#CloseSvgGrow)" stroke="none" />
         </svg>
-        <div class="tooltip">Create database</div>
     </div>
-</div>
-<div class="fromDisplay">
-    <form id="NameInput">
-        <input type="text" id="nameInput" name="name" placeholder="Enter Database Name">
-    </form>
-    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="24px" height="24px" viewBox="0 0 24 24"
-        pointer-events="all" class="CloseCross">
-        <defs>
-            <linearGradient id="CloseSvgGrow" x1="100%" y1="100%" x2="0%" y2="0%">
-                <stop offset="0%" class="red" />
-                <stop offset="100%" class="yellow" />
-            </linearGradient>
-        </defs>
-        <path
-            d="M 0 9.6 L 9.6 9.6 L 9.6 0 L 14.4 0 L 14.4 9.6 L 24 9.6 L 24 14.4 L 14.4 14.4 L 14.4 24 L 9.6 24 L 9.6 14.4 L 0 14.4 Z"
-            fill="url(#CloseSvgGrow)" stroke="none" />
-    </svg>
-</div>
+</body>
