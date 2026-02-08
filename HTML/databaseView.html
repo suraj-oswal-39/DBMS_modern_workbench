@@ -1,7 +1,16 @@
 <body>
-    <div class="searchBar">
-        <input type="text" placeholder="Search…" id="svgSearchInput" autocomplete="off" />
-    </div>
+    <header>
+        <p class="appTitle">DBMS Workbench</p>
+
+        <div class="searchBar">
+            <input type="text" placeholder="Search…" id="svgSearchInput" autocomplete="off" />
+        </div>
+
+        <div class="SqlQuery">
+            <p class="runQuery">Query</p>
+        </div>
+    </header>
+    
     <div class="SvgGridTemplate">
         <div class="SvgBlock">
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" pointer-events="all"
@@ -22,7 +31,7 @@
                         fill="url(#addSvgGrow)" stroke="none" />
                 </g>
             </svg>
-            <div class="tooltip">Create database</div>
+            <p class="tooltip">Create database</p>
         </div>
     </div>
     <div class="fromDisplay">

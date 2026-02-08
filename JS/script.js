@@ -98,7 +98,7 @@ function fetchDatabases(SvgGridTemplate) {
                 </g>
             </svg>
             <div class="tooltipWrapper">
-                <div class="tooltip">${db.Database}</div>
+                <p class="tooltip">${db.Database}</p>
                 <div class="deleteSvg">
                     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="24px" height="24px" viewBox="0 0 24 24"
                         pointer-events="all" id="${db.Database}Delete">
@@ -220,7 +220,7 @@ function fetchTables(SvgGridTemplate, svgId) {
                             stroke="url(#${TableName}SvgGrow)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     <div class="tooltipWrapper">
-                        <div class="tooltip">${TableName}</div>
+                        <p class="tooltip">${TableName}</p>
                         <div class="deleteSvg">
                             <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="24px" height="24px" viewBox="0 0 24 24"
                                 pointer-events="all" id="${TableName}Delete">
@@ -458,8 +458,8 @@ function ruleChecker() {
         names.push(name);  
     });
 
-    let selectedDataType = document.querySelectorAll(".selectedDataType");
     // Rule B3: Data type is mandatory
+    let selectedDataType = document.querySelectorAll(".selectedDataType");
     selectedDataType.forEach((dataType) => {
         if (dataType.innerText === "Select Data Type") {
             alert("you must select data type");
@@ -482,6 +482,13 @@ function ruleChecker() {
     // Not Allowed: VARCHAR, TEXT, DATE, BOOLEAN
 
     // Rule D2: "DEFAULT" "NULL" allowed only if not "NOT NULL"
+}
+
+function runQueryDirectly() {
+    const runQuery = document.querySelector(".runQuery");
+    runQuery.addEventListener("click", () => {
+        
+    });
 }
 
 function initTableView(dbName) {

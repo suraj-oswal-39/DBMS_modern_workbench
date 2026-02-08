@@ -43,7 +43,7 @@ img {
         linear-gradient(145deg, #060000, #060000) border-box;
     border: 0.3rem solid transparent;
     border-radius: 1rem;
-    padding: 0.5em;
+    padding: 0.5rem;
 }
 
 .addSvg:hover {
@@ -74,7 +74,7 @@ img {
         linear-gradient(145deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
-    padding: 0.5em;
+    padding: 0.5rem;
     font-size: 0.7rem;
     opacity: 0;
     transition: opacity 0.2s linear 0.5s;
@@ -162,15 +162,26 @@ input:-webkit-autofill:active {
     transition: opacity 0.2s linear 0.5s;
 }
 
-.searchBar {
+.appTitle {
+    width: 100%;
+    padding-left: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+header {
     width: 100%;
     margin: 1.3rem 0;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
+}
+
+.searchBar {
+    width: 100%;
 }
 
 .searchBar input {
-    width: 60%;
+    width: 100%;
     max-width: 400px;
     padding: 0.6em 1em;
     border-radius: 1rem;
@@ -200,12 +211,40 @@ input::placeholder {
         "btn1 btn2";
     place-items: center;
     width: 25%;
-    background: linear-gradient(#060000, #060000) padding-box, linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    background: 
+        linear-gradient(#060000, #060000) padding-box, 
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     position: absolute;
     left: 37vw;
     top: 24vh;
+}
+
+.popUpQueryWindow {
+    display: grid;
+    grid-template-rows: 1fr 0.3fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "queryBox queryBox"
+        "btn1 btn2";
+    place-items: center;
+    width: 25%;
+    background: 
+        linear-gradient(#060000, #060000) padding-box, 
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    position: absolute;
+    left: 37vw;
+    top: 24vh;
+}
+
+.query {
+    grid-area: queryBox;
+    padding: 2em;
+    font-size: 0.8rem;
+    background-color: #060000;
 }
 
 .message {
@@ -214,7 +253,62 @@ input::placeholder {
     font-size: 0.8rem;
 }
 
+.message {
+    /* font-style: ;
+    font-variant-ligatures: ;
+    font-variant-caps: ;
+    font-variant-numeric: ;
+    font-variant-east-asian: ;
+    font-variant-alternates: ;
+    font-variant-position: ;
+    font-variant-emoji: ;
+    font-weight: ;
+    font-stretch: ;
+    font-size: ;
+    font-family: monospace;
+    font-optical-sizing: ;
+    font-size-adjust: ;
+    font-kerning: ;
+    font-feature-settings: ;
+    font-variation-settings: ;
+    font-language-override: ; */
+    text-rendering: auto;
+    color: fieldtext;
+    letter-spacing: normal;
+    word-spacing: normal;
+    line-height: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: start;
+    appearance: auto;
+    -webkit-rtl-ordering: logical;
+    resize: -internal-textarea-auto;
+    cursor: text;
+    overflow-wrap: break-word;
+    background-color: field;
+    column-count: initial !important;
+    margin: 0em 0em 0em 0em;
+    border-width: 1px;
+    border-style: solid;
+    border-color: light-dark(rgb(118, 118, 118), rgb(133, 133, 133));
+    border-image: initial;
+    padding: 2px;
+    white-space: pre-wrap;
+}
+
 .no {
+    background-color: #060000;
+    grid-area: btn1;
+    outline: none;
+    border: none;
+    width: 100%;
+    height: 3rem;
+    border-bottom-left-radius: 1rem;
+}
+
+.cancel {
     background-color: #060000;
     grid-area: btn1;
     outline: none;
@@ -234,7 +328,22 @@ input::placeholder {
     border-bottom-right-radius: 1rem;
 }
 
+.execute {
+    background-color: #060000;
+    grid-area: btn2;
+    outline: none;
+    border: none;
+    width: 100%;
+    height: 3rem;
+    border-bottom-right-radius: 1rem;
+}
+
 .no:hover, .yes:hover {
+    background-color: #181818;
+    font-size: 1.1rem;
+}
+
+.cancel:hover, .execute:hover {
     background-color: #181818;
     font-size: 1.1rem;
 }
@@ -334,7 +443,7 @@ input::placeholder {
         linear-gradient(#101010, #101010) padding-box, 
         linear-gradient(145deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
-    border-radius: 0.5em;
+    border-radius: 0.5rem;
     font-size: 0.8rem;
     /* width: auto; */
     width: 0rem;
@@ -497,3 +606,23 @@ input[type="checkbox"]:not(:checked) + label.btn {
     border-color: #202020;
 }
 
+.SqlQuery {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 3rem;
+}
+
+.runQuery {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background:
+        linear-gradient(#080808, #101010) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    padding: 0.5rem;
+    font-size: 0.7rem;
+    width: 3rem;
+}
