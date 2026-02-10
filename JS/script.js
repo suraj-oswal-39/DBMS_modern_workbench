@@ -543,6 +543,9 @@ function initTableView(dbName) {
     let rowCount = 0;
     const RemoveRow = document.querySelector("#RemoveRow");
     const resetBtn = document.querySelector("#resetBtn");
+    const DBTableTitle = document.querySelector(".DBTabletTitle");
+    let capitalizedDBName = dbName.charAt(0).toUpperCase() + dbName.slice(1);
+    DBTableTitle.textContent = `${capitalizedDBName} database tables`;
 
     message.textContent = "Are you sure you want to permanently delete this table? This will remove all data in the table and cannot be undone.";
 

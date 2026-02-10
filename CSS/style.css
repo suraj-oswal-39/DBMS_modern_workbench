@@ -18,7 +18,11 @@ hr {
         linear-gradient(145deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
-    margin: 2rem 3rem;
+    margin: 1rem 3rem;
+}
+
+h3 {
+    margin: 0 3rem;
 }
 
 .SvgGridTemplate {
@@ -172,15 +176,14 @@ input:-webkit-autofill:active {
     transition: opacity 0.2s linear 0.5s;
 }
 
-.appTitle {
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
 header {
     margin: 1.3rem 1rem;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+}
+
+h2 {
+    align-self: center;
 }
 
 .searchBar {
@@ -266,8 +269,6 @@ input::placeholder {
     position: absolute;
     left: 26vw;
     top: 12vh;
-    /* transition: opacity 0.2s ease-in-out;
-    opacity: 0; */
 }
 
 .queryBox {
