@@ -40,6 +40,7 @@ function enableSvgSearch(containerSelector) {
         });
     });
 }
+
 function fetchDatabases(SvgGridTemplate) {
     fetch("http://localhost:8080/databases", {
         method: "GET",
@@ -137,6 +138,7 @@ function fetchDatabases(SvgGridTemplate) {
         )
         .catch(err => console.log(err.message));
 }
+
 function createDatabases(newDBname) {
     fetch("http://localhost:8080/create-database", {
         method: "POST",
@@ -146,11 +148,11 @@ function createDatabases(newDBname) {
         .then(res => res.json())
         .then(data => {
             console.log(data.message);
-            // reloadPage();
             location.reload();
         })
         .catch(err => console.log(err));
 }
+
 function deleteDatabases(dbNameForDel, dbSvgForRemove) {
     fetch("http://localhost:8080/delete-database", {
         method: "POST",
@@ -164,6 +166,7 @@ function deleteDatabases(dbNameForDel, dbSvgForRemove) {
         })
         .catch(err => console.log(err));
 }
+
 function fetchTables(SvgGridTemplate, svgId) {
     if (!svgId) {
         console.log("No database selected");
@@ -256,6 +259,7 @@ function fetchTables(SvgGridTemplate, svgId) {
         })
         .catch(err => console.log(err.message));
 }
+
 function deleteTables(realTbNameForDel, TbSvgForRemove, dbName) {
     console.log("Deleting table:", realTbNameForDel, "from database:", dbName);
 
@@ -274,12 +278,118 @@ function deleteTables(realTbNameForDel, TbSvgForRemove, dbName) {
         })
         .catch(err => console.log(err.message));
 }
+
 function deletionPopUpMessage(containerSelector, NameForDel, SvgForRemove, dbName) {
     if (containerSelector === "databaseViewPage") {
         deleteDatabases(NameForDel, SvgForRemove);
     } else if (containerSelector === "tableViewPage") {
         deleteTables(NameForDel, SvgForRemove, dbName);
     }
+}
+
+function OptionSelection(selectedOption) {
+    const optionList = document.querySelectorAll(".selectedOption li");
+    optionList.forEach((option) => {
+        option.addEventListener("click", (event) => {
+            event.stopPropagation();
+
+            const dataTypeBtn = option.closest(".dataType");
+            const dt = dataTypeBtn.querySelector(".selectedDataType");
+            const selectedOption = dataTypeBtn.querySelector(".selectedOption");
+
+            dt.innerText = option.innerText;
+            selectedOption.removeAttribute("style");
+        });
+    });
+}
+
+function ruleChecker() {
+    // Rule A2: Table name must be valid
+    const tableNameInput = document.querySelector("#tableNameInput");
+    tableNameInput.addEventListener("change", () => {
+        const tableName = tableNameInput.value.trim();
+        if (!/^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/.test(tableName)) {
+            console.log("Invalid table name");
+            return;
+        }
+    });
+
+    let columnNames = document.querySelectorAll(".columnName");
+    let names = [];
+    columnNames.forEach((columnName) => {
+        // Rule B1: Column name is mandatory
+        if (columnName.value === "") {
+            alert("Column name is mandatory");
+            return;
+        }
+        // Rule B2: Column names must be unique
+        const name = columnName.value.trim();
+        if (names.includes(name)) {
+            alert("Duplicate column name");
+            names = [];
+            columnName.value = "";
+            return;
+        }
+        names.push(name);  
+    });
+
+    // Rule B3: Data type is mandatory
+    let selectedDataType = document.querySelectorAll(".selectedDataType");
+    selectedDataType.forEach((dataType) => {
+        if (dataType.innerText === "Select Data Type") {
+            alert("you must select data type");
+            return;
+        }
+    });
+
+    // Rule C1: AUTO_INCREMENT MUST be with PRIMARY KEY
+
+    // Rule C3: DEFAULT is NOT allowed with AUTO_INCREMENT
+
+    // Rule C4: BOOLEAN cannot be UNSIGNED
+
+    // Rule C5: PRIMARY KEY implies NOT NULL
+
+    // Rule C6: UNSIGNED allowed only for numeric types
+
+    // Rule D1: DEFAULT must match data type 
+    // Allowed : INT, BIGINT, SMALLINT, TINY_INT, DECIMAL, FLOAT / DOUBLE
+    // Not Allowed: VARCHAR, TEXT, DATE, BOOLEAN
+
+    // Rule D2: "DEFAULT" "NULL" allowed only if not "NOT NULL"
+}
+
+async function executeQuery() {
+    const query = document.querySelector(".queryBox").value;
+    alert(query);
+    const response = await fetch("http://localhost:8080/execute", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ query })
+    });
+
+    const data = await response.json();
+
+    alert(JSON.stringify(data, null, 2));
+}
+
+function queryRunner() {
+    const popUpQueryWindow = document.querySelector(".popUpQueryWindow");
+    const SqlQuery = document.querySelector(".SqlQuery");
+    SqlQuery.onclick = () => {
+        popUpQueryWindow.style.display = "grid";
+    };
+    const cancelBtn = document.querySelector(".cancel");
+    cancelBtn.onclick = () => {
+        popUpQueryWindow.style.display = "none";
+    };
+
+    const executeBtn = document.querySelector(".execute");
+    executeBtn.onclick = () => {
+        executeQuery();
+    };
 }
 
 function initDatabaseView($location, $rootScope) {
@@ -410,85 +520,8 @@ function initDatabaseView($location, $rootScope) {
         SvgGridTemplate.removeAttribute("style");
         popUpWindow.removeAttribute("style");
     };
-}
 
-function OptionSelection(selectedOption) {
-    const optionList = document.querySelectorAll(".selectedOption li");
-    optionList.forEach((option) => {
-        option.addEventListener("click", (event) => {
-            event.stopPropagation();
-
-            const dataTypeBtn = option.closest(".dataType");
-            const dt = dataTypeBtn.querySelector(".selectedDataType");
-            const selectedOption = dataTypeBtn.querySelector(".selectedOption");
-
-            dt.innerText = option.innerText;
-            selectedOption.removeAttribute("style");
-        });
-    });
-}
-
-function ruleChecker() {
-    // Rule A2: Table name must be valid
-    const tableNameInput = document.querySelector("#tableNameInput");
-    tableNameInput.addEventListener("change", () => {
-        const tableName = tableNameInput.value.trim();
-        if (!/^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/.test(tableName)) {
-            console.log("Invalid table name");
-            return;
-        }
-    });
-
-    let columnNames = document.querySelectorAll(".columnName");
-    let names = [];
-    columnNames.forEach((columnName) => {
-        // Rule B1: Column name is mandatory
-        if (columnName.value === "") {
-            alert("Column name is mandatory");
-            return;
-        }
-        // Rule B2: Column names must be unique
-        const name = columnName.value.trim();
-        if (names.includes(name)) {
-            alert("Duplicate column name");
-            names = [];
-            columnName.value = "";
-            return;
-        }
-        names.push(name);  
-    });
-
-    // Rule B3: Data type is mandatory
-    let selectedDataType = document.querySelectorAll(".selectedDataType");
-    selectedDataType.forEach((dataType) => {
-        if (dataType.innerText === "Select Data Type") {
-            alert("you must select data type");
-            return;
-        }
-    });
-
-    // Rule C1: AUTO_INCREMENT MUST be with PRIMARY KEY
-
-    // Rule C3: DEFAULT is NOT allowed with AUTO_INCREMENT
-
-    // Rule C4: BOOLEAN cannot be UNSIGNED
-
-    // Rule C5: PRIMARY KEY implies NOT NULL
-
-    // Rule C6: UNSIGNED allowed only for numeric types
-
-    // Rule D1: DEFAULT must match data type 
-    // Allowed : INT, BIGINT, SMALLINT, TINY_INT, DECIMAL, FLOAT / DOUBLE
-    // Not Allowed: VARCHAR, TEXT, DATE, BOOLEAN
-
-    // Rule D2: "DEFAULT" "NULL" allowed only if not "NOT NULL"
-}
-
-function runQueryDirectly() {
-    const runQuery = document.querySelector(".runQuery");
-    runQuery.addEventListener("click", () => {
-        
-    });
+    queryRunner();
 }
 
 function initTableView(dbName) {
@@ -558,6 +591,7 @@ function initTableView(dbName) {
         popUpWindow.removeAttribute("style");
         deletionPopUpMessage("tableViewPage", realTbNameForDel, TbSvgForRemove, dbName);
     };
+
 
     CloseCross2.onclick = () => {
         fromDisplay2.style.display = "none";
@@ -656,4 +690,6 @@ function initTableView(dbName) {
     createBtn.addEventListener("click", () => {
         ruleChecker();
     });
+
+    queryRunner();
 }

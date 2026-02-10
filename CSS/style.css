@@ -12,13 +12,21 @@ body {
     overflow-x: hidden;
 }
 
+hr {
+    background:
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    margin: 2rem 3rem;
+}
+
 .SvgGridTemplate {
     display: grid;
     grid-template-rows: repeat(auto-fit, minmax(125px, 1fr));
     grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
     place-items: center;
-    margin: 2em;
-    transition: all 0.5s linear;
+    margin: 1rem 2rem;
 }
 
 img {
@@ -80,7 +88,8 @@ img {
     transition: opacity 0.2s linear 0.5s;
 }
 
-.SvgBlock:hover .tooltip, .SvgBlock:hover .deleteSvg {
+.SvgBlock:hover .tooltip,
+.SvgBlock:hover .deleteSvg {
     opacity: 1;
 }
 
@@ -150,8 +159,9 @@ input:-webkit-autofill:active {
 }
 
 .tooltipWrapper {
-    display: flex;
     position: sticky;
+    display: flex;
+    align-items: center;
     column-gap: 1rem;
     z-index: 1;
 }
@@ -163,17 +173,14 @@ input:-webkit-autofill:active {
 }
 
 .appTitle {
-    width: 100%;
-    padding-left: 1rem;
     font-weight: bold;
     font-size: 1.2rem;
 }
 
 header {
-    width: 100%;
-    margin: 1.3rem 0;
-    display: flex;
-    justify-content: space-around;
+    margin: 1.3rem 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
 }
 
 .searchBar {
@@ -181,9 +188,8 @@ header {
 }
 
 .searchBar input {
-    width: 100%;
-    max-width: 400px;
-    padding: 0.6em 1em;
+    width: 92%;
+    padding: 0.6rem 1em;
     border-radius: 1rem;
     border: 0.2rem solid #303030;
     background-color: #060000;
@@ -202,6 +208,27 @@ input::placeholder {
     border: 0.2rem solid transparent;
 }
 
+.SqlQuery {
+    width: auto;
+    display: flex;
+    justify-content: flex-end;
+    cursor: default;
+}
+
+.runQuery {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background:
+        linear-gradient(#080808, #101010) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    padding: 0.5rem;
+    font-size: 0.7rem;
+    width: 3rem;
+}
+
 .popUpWindow {
     display: none;
     grid-template-rows: 1fr 0.3fr;
@@ -211,8 +238,8 @@ input::placeholder {
         "btn1 btn2";
     place-items: center;
     width: 25%;
-    background: 
-        linear-gradient(#060000, #060000) padding-box, 
+    background:
+        linear-gradient(#060000, #060000) padding-box,
         linear-gradient(145deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
@@ -222,80 +249,44 @@ input::placeholder {
 }
 
 .popUpQueryWindow {
-    display: grid;
+    width: auto;
+    height: 24rem;
+    display: none;
     grid-template-rows: 1fr 0.3fr;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
         "queryBox queryBox"
         "btn1 btn2";
     place-items: center;
-    width: 25%;
-    background: 
-        linear-gradient(#060000, #060000) padding-box, 
+    background:
+        linear-gradient(#060000, #060000) padding-box,
         linear-gradient(145deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     position: absolute;
-    left: 37vw;
-    top: 24vh;
+    left: 26vw;
+    top: 12vh;
+    /* transition: opacity 0.2s ease-in-out;
+    opacity: 0; */
 }
 
-.query {
+.queryBox {
     grid-area: queryBox;
     padding: 2em;
     font-size: 0.8rem;
     background-color: #060000;
+    width: 32rem;
+    height: 17.7rem;
+    border-radius: 1rem;
+    outline: none;
+    border: none;
+    resize: none;
 }
 
 .message {
     grid-area: meg;
     padding: 2em;
     font-size: 0.8rem;
-}
-
-.message {
-    /* font-style: ;
-    font-variant-ligatures: ;
-    font-variant-caps: ;
-    font-variant-numeric: ;
-    font-variant-east-asian: ;
-    font-variant-alternates: ;
-    font-variant-position: ;
-    font-variant-emoji: ;
-    font-weight: ;
-    font-stretch: ;
-    font-size: ;
-    font-family: monospace;
-    font-optical-sizing: ;
-    font-size-adjust: ;
-    font-kerning: ;
-    font-feature-settings: ;
-    font-variation-settings: ;
-    font-language-override: ; */
-    text-rendering: auto;
-    color: fieldtext;
-    letter-spacing: normal;
-    word-spacing: normal;
-    line-height: normal;
-    text-transform: none;
-    text-indent: 0px;
-    text-shadow: none;
-    display: inline-block;
-    text-align: start;
-    appearance: auto;
-    -webkit-rtl-ordering: logical;
-    resize: -internal-textarea-auto;
-    cursor: text;
-    overflow-wrap: break-word;
-    background-color: field;
-    column-count: initial !important;
-    margin: 0em 0em 0em 0em;
-    border-width: 1px;
-    border-style: solid;
-    border-color: light-dark(rgb(118, 118, 118), rgb(133, 133, 133));
-    border-image: initial;
-    padding: 2px;
-    white-space: pre-wrap;
 }
 
 .no {
@@ -338,12 +329,14 @@ input::placeholder {
     border-bottom-right-radius: 1rem;
 }
 
-.no:hover, .yes:hover {
+.no:hover,
+.yes:hover {
     background-color: #181818;
     font-size: 1.1rem;
 }
 
-.cancel:hover, .execute:hover {
+.cancel:hover,
+.execute:hover {
     background-color: #181818;
     font-size: 1.1rem;
 }
@@ -385,7 +378,6 @@ input::placeholder {
     width: 2rem;
     height: 2rem;
     opacity: 1;
-    /* transition: opacity 1s linear 1s; */
 }
 
 .CloseCross2 .red {
@@ -440,7 +432,7 @@ input::placeholder {
     align-items: center;
     list-style-type: none;
     background:
-        linear-gradient(#101010, #101010) padding-box, 
+        linear-gradient(#101010, #101010) padding-box,
         linear-gradient(145deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 0.5rem;
@@ -452,7 +444,7 @@ input::placeholder {
     /* opacity: 1; */
     opacity: 0;
     overflow: hidden;
-    transition:  
+    transition:
         width 0.2s linear 0.2s,
         height 0.2s linear 0.4s;
     z-index: 999;
@@ -479,11 +471,13 @@ li[value="BOOLEAN"]:hover {
     border-bottom-right-radius: 0.2rem;
 }
 
-.columnNameInputDiv, .defaultValueDiv {
+.columnNameInputDiv,
+.defaultValueDiv {
     width: 15.2rem;
 }
 
-.columnName, .expression {
+.columnName,
+.expression {
     background-color: #202020;
     color: white;
     caret-color: white;
@@ -511,21 +505,25 @@ li[value="BOOLEAN"]:hover {
     width: -webkit-fill-available;
 }
 
-.columnName:hover, #tableNameInput:hover, .expression:hover {
-    border-color:#ffff00;
+.columnName:hover,
+#tableNameInput:hover,
+.expression:hover {
+    border-color: #ffff00;
 }
 
-.columnName:active, #tableNameInput:active, .expression:active {
-    border-color:#202020;
+.columnName:active,
+#tableNameInput:active,
+.expression:active {
+    border-color: #202020;
 }
 
-.columnName:-webkit-autofill, 
+.columnName:-webkit-autofill,
 #tableNameInput:-webkit-autofill,
 .expression:-webkit-autofill,
-.columnName:-webkit-autofill:focus, 
+.columnName:-webkit-autofill:focus,
 #tableNameInput:-webkit-autofill:focus,
 .expression:-webkit-autofill:focus,
-.columnName:-webkit-autofill:active, 
+.columnName:-webkit-autofill:active,
 #tableNameInput:-webkit-autofill:active,
 .expression:-webkit-autofill:active {
     -webkit-box-shadow: inset 0 0 0 1000px #202020;
@@ -552,13 +550,13 @@ li[value="BOOLEAN"]:hover {
 
 /* Rule E1: Only one PRIMARY KEY per table*/
 /* Rule C2: Only ONE AUTO_INCREMENT column per table */
-input[type="checkbox"]:checked + label.btn,
-input[type="radio"]:checked + label.Pk,
-input[type="radio"]:checked + label.Ai {
+input[type="checkbox"]:checked+label.btn,
+input[type="radio"]:checked+label.Pk,
+input[type="radio"]:checked+label.Ai {
     border: 0.2rem solid #ffff00;
 }
 
-input[type="checkbox"]:not(:checked) + label.btn {
+input[type="checkbox"]:not(:checked)+label.btn {
     border: 0.2rem solid #202020;
 }
 
@@ -567,18 +565,21 @@ input[type="checkbox"]:not(:checked) + label.btn {
     width: 100%;
 }
 
-#AddRow, #RemoveRow {
+#AddRow,
+#RemoveRow {
     width: 50%;
     background-color: #101010;
     border: 0.2rem solid #202020;
     font-size: 2rem;
 }
 
-#AddRow:hover, #RemoveRow:hover {
+#AddRow:hover,
+#RemoveRow:hover {
     border-color: #ffff00;
 }
 
-#AddRow:active, #RemoveRow:active {
+#AddRow:active,
+#RemoveRow:active {
     border-color: #202020;
 }
 
@@ -590,7 +591,8 @@ input[type="checkbox"]:not(:checked) + label.btn {
     column-gap: 0.7rem;
 }
 
-#resetBtn, #createBtn {
+#resetBtn,
+#createBtn {
     background-color: #101010;
     border: 0.2rem solid #202020;
     padding: 0.5rem;
@@ -598,31 +600,12 @@ input[type="checkbox"]:not(:checked) + label.btn {
     border-radius: 0.5rem;
 }
 
-#resetBtn:hover, #createBtn:hover {
+#resetBtn:hover,
+#createBtn:hover {
     border-color: #ffff00;
 }
 
-#resetBtn:active, #createBtn:active {
+#resetBtn:active,
+#createBtn:active {
     border-color: #202020;
-}
-
-.SqlQuery {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 3rem;
-}
-
-.runQuery {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background:
-        linear-gradient(#080808, #101010) padding-box,
-        linear-gradient(145deg, #ffff00, #ff0000) border-box;
-    border: 0.2rem solid transparent;
-    border-radius: 1rem;
-    padding: 0.5rem;
-    font-size: 0.7rem;
-    width: 3rem;
 }

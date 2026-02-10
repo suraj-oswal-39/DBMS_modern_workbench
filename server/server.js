@@ -10,6 +10,22 @@ const db = mysql.createConnection({
     password: "suraj3690",
     port: 3306
 });
+
+app.post("/execute", (req, res) => {
+    const query = req.body.query;
+
+    if (!query) {
+        return res.status(400).json({ error: "Query is empty" });
+    }
+
+    db.query(query, (err, result) => {
+        if (err) {
+            return res.json({ error: err.message });
+        }
+        res.json({ result });
+    });
+});
+
 // Delete table
 app.post("/delete-Table", (req, res) => {
     const { TbName, databaseName } = req.body;
