@@ -1,4 +1,0 @@
-C:\VS CODE\My Project\DBMS project>npm init -y
-C:\VS CODE\My Project\DBMS project>npm install express mysql2
-cd "C:\VS CODE\My Project\DBMS project\server"
-node server.js
