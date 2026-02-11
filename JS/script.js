@@ -2,12 +2,25 @@ console.log("JavaScript file is linked successfully.");
 
 let svgId = "";
 
-function removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross) {
+function NoBtn(noBtn, SvgGridTemplate, popUpWindow, headerTag, hrTag, h3Tag) {
+    noBtn.onclick = () => {
+        hrTag.removeAttribute("style");
+        h3Tag.removeAttribute("style");
+        headerTag.removeAttribute("style");
+        SvgGridTemplate.removeAttribute("style");
+        popUpWindow.removeAttribute("style");
+    };
+}
+
+function removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross, headerTag, hrTag, h3Tag) {
     nameInput.value = "";
     addSvg.removeAttribute("style");
     tooltip.removeAttribute("style");
     red.removeAttribute("style");
     yellow.removeAttribute("style");
+    headerTag.removeAttribute("style");
+    hrTag.removeAttribute("style");
+    h3Tag.removeAttribute("style");
     SvgGridTemplate.removeAttribute("style");
     NameInput.removeAttribute("style");
     CloseCross.removeAttribute("style");
@@ -378,15 +391,17 @@ async function executeQuery() {
 function queryRunner() {
     const popUpQueryWindow = document.querySelector(".popUpQueryWindow");
     const SqlQuery = document.querySelector(".SqlQuery");
+    const executeBtn = document.querySelector(".execute");
+    const cancelBtn = document.querySelector(".cancel");
+
     SqlQuery.onclick = () => {
         popUpQueryWindow.style.display = "grid";
     };
-    const cancelBtn = document.querySelector(".cancel");
+
     cancelBtn.onclick = () => {
         popUpQueryWindow.style.display = "none";
     };
 
-    const executeBtn = document.querySelector(".execute");
     executeBtn.onclick = () => {
         executeQuery();
     };
@@ -402,9 +417,12 @@ function initDatabaseView($location, $rootScope) {
     const SvgGridTemplate = document.querySelector(".SvgGridTemplate");
     const CloseCross = document.querySelector(".CloseCross");
     const popUpWindow = document.querySelector(".popUpWindow");
-    const no = document.querySelector(".no");
-    const yes = document.querySelector(".yes");
+    const noBtn = document.querySelector(".no");
+    const yesBtn = document.querySelector(".yes");
     const message = document.querySelector(".message");
+    const headerTag = document.getElementsByTagName("header")[0];
+    const hrTag = document.getElementsByTagName("hr")[0];
+    const h3Tag = document.getElementsByTagName("h3")[0];
 
     message.textContent = "This will permanently delete the selected database. All tables, records, and related data will be removed. This action cannot be undone.";
 
@@ -421,6 +439,9 @@ function initDatabaseView($location, $rootScope) {
         tooltip.style.opacity = "1";
         red.style.stopColor = "#ff0000";
         yellow.style.stopColor = "#ffff00";
+        headerTag.style.filter = "blur(3px)";
+        hrTag.style.filter = "blur(3px)";
+        h3Tag.style.filter = "blur(3px)";
         SvgGridTemplate.style.filter = "blur(3px)";
         NameInput.style.opacity = 1;
         NameInput.style.width = "10rem";
@@ -467,13 +488,13 @@ function initDatabaseView($location, $rootScope) {
 
             newDBname = "";
 
-            removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross);
+            removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross, headerTag, hrTag, h3Tag);
         }
     });
 
     // Close input field on click event
     CloseCross.onclick = () => {
-        removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross);
+        removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross, headerTag, hrTag, h3Tag);
     };
 
     // Delete database on click event
@@ -488,6 +509,9 @@ function initDatabaseView($location, $rootScope) {
         dbNameForDel = dbSvgForRemove.id;
         console.log("Deleted DB:", dbNameForDel);
 
+        headerTag.style.filter = "blur(3px)";
+        hrTag.style.filter = "blur(3px)";
+        h3Tag.style.filter = "blur(3px)";
         SvgGridTemplate.style.filter = "blur(3px)";
         popUpWindow.style.display = "grid";
     });
@@ -510,12 +534,9 @@ function initDatabaseView($location, $rootScope) {
 
     enableSvgSearch(".SvgGridTemplate");
 
-    no.onclick = () => {
-        SvgGridTemplate.removeAttribute("style");
-        popUpWindow.removeAttribute("style");
-    };
+    NoBtn(noBtn, SvgGridTemplate, popUpWindow, headerTag, hrTag, h3Tag)
 
-    yes.onclick = () => {
+    yesBtn.onclick = () => {
         deletionPopUpMessage("databaseViewPage", dbNameForDel, dbSvgForRemove);
         SvgGridTemplate.removeAttribute("style");
         popUpWindow.removeAttribute("style");
@@ -530,8 +551,8 @@ function initTableView(dbName) {
     const SvgGridTemplate = document.querySelector(".SvgGridTemplate");
     const CloseCross2 = document.querySelector(".CloseCross2");
     const popUpWindow = document.querySelector(".popUpWindow");
-    const no = document.querySelector(".no");
-    const yes = document.querySelector(".yes");
+    const noBtn = document.querySelector(".no");
+    const yesBtn = document.querySelector(".yes");
     const message = document.querySelector(".message");
     const fromDisplay2 = document.querySelector(".fromDisplay2");
     const rowContainer = document.querySelector(".rowContainer");
@@ -543,14 +564,19 @@ function initTableView(dbName) {
     let rowCount = 0;
     const RemoveRow = document.querySelector("#RemoveRow");
     const resetBtn = document.querySelector("#resetBtn");
-    const DBTableTitle = document.querySelector(".DBTabletTitle");
+    const h3Tag = document.querySelector(".DBTabletTitle");
+    const headerTag = document.getElementsByTagName("header")[0];
+    const hrTag = document.getElementsByTagName("hr")[0];
     let capitalizedDBName = dbName.charAt(0).toUpperCase() + dbName.slice(1);
-    DBTableTitle.textContent = `${capitalizedDBName} database tables`;
+    h3Tag.textContent = `${capitalizedDBName} database tables`;
 
     message.textContent = "Are you sure you want to permanently delete this table? This will remove all data in the table and cannot be undone.";
 
     // open table creation form on click event
     addSvg.onclick = () => {
+        headerTag.style.filter = "blur(3px)";
+        hrTag.style.filter = "blur(3px)";
+        h3Tag.style.filter = "blur(3px)";
         SvgGridTemplate.style.filter = "blur(3px)";
         fromDisplay2.style.display = "flex";
     };
@@ -584,12 +610,9 @@ function initTableView(dbName) {
 
     enableSvgSearch(".SvgGridTemplate");
 
-    no.onclick = () => {
-        SvgGridTemplate.removeAttribute("style");
-        popUpWindow.removeAttribute("style");
-    };
+    NoBtn(noBtn, SvgGridTemplate, popUpWindow, headerTag, hrTag, h3Tag);
 
-    yes.onclick = () => {
+    yesBtn.onclick = () => {
         SvgGridTemplate.removeAttribute("style");
         popUpWindow.removeAttribute("style");
         deletionPopUpMessage("tableViewPage", realTbNameForDel, TbSvgForRemove, dbName);
@@ -598,6 +621,9 @@ function initTableView(dbName) {
 
     CloseCross2.onclick = () => {
         fromDisplay2.style.display = "none";
+        headerTag.removeAttribute("style");
+        hrTag.removeAttribute("style");
+        h3Tag.removeAttribute("style");
         SvgGridTemplate.removeAttribute("style");
     };
 

@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Database management system</title>
-    <link rel="stylesheet" href="./CSS/style.css">
+    <link rel="stylesheet" href="./CSS/style1.css">
+    <link rel="stylesheet" href="./CSS/style2.css">
+    <link rel="stylesheet" href="./CSS/style3.css">
     <!-- need internet connection -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
@@ -13,17 +15,35 @@
 </head>
 
 <body ng-app="myApp">
-    <div ng-view></div>
+    <header>
+        <h2>DBMS Workbench</h2>
+
+        <div class="searchBar">
+            <input type="text" placeholder="Search…" id="svgSearchInput" autocomplete="off" />
+        </div>
+
+        <div class="SqlQuery">
+            <p class="runQuery">Query</p>
+        </div>
+    </header>
+
+    <hr>
+    <div ng-view class="routingContainer"></div>
+
     <div class="popUpWindow">
         <p class="message"></p>
+        
         <button class="no">No</button>
         <button class="yes">Delete</button>
     </div>
+
     <form class="popUpQueryWindow">
         <textarea class="queryBox" placeholder="Enter your query"></textarea>
+
         <button class="cancel">Cancel</button>
         <button class="execute" type="button">Execute</button>
     </form>
+
     <script src="./JS/script.js"></script>
 </body>
 

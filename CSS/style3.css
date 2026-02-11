@@ -1,0 +1,268 @@
+.fromDisplay2 {
+    display: none;
+    width: 100%;
+    justify-content: center;
+    position: absolute;
+    top: 1vh;
+}
+
+#tableCreation {
+    position: relative;
+    background:
+        linear-gradient(#101010, #101010) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    padding: 0.7em;
+    width: 85vw;
+    height: 85vh;
+    opacity: 1;
+    z-index: 1;
+}
+
+.CloseCross2 {
+    position: absolute;
+    right: 1rem;
+    transform: rotate(45deg);
+    width: 2rem;
+    height: 2rem;
+    opacity: 1;
+}
+
+.CloseCross2 .red {
+    stop-color: #303030;
+}
+
+.CloseCross2 .yellow {
+    stop-color: #303030;
+}
+
+.CloseCross2:hover .red {
+    stop-color: #ff0000;
+}
+
+.CloseCross2:hover .yellow {
+    stop-color: #ffff00;
+}
+
+.formTitle {
+    padding-left: 3em;
+    padding-bottom: 1rem;
+    font-weight: bold;
+}
+
+#tableNameInput {
+    background-color: #202020;
+    color: white;
+    caret-color: white;
+    padding: 0.4rem;
+    border: 0.2rem solid #202020;
+    outline: none;
+    margin-left: 1rem;
+    width: 16rem;
+}
+
+.columnName,
+.expression {
+    background-color: #202020;
+    color: white;
+    caret-color: white;
+    padding: 0.4rem;
+    border: 0.2rem solid #202020;
+    outline: none;
+}
+
+.columnName {
+    width: -webkit-fill-available;
+}
+
+.expression {
+    width: -webkit-fill-available;
+}
+
+.columnName:hover,
+#tableNameInput:hover,
+.expression:hover {
+    border-color: #ffff00;
+}
+
+.columnName:active,
+#tableNameInput:active,
+.expression:active {
+    border-color: #202020;
+}
+
+.columnName:-webkit-autofill,
+#tableNameInput:-webkit-autofill,
+.expression:-webkit-autofill,
+.columnName:-webkit-autofill:focus,
+#tableNameInput:-webkit-autofill:focus,
+.expression:-webkit-autofill:focus,
+.columnName:-webkit-autofill:active,
+#tableNameInput:-webkit-autofill:active,
+.expression:-webkit-autofill:active {
+    -webkit-box-shadow: inset 0 0 0 1000px #202020;
+    -webkit-text-fill-color: white;
+    caret-color: white;
+    outline: none;
+    border: 0.2rem solid #202020;
+}
+
+.columnHeader {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0rem 0.3rem 0rem;
+    width: 84%;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    gap: 0.2rem;
+    padding-bottom: 0.2rem;
+}
+
+.columnNameInputDiv,
+.defaultValueDiv {
+    width: 15.2rem;
+}
+
+.dataType {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #202020;
+    border: 0.2rem solid #202020;
+    cursor: default;
+    padding: 0.4rem;
+    width: 7.53rem;
+}
+
+.dataType:hover {
+    border: 0.2rem solid #ffff00;
+}
+
+.dataType:active {
+    border: 0.2rem solid #202020;
+}
+
+.selectedOption {
+    position: absolute;
+    top: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    list-style-type: none;
+    background:
+        linear-gradient(#101010, #101010) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    /* width: auto; */
+    width: 0rem;
+    /* height: 18.3rem; */
+    height: 0rem;
+    /* opacity: 1; */
+    opacity: 0;
+    overflow: hidden;
+    transition:
+        width 0.2s linear 0.2s,
+        height 0.2s linear 0.4s;
+    z-index: 999;
+}
+
+li {
+    width: 6rem;
+    text-align: center;
+    padding: 0.3rem;
+}
+
+li:hover {
+    background-color: rgb(56, 56, 56);
+    width: 100%;
+}
+
+li[value="INT"]:hover {
+    border-top-left-radius: 0.2rem;
+    border-top-right-radius: 0.2rem;
+}
+
+li[value="BOOLEAN"]:hover {
+    border-bottom-left-radius: 0.2rem;
+    border-bottom-right-radius: 0.2rem;
+}
+
+.btn {
+    background-color: #202020;
+    color: white;
+    border: 0.2rem solid transparent;
+    padding: 0.45rem;
+    font-size: 0.84rem;
+}
+
+/* Rule E1: Only one PRIMARY KEY per table*/
+/* Rule C2: Only ONE AUTO_INCREMENT column per table */
+input[type="checkbox"]:checked+label.btn,
+input[type="radio"]:checked+label.Pk,
+input[type="radio"]:checked+label.Ai {
+    border: 0.2rem solid #ffff00;
+}
+
+input[type="checkbox"]:not(:checked)+label.btn {
+    border: 0.2rem solid #202020;
+}
+
+.AddRemoveRow {
+    display: flex;
+    width: 100%;
+}
+
+#AddRow,
+#RemoveRow {
+    width: 50%;
+    background-color: #101010;
+    border: 0.2rem solid #202020;
+    font-size: 2rem;
+}
+
+#AddRow:hover,
+#RemoveRow:hover {
+    border-color: #ffff00;
+}
+
+#AddRow:active,
+#RemoveRow:active {
+    border-color: #202020;
+}
+
+.formButtons {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    display: flex;
+    column-gap: 0.7rem;
+}
+
+#resetBtn,
+#createBtn {
+    background-color: #101010;
+    border: 0.2rem solid #202020;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+}
+
+#resetBtn:hover,
+#createBtn:hover {
+    border-color: #ffff00;
+}
+
+#resetBtn:active,
+#createBtn:active {
+    border-color: #202020;
+}

@@ -1,19 +1,9 @@
 <body>
-    <header>
-        <h2>DBMS Workbench</h2>
-
-        <div class="searchBar">
-            <input type="text" placeholder="Search…" id="svgSearchInput" autocomplete="off" />
-        </div>
-
-        <div class="SqlQuery">
-            <p class="runQuery">Query</p>
-        </div>
-    </header>
-    <hr>
     <h3>Databases</h3>
+
     <div class="SvgGridTemplate">
         <div class="SvgBlock">
+
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" pointer-events="all"
                 class="addSvg">
                 <defs>
@@ -32,13 +22,18 @@
                         fill="url(#addSvgGrow)" stroke="none" />
                 </g>
             </svg>
+
             <p class="tooltip">Create database</p>
+
         </div>
     </div>
+
     <div class="fromDisplay">
+
         <form id="NameInput">
             <input type="text" id="nameInput" name="name" placeholder="Enter Database Name">
         </form>
+
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="24px" height="24px" viewBox="0 0 24 24"
             pointer-events="all" class="CloseCross">
             <defs>
@@ -51,5 +46,6 @@
                 d="M 0 9.6 L 9.6 9.6 L 9.6 0 L 14.4 0 L 14.4 9.6 L 24 9.6 L 24 14.4 L 14.4 14.4 L 14.4 24 L 9.6 24 L 9.6 14.4 L 0 14.4 Z"
                 fill="url(#CloseSvgGrow)" stroke="none" />
         </svg>
+        
     </div>
 </body>

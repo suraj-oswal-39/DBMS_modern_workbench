@@ -1,0 +1,160 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: poppins, sans-serif;
+    color: white;
+}
+
+body {
+    position: relative;
+    background-color: #060000;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+header {
+    margin: 1.3rem 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+}
+
+h2 {
+    align-self: center;
+}
+
+.searchBar {
+    width: 100%;
+}
+
+.searchBar input {
+    width: 92%;
+    padding: 0.6rem 1em;
+    border-radius: 1rem;
+    border: 0.2rem solid #303030;
+    background-color: #060000;
+    color: white;
+    outline: none;
+}
+
+input::placeholder {
+    color: #888;
+}
+
+.searchBar input:focus {
+    background:
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+}
+
+.SqlQuery {
+    width: auto;
+    display: flex;
+    justify-content: flex-end;
+    cursor: default;
+}
+
+.runQuery {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background:
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    padding: 0.5rem;
+    font-size: 0.7rem;
+    width: 3rem;
+}
+
+hr {
+    background:
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    margin: 1rem 3rem;
+}
+
+.popUpWindow {
+    display: none;
+    grid-template-rows: 1fr 0.3fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "meg meg"
+        "btn1 btn2";
+    place-items: center;
+    width: 25%;
+    background:
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    position: absolute;
+    left: 37vw;
+    top: 24vh;
+}
+
+.message {
+    grid-area: meg;
+    padding: 2em;
+    font-size: 0.8rem;
+}
+
+.no, .yes, .cancel, .execute{
+    background-color: #060000;
+    outline: none;
+    border: none;
+    width: 100%;
+    height: 3rem;
+} 
+
+.no, .cancel {
+    grid-area: btn1;
+    border-bottom-left-radius: 1rem;
+}
+
+.yes, .execute {
+    grid-area: btn2;
+    border-bottom-right-radius: 1rem;
+}
+
+.no:hover, .yes:hover,
+.cancel:hover, .execute:hover {
+    background-color: #181818;
+    font-size: 1.1rem;
+}
+
+.popUpQueryWindow {
+    width: auto;
+    height: 24rem;
+    display: none;
+    grid-template-rows: 1fr 0.3fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "queryBox queryBox"
+        "btn1 btn2";
+    place-items: center;
+    background:
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    position: absolute;
+    left: 26vw;
+    top: 12vh;
+}
+
+.queryBox {
+    grid-area: queryBox;
+    padding: 2em;
+    font-size: 0.8rem;
+    background-color: #060000;
+    width: 32rem;
+    height: 17.7rem;
+    border-radius: 1rem;
+    outline: none;
+    border: none;
+    resize: none;
+}
