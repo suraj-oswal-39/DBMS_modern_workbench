@@ -66,45 +66,13 @@ function fetchDatabases(SvgGridTemplate) {
                 newDBSvg.classList.add("SvgBlock");
                 newDBSvg.setAttribute("id", db.Database);
                 newDBSvg.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" pointer-events="all" id="${db.Database}Svg">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" pointer-events="all" class="addSvg">
 	            <defs>
 	            	<linearGradient id="${db.Database}SvgGrow" x1="100%" y1="100%" x2="0%" y2="0%">
 	            		<stop offset="0%" class="red"/>
 	            		<stop offset="100%" class="yellow"/>
 	            	</linearGradient>
 	            </defs>
-	            <style>
-                    #${db.Database}Svg {
-                        background:
-                            linear-gradient(#060000, #060000) padding-box,
-                            linear-gradient(145deg, #060000, #060000) border-box;
-                        border: 0.3rem solid transparent;
-                        border-radius: 1rem;
-                        padding: 0.5em;
-                    }
-
-                    #${db.Database}Svg:hover {
-                        background:
-                            linear-gradient(#060000, #060000) padding-box,
-                            linear-gradient(145deg, #ffff00, #ff0000) border-box;
-                    }
-
-	            	#${db.Database}Svg .red {
-	            		stop-color: #303030;
-	            	}
-
-	            	#${db.Database}Svg .yellow {
-	            		stop-color: #303030;
-	            	}
-
-	            	#${db.Database}Svg:hover .red {
-	            		stop-color: #ff0000;
-	            	}
-
-	            	#${db.Database}Svg:hover .yellow {
-	            		stop-color: #ffff00;
-	            	}
-	            </style>
                 <g>
                     <path d="M 3.75 5 C 3.75 9 20.25 9 20.25 5" fill="none" stroke="url(#${db.Database}SvgGrow)" stroke-miterlimit="10"/>
                     <path d="M 3.75 5 C 3.75 -0.33 20.25 -0.33 20.25 5 L 20.25 19 C 20.25 24.33 3.75 24.33 3.75 19 Z" fill="none"
