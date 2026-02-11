@@ -388,18 +388,26 @@ async function executeQuery() {
     alert(JSON.stringify(data, null, 2));
 }
 
-function queryRunner() {
+function queryRunner(headerTag, hrTag, h3Tag, SvgGridTemplate) {
     const popUpQueryWindow = document.querySelector(".popUpQueryWindow");
-    const SqlQuery = document.querySelector(".SqlQuery");
+    const runQuery = document.querySelector(".runQuery");
     const executeBtn = document.querySelector(".execute");
     const cancelBtn = document.querySelector(".cancel");
 
-    SqlQuery.onclick = () => {
+    runQuery.onclick = () => {
         popUpQueryWindow.style.display = "grid";
+        headerTag.style.filter = "blur(3px)";
+        hrTag.style.filter = "blur(3px)";
+        h3Tag.style.filter = "blur(3px)";
+        SvgGridTemplate.style.filter = "blur(3px)";
     };
 
     cancelBtn.onclick = () => {
         popUpQueryWindow.style.display = "none";
+        headerTag.removeAttribute("style");
+        hrTag.removeAttribute("style");
+        h3Tag.removeAttribute("style");
+        SvgGridTemplate.removeAttribute("style");
     };
 
     executeBtn.onclick = () => {
@@ -538,11 +546,14 @@ function initDatabaseView($location, $rootScope) {
 
     yesBtn.onclick = () => {
         deletionPopUpMessage("databaseViewPage", dbNameForDel, dbSvgForRemove);
+        headerTag.removeAttribute("style");
+        hrTag.removeAttribute("style");
+        h3Tag.removeAttribute("style");
         SvgGridTemplate.removeAttribute("style");
         popUpWindow.removeAttribute("style");
     };
 
-    queryRunner();
+    queryRunner(headerTag, hrTag, h3Tag, SvgGridTemplate);
 }
 
 function initTableView(dbName) {
@@ -581,7 +592,7 @@ function initTableView(dbName) {
         fromDisplay2.style.display = "flex";
     };
 
-    // Delete database on click event
+    // Delete table on click event
     SvgGridTemplate.addEventListener("click", function (event) {
         const deleteBtn = event.target.closest(".deleteSvg");
         if (!deleteBtn) return;
@@ -594,6 +605,9 @@ function initTableView(dbName) {
 
         console.log("Deleted Tb:", realTbNameForDel);
 
+        headerTag.style.filter = "blur(3px)";
+        hrTag.style.filter = "blur(3px)";
+        h3Tag.style.filter = "blur(3px)";
         SvgGridTemplate.style.filter = "blur(3px)";
         popUpWindow.style.display = "grid";
     });
@@ -611,14 +625,16 @@ function initTableView(dbName) {
     enableSvgSearch(".SvgGridTemplate");
 
     NoBtn(noBtn, SvgGridTemplate, popUpWindow, headerTag, hrTag, h3Tag);
-
+    
     yesBtn.onclick = () => {
+        headerTag.removeAttribute("style");
+        hrTag.removeAttribute("style");
+        h3Tag.removeAttribute("style");
         SvgGridTemplate.removeAttribute("style");
         popUpWindow.removeAttribute("style");
         deletionPopUpMessage("tableViewPage", realTbNameForDel, TbSvgForRemove, dbName);
     };
-
-
+    
     CloseCross2.onclick = () => {
         fromDisplay2.style.display = "none";
         headerTag.removeAttribute("style");
@@ -720,5 +736,5 @@ function initTableView(dbName) {
         ruleChecker();
     });
 
-    queryRunner();
+    queryRunner(headerTag, hrTag, h3Tag, SvgGridTemplate);
 }
