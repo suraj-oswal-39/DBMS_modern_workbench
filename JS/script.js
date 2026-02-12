@@ -2,26 +2,20 @@ console.log("JavaScript file is linked successfully.");
 
 let svgId = "";
 
-function NoBtn(noBtn, SvgGridTemplate, popUpWindow, headerTag, hrTag, h3Tag) {
+function NoBtn(noBtn, routingContainer, popUpWindow) {
     noBtn.onclick = () => {
-        hrTag.removeAttribute("style");
-        h3Tag.removeAttribute("style");
-        headerTag.removeAttribute("style");
-        SvgGridTemplate.removeAttribute("style");
+        routingContainer.removeAttribute("style");
         popUpWindow.removeAttribute("style");
     };
 }
 
-function removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross, headerTag, hrTag, h3Tag) {
+function removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross) {
     nameInput.value = "";
     addSvg.removeAttribute("style");
     tooltip.removeAttribute("style");
     red.removeAttribute("style");
     yellow.removeAttribute("style");
-    headerTag.removeAttribute("style");
-    hrTag.removeAttribute("style");
-    h3Tag.removeAttribute("style");
-    SvgGridTemplate.removeAttribute("style");
+    routingContainer.removeAttribute("style");
     NameInput.removeAttribute("style");
     CloseCross.removeAttribute("style");
 }
@@ -66,7 +60,7 @@ function fetchDatabases(SvgGridTemplate) {
                 newDBSvg.classList.add("SvgBlock");
                 newDBSvg.setAttribute("id", db.Database);
                 newDBSvg.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" pointer-events="all" class="addSvg">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" pointer-events="all" id="${db.Database}Svg" class="addSvg">
 	            <defs>
 	            	<linearGradient id="${db.Database}SvgGrow" x1="100%" y1="100%" x2="0%" y2="0%">
 	            		<stop offset="0%" class="red"/>
@@ -83,30 +77,13 @@ function fetchDatabases(SvgGridTemplate) {
                 <p class="tooltip">${db.Database}</p>
                 <div class="deleteSvg">
                     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="24px" height="24px" viewBox="0 0 24 24"
-                        pointer-events="all" id="${db.Database}Delete">
+                        pointer-events="all" class="crossDelete">
                     <defs>
                         <linearGradient id="${db.Database}DelCrossGrow" x1="100%" y1="100%" x2="0%" y2="0%">
                             <stop offset="0%" class="red" />
-                           <stop offset="100%" class="yellow" />
+                            <stop offset="100%" class="yellow" />
                         </linearGradient>
                     </defs>
-                    <style>
-                    #${db.Database}Delete .red {
-	            		stop-color: #303030;
-	            	}
-
-	            	#${db.Database}Delete .yellow {
-	            		stop-color: #303030;
-	            	}
-
-	            	#${db.Database}Delete:hover .red {
-	            		stop-color: #ff0000;
-	            	}
-
-	            	#${db.Database}Delete:hover .yellow {
-	            		stop-color: #ffff00;
-	            	}
-                    </style>
                     <path
                         d="M 0 9.6 L 9.6 9.6 L 9.6 0 L 14.4 0 L 14.4 9.6 L 24 9.6 L 24 14.4 L 14.4 14.4 L 14.4 24 L 9.6 24 L 9.6 14.4 L 0 14.4 Z"
                             fill="url(#${db.Database}DelCrossGrow)" stroke="none" />
@@ -165,39 +142,13 @@ function fetchTables(SvgGridTemplate, svgId) {
                 newTbSvg.setAttribute("id", TableName);
                 newTbSvg.dataset.tableName = realTableName;
                 newTbSvg.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" pointer-events="all" id="${TableName}Svg">
+                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 24 24" pointer-events="all" id="${TableName}Svg" class="addSvg">
 	                <defs>
 	            	<linearGradient id="${TableName}SvgGrow" x1="100%" y1="100%" x2="0%" y2="0%">
 	            		<stop offset="0%" class="red"/>
 	            		<stop offset="100%" class="yellow"/>
 	            	</linearGradient>
 	                </defs>
-	                <style>
-                        #${TableName}Svg {
-                            background:
-                                linear-gradient(#060000, #060000) padding-box,
-                                linear-gradient(145deg, #060000, #060000) border-box;
-                            border: 0.3rem solid transparent;
-                            border-radius: 1rem;
-                            padding: 0.5em;
-                        }
-                        #${TableName}Svg:hover {
-                            background:
-                                linear-gradient(#060000, #060000) padding-box,
-                                linear-gradient(145deg, #ffff00, #ff0000) border-box;
-                        }
-	            	    #${TableName}Svg .red {
-	            	    	stop-color: #303030;
-	            	    }
-	            	    #${TableName}Svg .yellow {
-	            	    	stop-color: #303030;
-	            	    }
-	            	    #${TableName}Svg:hover .red {
-	            	    	stop-color: #ff0000;
-	            	    }
-	            	    #${TableName}Svg:hover .yellow {
-	            	    	stop-color: #ffff00;
-	            	    }
                     </style>
                         <path
                             d="M4 15V16.8002C4 17.9203 4 18.4801 4.21799 18.9079C4.40973 19.2842 4.71547 19.5905 5.0918 19.7822C5.5192 20 6.07899 20 7.19691 20H12M4 15V9M4 15H12M4 9V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H12M4 9H12M12 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20 5.5192 20 6.07899 20 7.19691V9M12 4V9M12 9V15M12 9H20M12 15V20M12 15H20M12 20H16.8036C17.9215 20 18.4805 20 18.9079 19.7822C19.2842 19.5905 19.5905 19.2842 19.7822 18.9079C20 18.4805 20 17.9215 20 16.8036V15M20 15V9"
@@ -207,27 +158,13 @@ function fetchTables(SvgGridTemplate, svgId) {
                         <p class="tooltip">${TableName}</p>
                         <div class="deleteSvg">
                             <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="24px" height="24px" viewBox="0 0 24 24"
-                                pointer-events="all" id="${TableName}Delete">
+                                pointer-events="all" class="crossDelete">
                             <defs>
                                 <linearGradient id="${TableName}DelCrossGrow" x1="100%" y1="100%" x2="0%" y2="0%">
                                     <stop offset="0%" class="red" />
                                 <stop offset="100%" class="yellow" />
                                 </linearGradient>
                             </defs>
-                            <style>
-                            #${TableName}Delete .red {
-                                stop-color: #303030;
-                            }
-                            #${TableName}Delete .yellow {
-                                stop-color: #303030;
-                            }
-                            #${TableName}Delete:hover .red {
-                                stop-color: #ff0000;
-                            }
-                            #${TableName}Delete:hover .yellow {
-                                stop-color: #ffff00;
-                            }
-                            </style>
                             <path
                                 d="M 0 9.6 L 9.6 9.6 L 9.6 0 L 14.4 0 L 14.4 9.6 L 24 9.6 L 24 14.4 L 14.4 14.4 L 14.4 24 L 9.6 24 L 9.6 14.4 L 0 14.4 Z"
                                     fill="url(#${TableName}DelCrossGrow)" stroke="none" />
@@ -268,7 +205,7 @@ function deletionPopUpMessage(containerSelector, NameForDel, SvgForRemove, dbNam
     }
 }
 
-function OptionSelection(selectedOption) {
+function OptionSelection() {
     const optionList = document.querySelectorAll(".selectedOption li");
     optionList.forEach((option) => {
         option.addEventListener("click", (event) => {
@@ -356,7 +293,7 @@ async function executeQuery() {
     alert(JSON.stringify(data, null, 2));
 }
 
-function queryRunner(headerTag, hrTag, h3Tag, SvgGridTemplate) {
+function queryRunner(routingContainer) {
     const popUpQueryWindow = document.querySelector(".popUpQueryWindow");
     const runQuery = document.querySelector(".runQuery");
     const executeBtn = document.querySelector(".execute");
@@ -364,18 +301,12 @@ function queryRunner(headerTag, hrTag, h3Tag, SvgGridTemplate) {
 
     runQuery.onclick = () => {
         popUpQueryWindow.style.display = "grid";
-        headerTag.style.filter = "blur(3px)";
-        hrTag.style.filter = "blur(3px)";
-        h3Tag.style.filter = "blur(3px)";
-        SvgGridTemplate.style.filter = "blur(3px)";
+        routingContainer.style.filter = "blur(3px)";
     };
 
     cancelBtn.onclick = () => {
         popUpQueryWindow.style.display = "none";
-        headerTag.removeAttribute("style");
-        hrTag.removeAttribute("style");
-        h3Tag.removeAttribute("style");
-        SvgGridTemplate.removeAttribute("style");
+        routingContainer.removeAttribute("style");
     };
 
     executeBtn.onclick = () => {
@@ -390,15 +321,13 @@ function initDatabaseView($location, $rootScope) {
     const red = document.querySelector(".red");
     const yellow = document.querySelector(".yellow");
     const NameInput = document.getElementById("NameInput");
+    const routingContainer = document.querySelector(".routingContainer");
     const SvgGridTemplate = document.querySelector(".SvgGridTemplate");
     const CloseCross = document.querySelector(".CloseCross");
     const popUpWindow = document.querySelector(".popUpWindow");
     const noBtn = document.querySelector(".no");
     const yesBtn = document.querySelector(".yes");
     const message = document.querySelector(".message");
-    const headerTag = document.getElementsByTagName("header")[0];
-    const hrTag = document.getElementsByTagName("hr")[0];
-    const h3Tag = document.getElementsByTagName("h3")[0];
 
     message.textContent = "This will permanently delete the selected database. All tables, records, and related data will be removed. This action cannot be undone.";
 
@@ -415,10 +344,7 @@ function initDatabaseView($location, $rootScope) {
         tooltip.style.opacity = "1";
         red.style.stopColor = "#ff0000";
         yellow.style.stopColor = "#ffff00";
-        headerTag.style.filter = "blur(3px)";
-        hrTag.style.filter = "blur(3px)";
-        h3Tag.style.filter = "blur(3px)";
-        SvgGridTemplate.style.filter = "blur(3px)";
+        routingContainer.style.filter = "blur(3px)";
         NameInput.style.opacity = 1;
         NameInput.style.width = "10rem";
         CloseCross.style.opacity = 1;
@@ -464,13 +390,13 @@ function initDatabaseView($location, $rootScope) {
 
             newDBname = "";
 
-            removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross, headerTag, hrTag, h3Tag);
+            removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross);
         }
     });
 
     // Close input field on click event
     CloseCross.onclick = () => {
-        removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, SvgGridTemplate, CloseCross, headerTag, hrTag, h3Tag);
+        removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross);
     };
 
     // Delete database on click event
@@ -485,10 +411,7 @@ function initDatabaseView($location, $rootScope) {
         dbNameForDel = dbSvgForRemove.id;
         console.log("Deleted DB:", dbNameForDel);
 
-        headerTag.style.filter = "blur(3px)";
-        hrTag.style.filter = "blur(3px)";
-        h3Tag.style.filter = "blur(3px)";
-        SvgGridTemplate.style.filter = "blur(3px)";
+        routingContainer.style.filter = "blur(3px)";
         popUpWindow.style.display = "grid";
     });
 
@@ -510,23 +433,21 @@ function initDatabaseView($location, $rootScope) {
 
     enableSvgSearch(".SvgGridTemplate");
 
-    NoBtn(noBtn, SvgGridTemplate, popUpWindow, headerTag, hrTag, h3Tag)
+    NoBtn(noBtn, routingContainer, popUpWindow);
 
     yesBtn.onclick = () => {
         deletionPopUpMessage("databaseViewPage", dbNameForDel, dbSvgForRemove);
-        headerTag.removeAttribute("style");
-        hrTag.removeAttribute("style");
-        h3Tag.removeAttribute("style");
-        SvgGridTemplate.removeAttribute("style");
+        routingContainer.removeAttribute("style");
         popUpWindow.removeAttribute("style");
     };
 
-    queryRunner(headerTag, hrTag, h3Tag, SvgGridTemplate);
+    queryRunner(routingContainer);
 }
 
 function initTableView(dbName) {
 
     const addSvg = document.querySelector(".addSvg");
+    const routingContainer = document.querySelector(".routingContainer");
     const SvgGridTemplate = document.querySelector(".SvgGridTemplate");
     const CloseCross2 = document.querySelector(".CloseCross2");
     const popUpWindow = document.querySelector(".popUpWindow");
@@ -544,8 +465,6 @@ function initTableView(dbName) {
     const RemoveRow = document.querySelector("#RemoveRow");
     const resetBtn = document.querySelector("#resetBtn");
     const h3Tag = document.querySelector(".DBTabletTitle");
-    const headerTag = document.getElementsByTagName("header")[0];
-    const hrTag = document.getElementsByTagName("hr")[0];
     let capitalizedDBName = dbName.charAt(0).toUpperCase() + dbName.slice(1);
     h3Tag.textContent = `${capitalizedDBName} database tables`;
 
@@ -553,10 +472,7 @@ function initTableView(dbName) {
 
     // open table creation form on click event
     addSvg.onclick = () => {
-        headerTag.style.filter = "blur(3px)";
-        hrTag.style.filter = "blur(3px)";
-        h3Tag.style.filter = "blur(3px)";
-        SvgGridTemplate.style.filter = "blur(3px)";
+        routingContainer.style.filter = "blur(3px)";
         fromDisplay2.style.display = "flex";
     };
 
@@ -573,10 +489,7 @@ function initTableView(dbName) {
 
         console.log("Deleted Tb:", realTbNameForDel);
 
-        headerTag.style.filter = "blur(3px)";
-        hrTag.style.filter = "blur(3px)";
-        h3Tag.style.filter = "blur(3px)";
-        SvgGridTemplate.style.filter = "blur(3px)";
+        routingContainer.style.filter = "blur(3px)";
         popUpWindow.style.display = "grid";
     });
 
@@ -592,23 +505,17 @@ function initTableView(dbName) {
 
     enableSvgSearch(".SvgGridTemplate");
 
-    NoBtn(noBtn, SvgGridTemplate, popUpWindow, headerTag, hrTag, h3Tag);
+    NoBtn(noBtn, routingContainer, popUpWindow);
     
     yesBtn.onclick = () => {
-        headerTag.removeAttribute("style");
-        hrTag.removeAttribute("style");
-        h3Tag.removeAttribute("style");
-        SvgGridTemplate.removeAttribute("style");
+        routingContainer.removeAttribute("style");
         popUpWindow.removeAttribute("style");
         deletionPopUpMessage("tableViewPage", realTbNameForDel, TbSvgForRemove, dbName);
     };
     
     CloseCross2.onclick = () => {
         fromDisplay2.style.display = "none";
-        headerTag.removeAttribute("style");
-        hrTag.removeAttribute("style");
-        h3Tag.removeAttribute("style");
-        SvgGridTemplate.removeAttribute("style");
+        routingContainer.removeAttribute("style");
     };
 
     rowContainer.addEventListener("click", function (event) {
@@ -621,7 +528,7 @@ function initTableView(dbName) {
         selectedOption.style.height = "18.3rem";
     });
 
-    OptionSelection(selectedOption);
+    OptionSelection();
 
     AddRow.addEventListener("click", () => {
         rowCount++;
@@ -672,7 +579,7 @@ function initTableView(dbName) {
                     </div>
         `;
         rowContainer.appendChild(newRow);
-        OptionSelection(selectedOption);
+        OptionSelection();
     });
 
     RemoveRow.addEventListener("click", () => {
@@ -685,7 +592,7 @@ function initTableView(dbName) {
         let lastRow = rowContainer.lastChild;
         rowContainer.removeChild(lastRow);
         rowCount--;
-        OptionSelection(selectedOption);
+        OptionSelection();
     });
 
     resetBtn.addEventListener("click", () => {
@@ -693,9 +600,10 @@ function initTableView(dbName) {
 
         selectedDataTypeList.forEach((selectedDT) => {
             selectedDT.innerText = "Select Data Type";
-            selectedOption.removeAttribute("style");
-
-            OptionSelection(selectedOption);
+            if (selectedOption.style) {
+                selectedOption.removeAttribute("style");
+            }
+            OptionSelection();
         });
     });
 
@@ -704,5 +612,5 @@ function initTableView(dbName) {
         ruleChecker();
     });
 
-    queryRunner(headerTag, hrTag, h3Tag, SvgGridTemplate);
+    queryRunner(routingContainer);
 }
