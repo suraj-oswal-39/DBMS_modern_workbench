@@ -19,8 +19,6 @@ h3 {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    will-change: transform;
-    transform: translateZ(0);
 }
 
 .SvgBlock:hover .tooltip,
@@ -67,6 +65,7 @@ h3 {
     font-size: 0.7rem;
     opacity: 0;
     transition: opacity 0.2s linear 0.5s;
+    pointer-events: none;
 }
 
 .fromDisplay {
@@ -146,5 +145,6 @@ input:-webkit-autofill:active {
 .deleteSvg {
     transform: rotate(45deg);
     opacity: 0;
-    transition: opacity 0.2s linear 0.5s
+    transition: opacity 0.2s linear 0.5s;
+    pointer-events: auto;
 }

@@ -206,24 +206,56 @@ function deletionPopUpMessage(containerSelector, NameForDel, SvgForRemove, dbNam
 }
 
 function OptionSelection() {
-    const optionList = document.querySelectorAll(".selectedOption li");
-    optionList.forEach((option) => {
-        option.addEventListener("click", (event) => {
-            event.stopPropagation();
 
-            const dataTypeBtn = option.closest(".dataType");
-            const dt = dataTypeBtn.querySelector(".selectedDataType");
-            const selectedOption = dataTypeBtn.querySelector(".selectedOption");
+    const rowContainer = document.querySelector(".rowContainer");
 
-            dt.innerText = option.innerText;
-            selectedOption.removeAttribute("style");
-        });
+    rowContainer.addEventListener("click", function (event) {
+
+        const option = event.target.closest(".dataTypeList li");
+        if (!option) return;
+
+        event.stopPropagation();
+
+        const row = option.closest(".row");
+        const dataTypeBtn = option.closest(".dataType");
+        const dt = dataTypeBtn.querySelector(".selectedDataType");
+        const dataTypeList = dataTypeBtn.querySelector(".dataTypeList");
+        const sizeInput = row.querySelector(".sizeInput");
+
+        const selectedType = option.innerText;
+
+        dt.innerText = selectedType;
+        dataTypeList.removeAttribute("style");
+
+        // Remove parentheses for checking
+        const cleanType = selectedType.replace(/\(.*\)/, "");
+
+        // Disable list
+        const disableList = ["FLOAT", "DOUBLE", "DATE", "BOOLEAN"];
+
+        if (disableList.includes(cleanType)) {
+            sizeInput.setAttribute("disabled", "true");
+            sizeInput.value = "";
+            sizeInput.placeholder = "N/A";
+        } else {
+            sizeInput.removeAttribute("disabled");
+            sizeInput.placeholder = "size";
+        }
+
     });
 }
 
 function ruleChecker() {
-    // Rule A2: Table name must be valid
+
     const tableNameInput = document.querySelector("#tableNameInput");
+    let columnNames = document.querySelectorAll(".columnName");
+    let names = [];
+    let selectedDataType = document.querySelectorAll(".selectedDataType");
+    const autoIncrements = document.querySelectorAll('input[name="ai"]');
+    const primaryKeys = document.querySelectorAll('input[name="pk"]');
+    const NotNulls = document.querySelectorAll(".NN");
+
+    // Table name must be valid
     tableNameInput.addEventListener("change", () => {
         const tableName = tableNameInput.value.trim();
         if (!/^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/.test(tableName)) {
@@ -232,49 +264,75 @@ function ruleChecker() {
         }
     });
 
-    let columnNames = document.querySelectorAll(".columnName");
-    let names = [];
     columnNames.forEach((columnName) => {
-        // Rule B1: Column name is mandatory
+        // Column name is mandatory
         if (columnName.value === "") {
-            alert("Column name is mandatory");
+            console.log("Column name is mandatory");
             return;
         }
-        // Rule B2: Column names must be unique
+        // Column names must be unique
         const name = columnName.value.trim();
         if (names.includes(name)) {
-            alert("Duplicate column name");
+            console.log("Duplicate column name");
             names = [];
             columnName.value = "";
             return;
         }
-        names.push(name);  
+        names.push(name);
     });
 
-    // Rule B3: Data type is mandatory
-    let selectedDataType = document.querySelectorAll(".selectedDataType");
+    //  Data type is mandatory
     selectedDataType.forEach((dataType) => {
         if (dataType.innerText === "Select Data Type") {
-            alert("you must select data type");
+            console.log("you must select data type");
             return;
         }
     });
 
-    // Rule C1: AUTO_INCREMENT MUST be with PRIMARY KEY
+    // AUTO_INCREMENT MUST be with PRIMARY KEY!
 
-    // Rule C3: DEFAULT is NOT allowed with AUTO_INCREMENT
+    // DEFAULT is NOT allowed with AUTO_INCREMENT
+    // Must be a numeric type: int or bigint
+    const expressions = document.querySelectorAll(".expression");
+    autoIncrements.forEach((ai, index) => {
+        if (ai.checked) {
+            if (selectedDataType[index].innerText !== "INT()" && selectedDataType[index].innerText !== "BIGINT()") {
+                console.log("datatype must be INT or BIGINT");
+                return;
+            }
+            primaryKeys[index].checked = true
+            expressions[index].setAttribute("disabled", "true");
+            expressions[index].value = "";
+            expressions[index].placeholder = "disabled";
+        }
+    });
 
-    // Rule C4: BOOLEAN cannot be UNSIGNED
+   
 
-    // Rule C5: PRIMARY KEY implies NOT NULL
 
-    // Rule C6: UNSIGNED allowed only for numeric types
+    // PRIMARY KEY implies NOT NULL!
 
-    // Rule D1: DEFAULT must match data type 
-    // Allowed : INT, BIGINT, SMALLINT, TINY_INT, DECIMAL, FLOAT / DOUBLE
-    // Not Allowed: VARCHAR, TEXT, DATE, BOOLEAN
+    // UNSIGNED allowed only for numeric types
+     // BOOLEAN cannot be UNSIGNED
+    const UnsignedList = document.querySelectorAll(".US");
+    UnsignedList.forEach((us, index) => {
+        if (us.checked) {
+            if (selectedDataType[index].innerText !== "INT()" && selectedDataType[index].innerText !== "BIGINT()" &&
+                selectedDataType[index].innerText !== "DECIMAL()" && selectedDataType[index].innerText !== "FLOAT" &&
+                selectedDataType[index].innerText !== "DOUBLE" && selectedDataType[index].innerText === "BOOLEAN") {
+                console.log("UNSIGNED allowed only for numeric types!");
+                return;
+            }
+        }
+    });
 
-    // Rule D2: "DEFAULT" "NULL" allowed only if not "NOT NULL"
+    // DEFAULT must match data type !
+    // eg -
+    // age INT DEFAULT 'abc' (wrong)
+    // name VARCHAR(50) DEFAULT 10 (wrong)
+
+    // "DEFAULT" "NULL" allowed only if not "NOT NULL"!
+    // name VARCHAR(50) NOT NULL DEFAULT NULL ❌
 }
 
 async function executeQuery() {
@@ -457,7 +515,7 @@ function initTableView(dbName) {
     const fromDisplay2 = document.querySelector(".fromDisplay2");
     const rowContainer = document.querySelector(".rowContainer");
     let btn;
-    let selectedOption;
+    let dataTypeList;
     let realTbNameForDel = "";
     let TbSvgForRemove = "";
     const AddRow = document.querySelector("#AddRow");
@@ -506,13 +564,13 @@ function initTableView(dbName) {
     enableSvgSearch(".SvgGridTemplate");
 
     NoBtn(noBtn, routingContainer, popUpWindow);
-    
+
     yesBtn.onclick = () => {
         routingContainer.removeAttribute("style");
         popUpWindow.removeAttribute("style");
         deletionPopUpMessage("tableViewPage", realTbNameForDel, TbSvgForRemove, dbName);
     };
-    
+
     CloseCross2.onclick = () => {
         fromDisplay2.style.display = "none";
         routingContainer.removeAttribute("style");
@@ -522,47 +580,61 @@ function initTableView(dbName) {
         btn = event.target.closest(".dataType");
         if (!btn) return;
 
-        selectedOption = btn.querySelector(".selectedOption");
-        selectedOption.style.opacity = "1";
-        selectedOption.style.width = "7rem";
-        selectedOption.style.height = "18.3rem";
+        dataTypeList = btn.querySelector(".dataTypeList");
+        dataTypeList.style.opacity = "1";
+        dataTypeList.style.width = "7rem";
+        dataTypeList.style.height = "18.3rem";
     });
 
-    OptionSelection();
+    document.addEventListener("click", function (event) {
+
+        // If click is inside any .dataType → do nothing
+        if (event.target.closest(".dataType")) return;
+
+        // Otherwise close ALL open dropdowns
+        const openLists = document.querySelectorAll(".dataTypeList");
+
+        openLists.forEach((list) => {
+            list.removeAttribute("style");
+        });
+    });
 
     AddRow.addEventListener("click", () => {
         rowCount++;
         const newRow = document.createElement("div");
         newRow.classList.add("row");
         newRow.innerHTML = `
-            <div class="columnNameInputDiv">
+                    <div class="columnNameInputDiv">
                         <input type="text" class="columnName" name="columnName" placeholder="Enter Column Name" required />
                     </div>
 
                     <button type="button" class="dataType">
                         <p class="selectedDataType">Select Data Type</p>
-                        <ul class="selectedOption">
-                            <li>INT</li>
-                            <li>BIGINT</li>
-                            <li>DECIMAL</li>
+                        <ul class="dataTypeList">
+                            <li>INT()</li>
+                            <li>BIGINT()</li>
+                            <li>DECIMAL()</li>
                             <li>FLOAT</li>
                             <li>DOUBLE</li>
-                            <li>VARCHAR</li>
-                            <li>CHAR</li>
-                            <li>TEXT</li>
+                            <li>VARCHAR()</li>
+                            <li>CHAR()</li>
+                            <li>TEXT()</li>
                             <li>DATE</li>
-                            <li>DATETIME</li>
-                            <li>TIMESTAMP</li>
+                            <li>DATETIME()</li>
+                            <li>TIMESTAMP()</li>
                             <li>BOOLEAN</li>
                         </ul>
                     </button>
+
+                    <div class="sizeInputDiv">
+                        <input type="number" class="sizeInput" name="sizeValue" placeholder="size" disabled/>
+                    </div>
                     
-                    <!-- Rule E1: Only one PRIMARY KEY per table -->
                     <input type="radio" id="pk${rowCount}" name="pk" value="pk${rowCount}" hidden />
                     <label for="pk${rowCount}" class="btn Pk">Primary Key</label>
 
                     <input type="checkbox" id="nn${rowCount}" hidden />
-                    <label for="nn${rowCount}" class="btn">Not Null</label>
+                    <label for="nn${rowCount}" class="btn NN">Not Null</label>
 
                     <input type="checkbox" id="uq${rowCount}" hidden />
                     <label for="uq${rowCount}" class="btn">Unique</label>
@@ -570,7 +642,6 @@ function initTableView(dbName) {
                     <input type="checkbox" id="us${rowCount}" hidden />
                     <label for="us${rowCount}" class="btn">Unsigned</label>
 
-                    <!-- Rule C2: Only ONE AUTO_INCREMENT column per table -->
                     <input type="radio" id="ai${rowCount}" name="ai" value="ai${rowCount}" hidden />
                     <label for="ai${rowCount}" class="btn Ai">Auto Increment</label>
 
@@ -579,11 +650,13 @@ function initTableView(dbName) {
                     </div>
         `;
         rowContainer.appendChild(newRow);
-        OptionSelection();
+        
     });
 
+    OptionSelection();
+
     RemoveRow.addEventListener("click", () => {
-        // Rule A1: Table must have at least one row
+        // Table must have at least one row
         if (rowCount <= 0) {
             console.log("at least have 1 row");
             return;
@@ -592,7 +665,6 @@ function initTableView(dbName) {
         let lastRow = rowContainer.lastChild;
         rowContainer.removeChild(lastRow);
         rowCount--;
-        OptionSelection();
     });
 
     resetBtn.addEventListener("click", () => {
@@ -600,16 +672,28 @@ function initTableView(dbName) {
 
         selectedDataTypeList.forEach((selectedDT) => {
             selectedDT.innerText = "Select Data Type";
-            if (selectedOption.style) {
-                selectedOption.removeAttribute("style");
+            if (dataTypeList.style) {
+                dataTypeList.removeAttribute("style");
             }
-            OptionSelection();
         });
     });
 
     const createBtn = document.querySelector("#createBtn");
     createBtn.addEventListener("click", () => {
         ruleChecker();
+    });
+
+    let dataTypeButtons = document.querySelectorAll('.dataType');
+
+    dataTypeButtons.forEach(button => {
+    button.addEventListener('click', event => {
+            let row = event.target.closest('.row');
+            let sizeInput = row.querySelector('.sizeInput');
+            let dataType = button.querySelector('.selectedDataType').innerText;
+            if (!["FLOAT", "DOUBLE", "DATE", "BOOLEAN"].includes(dataType)) {
+                sizeInput.removeAttribute("disabled");
+            }
+        });
     });
 
     queryRunner(routingContainer);

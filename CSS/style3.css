@@ -8,14 +8,14 @@
 
 #tableCreation {
     position: relative;
-    background:
-        linear-gradient(#101010, #101010) padding-box,
+    background: 
+        linear-gradient(#101010, #101010) padding-box, 
         linear-gradient(145deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     padding: 0.7em;
-    width: 85vw;
-    height: 85vh;
+    min-width: 85vw;
+    min-height: 85vh;
     opacity: 1;
     z-index: 1;
 }
@@ -63,7 +63,8 @@
 }
 
 .columnName,
-.expression {
+.expression,
+.sizeInput {
     background-color: #202020;
     color: white;
     caret-color: white;
@@ -72,29 +73,30 @@
     outline: none;
 }
 
-.columnName {
-    width: -webkit-fill-available;
-}
-
-.expression {
+.columnName, .expression, .sizeInput {
     width: -webkit-fill-available;
 }
 
 .columnName:hover,
 #tableNameInput:hover,
-.expression:hover {
+.expression:hover,
+.sizeInput:hover {
     border-color: #ffff00;
 }
 
 .columnName:active,
 #tableNameInput:active,
-.expression:active {
+.expression:active,
+.sizeInput:active {
     border-color: #202020;
 }
 
 .columnName:-webkit-autofill,
 #tableNameInput:-webkit-autofill,
 .expression:-webkit-autofill,
+.columnName:-webkit-autofill:hover,
+#tableNameInput:-webkit-autofill:hover,
+.expression:-webkit-autofill:hover,
 .columnName:-webkit-autofill:focus,
 #tableNameInput:-webkit-autofill:focus,
 .expression:-webkit-autofill:focus,
@@ -108,11 +110,8 @@
     border: 0.2rem solid #202020;
 }
 
-.columnHeader {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0rem 0.3rem 0rem;
-    width: 84%;
+.tableNameInputDiv {
+    padding-bottom: 1rem;
 }
 
 .row {
@@ -149,7 +148,7 @@
     border: 0.2rem solid #202020;
 }
 
-.selectedOption {
+.dataTypeList {
     position: absolute;
     top: 2rem;
     display: flex;
@@ -163,11 +162,8 @@
     border: 0.2rem solid transparent;
     border-radius: 0.5rem;
     font-size: 0.8rem;
-    /* width: auto; */
     width: 0rem;
-    /* height: 18.3rem; */
     height: 0rem;
-    /* opacity: 1; */
     opacity: 0;
     overflow: hidden;
     transition:
@@ -197,6 +193,10 @@ li[value="BOOLEAN"]:hover {
     border-bottom-right-radius: 0.2rem;
 }
 
+.sizeInputDiv {
+    width: 3.5rem;
+}
+
 .btn {
     background-color: #202020;
     color: white;
@@ -205,8 +205,6 @@ li[value="BOOLEAN"]:hover {
     font-size: 0.84rem;
 }
 
-/* Rule E1: Only one PRIMARY KEY per table*/
-/* Rule C2: Only ONE AUTO_INCREMENT column per table */
 input[type="checkbox"]:checked+label.btn,
 input[type="radio"]:checked+label.Pk,
 input[type="radio"]:checked+label.Ai {
@@ -241,11 +239,11 @@ input[type="checkbox"]:not(:checked)+label.btn {
 }
 
 .formButtons {
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
     display: flex;
     column-gap: 0.7rem;
+    justify-content: flex-end;
+    padding-right: 1rem;
+    padding-top: 1rem;
 }
 
 #resetBtn,

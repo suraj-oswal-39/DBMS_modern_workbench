@@ -79,11 +79,6 @@
                 </label>
             </div>
 
-            <div class="columnHeader">
-                <p>Column Name</p>
-                <p>Expression</p>
-            </div>
-
             <section class="rowContainer">
                 <div class="row">
 
@@ -94,41 +89,43 @@
 
                     <button type="button" class="dataType">
                         <p class="selectedDataType">Select Data Type</p>
-                        <ul class="selectedOption">
-                            <li>INT</li>
-                            <li>BIGINT</li>
-                            <li>DECIMAL</li>
+                        <ul class="dataTypeList">
+                            <li>INT()</li>
+                            <li>BIGINT()</li>
+                            <li>DECIMAL()</li>
                             <li>FLOAT</li>
                             <li>DOUBLE</li>
-                            <li>VARCHAR</li>
-                            <li>CHAR</li>
-                            <li>TEXT</li>
+                            <li>VARCHAR()</li>
+                            <li>CHAR()</li>
+                            <li>TEXT()</li>
                             <li>DATE</li>
-                            <li>DATETIME</li>
-                            <li>TIMESTAMP</li>
+                            <li>DATETIME()</li>
+                            <li>TIMESTAMP()</li>
                             <li>BOOLEAN</li>
                         </ul>
                     </button>
 
-                    <!-- Rule E1: Only one PRIMARY KEY per table -->
+                    <div class="sizeInputDiv">
+                        <input type="number" class="sizeInput" name="sizeValue" placeholder="size" disabled/>
+                    </div>
+
                     <input type="radio" id="pk0" name="pk" value="pk0" hidden />
                     <label for="pk0" class="btn Pk">Primary Key</label>
 
                     <input type="checkbox" id="nn0" hidden />
-                    <label for="nn0" class="btn">Not Null</label>
+                    <label for="nn0" class="btn NN">Not Null</label>
 
                     <input type="checkbox" id="uq0" hidden />
                     <label for="uq0" class="btn">Unique</label>
 
                     <input type="checkbox" id="us0" hidden />
-                    <label for="us0" class="btn">Unsigned</label>
+                    <label for="us0" class="btn US">Unsigned</label>
 
-                    <!-- Rule C2: Only ONE AUTO_INCREMENT column per table -->
                     <input type="radio" id="ai0" name="ai" value="ai0" hidden />
                     <label for="ai0" class="btn Ai">Auto Increment</label>
 
                     <div class="defaultValueDiv">
-                        <input type="text" class="expression" name="expression" placeholder="Enter Default Value" />
+                        <input type="text" class="expression" name="expression" placeholder="Enter Default Value / Expression" />
                     </div>
 
                 </div>
