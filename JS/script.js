@@ -240,6 +240,14 @@ function OptionSelection() {
             sizeInput.placeholder = "size";
         }
 
+        // TEXT cannot have DEFAULT
+        const exp = row.querySelector(".expression");
+        if (cleanType === "TEXT") {
+            exp.setAttribute("disabled", "true");
+            exp.value = "";
+            exp.placeholder = "disabled";
+        }
+
     });
 }
 
@@ -249,11 +257,8 @@ function ruleChecker() {
     let columnNames = document.querySelectorAll(".columnName");
     let names = [];
     let selectedDataType = document.querySelectorAll(".selectedDataType");
-    const autoIncrements = document.querySelectorAll('input[name="ai"]');
     const primaryKeys = document.querySelectorAll('input[name="pk"]');
-    const NotNulls = document.querySelectorAll("input[name='nn']");
-    const expressions = document.querySelectorAll(".expression");
-    const UnsignedList = document.querySelectorAll(".US");
+    const uniques = document.querySelectorAll('input[name="uq"]');
 
     // Table name must be valid
     tableNameInput.addEventListener("change", () => {
@@ -296,50 +301,13 @@ function ruleChecker() {
             return;
         }
     });
-    const uniques = document.querySelectorAll('input[name="uq"]');
     uniques.forEach((up, index) => {
         if (up.checked && (selectedDataType[index].innerText === "TEXT()" || selectedDataType[index].innerText === "BOOLEAN")) {
             console.log("unique key cannot with 'TEXT' or 'BOOLEAN' datatype");
             return;
-        } 
-    });
-
-    // AUTO_INCREMENT MUST be with PRIMARY KEY!
-    // DEFAULT is NOT allowed with AUTO_INCREMENT
-    // Must be a numeric type: int or bigint
-    autoIncrements.forEach((ai, index) => {
-        if (ai.checked) {
-            if (selectedDataType[index].innerText !== "INT()" && selectedDataType[index].innerText !== "BIGINT()") {
-                console.log("datatype must be INT or BIGINT");
-                return;
-            }
-            primaryKeys[index].checked = true
-            expressions[index].setAttribute("disabled", "true");
-            expressions[index].value = "";
-            expressions[index].placeholder = "disabled";
         }
     });
 
-    // UNSIGNED allowed only for numeric types
-     // BOOLEAN cannot be UNSIGNED
-    UnsignedList.forEach((us, index) => {
-        if (us.checked) {
-            if (selectedDataType[index].innerText !== "INT()" && selectedDataType[index].innerText !== "BIGINT()" &&
-                selectedDataType[index].innerText !== "DECIMAL()" && selectedDataType[index].innerText !== "FLOAT" &&
-                selectedDataType[index].innerText !== "DOUBLE" && selectedDataType[index].innerText === "BOOLEAN") {
-                console.log("UNSIGNED allowed only for numeric types!");
-                return;
-            }
-        }
-    });
-
-    // DEFAULT must match data type !
-    // eg -
-    // age INT DEFAULT 'abc' (wrong)
-    // name VARCHAR(50) DEFAULT 10 (wrong)
-
-    // "DEFAULT" "NULL" allowed only if not "NOT NULL"!
-    // name VARCHAR(50) NOT NULL DEFAULT NULL ❌
 }
 
 async function executeQuery() {
@@ -509,19 +477,59 @@ function initDatabaseView($location, $rootScope) {
     queryRunner(routingContainer);
 }
 
-function primaryKeyFeature() {
-    const primaryKeys = document.querySelectorAll('input[name="pk"]');
-    const NotNulls = document.querySelectorAll("input[name='nn']");
+function fromDisplay2buttonFeature() {
+    const rowContainer = document.querySelector(".rowContainer");
+
     // PRIMARY KEY implies NOT NULL
-    primaryKeys.forEach((pk, index) => {
-        pk.addEventListener('click', (event) => {
-            event.stopPropagation();
-            if (pk.checked) {
-                NotNulls[index].checked = true;
-                NotNulls[index].style.border = "0.2rem solid #ffff00";
-            }
-        });
+    rowContainer.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const pk = event.target.closest('input[name="pk"]');
+        if (!pk) return;
+        const row = pk.closest(".row");
+        const nn = row.querySelector('input[name="nn"]');
+        if (pk.checked) {
+            nn.checked = true;
+            nn.style.border = "0.2rem solid #ffff00";
+        }
     });
+
+    // UNSIGNED Only with numeric types
+    rowContainer.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const us = event.target.closest('input[name="us"]');
+        if (!us) return;
+        console.log(us);
+        const row = us.closest(".row");
+        const dataType = row.querySelector('.selectedDataType');
+        if (!["INT()", "BIGINT()", "DECIMAL()", "FLOAT", "DOUBLE"].includes(dataType.innerText)) {
+            us.checked = false;
+            us.removeAttribute("style");
+            console.log("Data type must be INT, BIGINT, DECIMAL, FLOAT or DOUBLE.");
+        }
+    });
+
+    // AUTO_INCREMENT Must be with integer type and either PRIMARY KEY or UNIQUE.
+    rowContainer.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const ai = event.target.closest('input[name="ai"]');
+        if (!ai) return;
+        const row = ai.closest(".row");
+        const dataType = row.querySelector('.selectedDataType');
+        const pk = row.querySelector('input[name="pk"]');
+        const uq = row.querySelector('input[name="uq"]');
+        const exp = row.querySelector('.expression');
+        if (!["INT()", "BIGINT()"].includes(dataType.innerText) || !(pk.checked || uq.checked)) {
+            ai.checked = false;
+            ai.removeAttribute("style");
+            console.log("Data type must be INT or BIGINT and either PRIMARY KEY or UNIQUE.");
+        }
+        if (ai.checked && exp.value === "") {
+            exp.setAttribute("disabled", "true");
+            exp.value = "";
+            exp.placeholder = "disabled";
+        }
+    });
+
 }
 
 function initTableView(dbName) {
@@ -672,7 +680,7 @@ function initTableView(dbName) {
                     </div>
         `;
         rowContainer.appendChild(newRow);
-        primaryKeyFeature();
+        fromDisplay2buttonFeature();
     });
 
     OptionSelection();
@@ -687,7 +695,7 @@ function initTableView(dbName) {
         let lastRow = rowContainer.lastChild;
         rowContainer.removeChild(lastRow);
         rowCount--;
-        primaryKeyFeature();
+        fromDisplay2buttonFeature();
     });
 
     resetBtn.addEventListener("click", () => {
@@ -706,19 +714,7 @@ function initTableView(dbName) {
         ruleChecker();
     });
 
-    let dataTypeButtons = document.querySelectorAll('.dataType');
+    fromDisplay2buttonFeature();
 
-    dataTypeButtons.forEach(button => {
-    button.addEventListener('click', event => {
-            let row = event.target.closest('.row');
-            let sizeInput = row.querySelector('.sizeInput');
-            let dataType = button.querySelector('.selectedDataType').innerText;
-            if (!["FLOAT", "DOUBLE", "DATE", "BOOLEAN"].includes(dataType)) {
-                sizeInput.removeAttribute("disabled");
-            }
-        });
-    });
-
-    primaryKeyFeature();
     queryRunner(routingContainer);
 }
