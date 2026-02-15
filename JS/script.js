@@ -252,6 +252,8 @@ function ruleChecker() {
     const autoIncrements = document.querySelectorAll('input[name="ai"]');
     const primaryKeys = document.querySelectorAll('input[name="pk"]');
     const NotNulls = document.querySelectorAll("input[name='nn']");
+    const expressions = document.querySelectorAll(".expression");
+    const UnsignedList = document.querySelectorAll(".US");
 
     // Table name must be valid
     tableNameInput.addEventListener("change", () => {
@@ -287,11 +289,24 @@ function ruleChecker() {
         }
     });
 
-    // AUTO_INCREMENT MUST be with PRIMARY KEY!
+    // Data type must be indexable
+    primaryKeys.forEach((pk, index) => {
+        if (pk.checked && (selectedDataType[index].innerText === "TEXT()" || selectedDataType[index].innerText === "BOOLEAN")) {
+            console.log("primary key cannot with 'TEXT' or 'BOOLEAN' datatype");
+            return;
+        }
+    });
+    const uniques = document.querySelectorAll('input[name="uq"]');
+    uniques.forEach((up, index) => {
+        if (up.checked && (selectedDataType[index].innerText === "TEXT()" || selectedDataType[index].innerText === "BOOLEAN")) {
+            console.log("unique key cannot with 'TEXT' or 'BOOLEAN' datatype");
+            return;
+        } 
+    });
 
+    // AUTO_INCREMENT MUST be with PRIMARY KEY!
     // DEFAULT is NOT allowed with AUTO_INCREMENT
     // Must be a numeric type: int or bigint
-    const expressions = document.querySelectorAll(".expression");
     autoIncrements.forEach((ai, index) => {
         if (ai.checked) {
             if (selectedDataType[index].innerText !== "INT()" && selectedDataType[index].innerText !== "BIGINT()") {
@@ -305,14 +320,8 @@ function ruleChecker() {
         }
     });
 
-   
-
-
-    // PRIMARY KEY implies NOT NULL!
-
     // UNSIGNED allowed only for numeric types
      // BOOLEAN cannot be UNSIGNED
-    const UnsignedList = document.querySelectorAll(".US");
     UnsignedList.forEach((us, index) => {
         if (us.checked) {
             if (selectedDataType[index].innerText !== "INT()" && selectedDataType[index].innerText !== "BIGINT()" &&
