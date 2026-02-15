@@ -227,10 +227,8 @@ function OptionSelection() {
         dt.innerText = selectedType;
         dataTypeList.removeAttribute("style");
 
-        // Remove parentheses for checking
         const cleanType = selectedType.replace(/\(.*\)/, "");
 
-        // Disable list
         const disableList = ["FLOAT", "DOUBLE", "DATE", "BOOLEAN"];
 
         if (disableList.includes(cleanType)) {
@@ -253,7 +251,7 @@ function ruleChecker() {
     let selectedDataType = document.querySelectorAll(".selectedDataType");
     const autoIncrements = document.querySelectorAll('input[name="ai"]');
     const primaryKeys = document.querySelectorAll('input[name="pk"]');
-    const NotNulls = document.querySelectorAll(".NN");
+    const NotNulls = document.querySelectorAll("input[name='nn']");
 
     // Table name must be valid
     tableNameInput.addEventListener("change", () => {
@@ -502,6 +500,21 @@ function initDatabaseView($location, $rootScope) {
     queryRunner(routingContainer);
 }
 
+function primaryKeyFeature() {
+    const primaryKeys = document.querySelectorAll('input[name="pk"]');
+    const NotNulls = document.querySelectorAll("input[name='nn']");
+    // PRIMARY KEY implies NOT NULL
+    primaryKeys.forEach((pk, index) => {
+        pk.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (pk.checked) {
+                NotNulls[index].checked = true;
+                NotNulls[index].style.border = "0.2rem solid #ffff00";
+            }
+        });
+    });
+}
+
 function initTableView(dbName) {
 
     const addSvg = document.querySelector(".addSvg");
@@ -629,17 +642,17 @@ function initTableView(dbName) {
                     <div class="sizeInputDiv">
                         <input type="number" class="sizeInput" name="sizeValue" placeholder="size" disabled/>
                     </div>
-                    
+                    <!-- Only ONE PRIMARY KEY per table -->
                     <input type="radio" id="pk${rowCount}" name="pk" value="pk${rowCount}" hidden />
                     <label for="pk${rowCount}" class="btn Pk">Primary Key</label>
 
-                    <input type="checkbox" id="nn${rowCount}" hidden />
+                    <input type="checkbox" id="nn${rowCount}" name="nn" value="nn${rowCount}" hidden />
                     <label for="nn${rowCount}" class="btn NN">Not Null</label>
 
-                    <input type="checkbox" id="uq${rowCount}" hidden />
+                    <input type="checkbox" id="uq${rowCount}" name="uq" value="uq${rowCount}" hidden />
                     <label for="uq${rowCount}" class="btn">Unique</label>
 
-                    <input type="checkbox" id="us${rowCount}" hidden />
+                    <input type="checkbox" id="us${rowCount}" name="us" value="us${rowCount}" hidden />
                     <label for="us${rowCount}" class="btn">Unsigned</label>
 
                     <input type="radio" id="ai${rowCount}" name="ai" value="ai${rowCount}" hidden />
@@ -650,7 +663,7 @@ function initTableView(dbName) {
                     </div>
         `;
         rowContainer.appendChild(newRow);
-        
+        primaryKeyFeature();
     });
 
     OptionSelection();
@@ -665,6 +678,7 @@ function initTableView(dbName) {
         let lastRow = rowContainer.lastChild;
         rowContainer.removeChild(lastRow);
         rowCount--;
+        primaryKeyFeature();
     });
 
     resetBtn.addEventListener("click", () => {
@@ -696,5 +710,6 @@ function initTableView(dbName) {
         });
     });
 
+    primaryKeyFeature();
     queryRunner(routingContainer);
 }

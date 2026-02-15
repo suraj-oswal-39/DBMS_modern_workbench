@@ -77,6 +77,12 @@
     width: -webkit-fill-available;
 }
 
+.sizeInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    padding: 0;
+}
+
 .columnName:hover,
 #tableNameInput:hover,
 .expression:hover,
