@@ -321,9 +321,17 @@ function ruleChecker() {
 
 }
 
+function outputWindow(outputMsg) {
+    const result = document.querySelector(".result");
+    const outputScreen = document.querySelector(".outputScreen");
+    outputScreen.style.display = "block";
+    result.innerText = "";
+    result.innerText = outputMsg;
+}
+
 async function executeQuery() {
     const query = document.querySelector(".queryBox").value;
-    alert(query);
+    console.log(query);
     const response = await fetch("http://localhost:8080/execute", {
         method: "POST",
         headers: {
@@ -334,7 +342,8 @@ async function executeQuery() {
 
     const data = await response.json();
 
-    alert(JSON.stringify(data, null, 2));
+    const responseJson = JSON.stringify(data, null, 2);
+    outputWindow(responseJson);
 }
 
 function queryRunner(routingContainer) {
@@ -357,12 +366,6 @@ function queryRunner(routingContainer) {
         executeQuery();
     };
 
-    const outputScreen = document.querySelector(".outputScreen");
-    const outputScreenClose = document.querySelector(".outputScreenClose");
-
-    outputScreenClose.onclick = () => {
-        outputScreen.style.display = "none";
-    };
 }
 
 function initDatabaseView($location, $rootScope) {
@@ -379,6 +382,8 @@ function initDatabaseView($location, $rootScope) {
     const noBtn = document.querySelector(".no");
     const yesBtn = document.querySelector(".yes");
     const message = document.querySelector(".message");
+    const outputScreen = document.querySelector(".outputScreen");
+    const outputScreenClose = document.querySelector(".outputScreenClose");
 
     message.textContent = "This will permanently delete the selected database. All tables, records, and related data will be removed. This action cannot be undone.";
 
@@ -493,6 +498,10 @@ function initDatabaseView($location, $rootScope) {
     };
 
     queryRunner(routingContainer);
+
+    outputScreenClose.onclick = () => {
+        outputScreen.style.display = "none";
+    };
 }
 
 function fromDisplay2buttonFeature() {
@@ -551,7 +560,6 @@ function fromDisplay2buttonFeature() {
 }
 
 function initTableView(dbName) {
-
     const addSvg = document.querySelector(".addSvg");
     const routingContainer = document.querySelector(".routingContainer");
     const SvgGridTemplate = document.querySelector(".SvgGridTemplate");
@@ -562,6 +570,9 @@ function initTableView(dbName) {
     const message = document.querySelector(".message");
     const fromDisplay2 = document.querySelector(".fromDisplay2");
     const rowContainer = document.querySelector(".rowContainer");
+    const outputScreen = document.querySelector(".outputScreen");
+    const outputScreenClose = document.querySelector(".outputScreenClose");
+
     let btn;
     let dataTypeList;
     let realTbNameForDel = "";
@@ -735,4 +746,8 @@ function initTableView(dbName) {
     fromDisplay2buttonFeature();
 
     queryRunner(routingContainer);
+
+    outputScreenClose.onclick = () => {
+        outputScreen.style.display = "none";
+    };
 }

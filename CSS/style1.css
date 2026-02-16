@@ -180,7 +180,7 @@ hr {
     left: 25vw;
     top: 12vh;
     width: 50vw;
-    height: 50vh;
+    min-height: 50vh;
     padding: 1rem;
 }
 
@@ -203,5 +203,5 @@ hr {
 
 .result {
     display: flex;
-    height: 16rem;
+    min-height: 16rem;
 }
