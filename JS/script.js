@@ -356,6 +356,13 @@ function queryRunner(routingContainer) {
     executeBtn.onclick = () => {
         executeQuery();
     };
+
+    const outputScreen = document.querySelector(".outputScreen");
+    const outputScreenClose = document.querySelector(".outputScreenClose");
+
+    outputScreenClose.onclick = () => {
+        outputScreen.style.display = "none";
+    };
 }
 
 function initDatabaseView($location, $rootScope) {

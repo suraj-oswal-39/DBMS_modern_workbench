@@ -29,22 +29,6 @@
     opacity: 1;
 }
 
-.CloseCross2 .red {
-    stop-color: #303030;
-}
-
-.CloseCross2 .yellow {
-    stop-color: #303030;
-}
-
-.CloseCross2:hover .red {
-    stop-color: #ff0000;
-}
-
-.CloseCross2:hover .yellow {
-    stop-color: #ffff00;
-}
-
 .formTitle {
     padding-left: 3em;
     padding-bottom: 1rem;

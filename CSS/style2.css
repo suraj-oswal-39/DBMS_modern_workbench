@@ -120,17 +120,25 @@ input:-webkit-autofill:active {
 .CloseCross .red,
 .CloseCross .yellow,
 .crossDelete .red,
-.crossDelete .yellow {
+.crossDelete .yellow,
+.CloseCross2 .red,
+.CloseCross2 .yellow,
+.outputScreenClose .red,
+.outputScreenClose .yellow {
     stop-color: #303030;
 }
 
 .CloseCross:hover .red,
-.crossDelete:hover .red {
+.crossDelete:hover .red,
+.CloseCross2:hover .red,
+.outputScreenClose:hover .red {
     stop-color: #ff0000;
 }
 
 .CloseCross:hover .yellow,
-.crossDelete:hover .yellow {
+.crossDelete:hover .yellow,
+.CloseCross2:hover .yellow,
+.outputScreenClose:hover .yellow {
     stop-color: #ffff00;
 }
 

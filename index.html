@@ -46,6 +46,8 @@
     </div>
 
     <form class="popUpQueryWindow">
+        <p class="popUpTitle">SQl Query</p>
+
         <textarea class="queryBox" placeholder="Enter your query"></textarea>
 
         <button class="cancel">Cancel</button>
@@ -143,7 +145,25 @@
         </form>
     </section>
 
-    <div class="outputScreen"></div>
+    <div class="outputScreen">
+        <p class="popUpTitle">SQl Query
+
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="24px" height="24px" viewBox="0 0 24 24"
+            pointer-events="all" class="outputScreenClose">
+            <defs>
+                <linearGradient id="outputScreenCloseSvgGrow" x1="100%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" class="red" />
+                    <stop offset="100%" class="yellow" />
+                </linearGradient>
+            </defs>
+            <path
+                d="M 0 9.6 L 9.6 9.6 L 9.6 0 L 14.4 0 L 14.4 9.6 L 24 9.6 L 24 14.4 L 14.4 14.4 L 14.4 24 L 9.6 24 L 9.6 14.4 L 0 14.4 Z"
+                fill="url(#outputScreenCloseSvgGrow)" stroke="none" />
+            </svg>
+        </p>
+        
+        <p class="result"></p>
+    </div>
 
     <script src="./JS/script.js"></script>
 </body>
