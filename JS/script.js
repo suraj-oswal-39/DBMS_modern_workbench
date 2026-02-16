@@ -258,7 +258,8 @@ function ruleChecker() {
     let names = [];
     let selectedDataType = document.querySelectorAll(".selectedDataType");
     const primaryKeys = document.querySelectorAll('input[name="pk"]');
-    const uniques = document.querySelectorAll('input[name="uq"]');
+    const NotNulls = document.querySelectorAll("input[name='nn']");
+    const expressions = document.querySelectorAll(".expression");
 
     // Table name must be valid
     tableNameInput.addEventListener("change", () => {
@@ -301,9 +302,19 @@ function ruleChecker() {
             return;
         }
     });
+    const uniques = document.querySelectorAll('input[name="uq"]');
     uniques.forEach((up, index) => {
         if (up.checked && (selectedDataType[index].innerText === "TEXT()" || selectedDataType[index].innerText === "BOOLEAN")) {
             console.log("unique key cannot with 'TEXT' or 'BOOLEAN' datatype");
+            return;
+        }
+    });
+    
+    // DEFAULT 'NULL' not allowed if column is NOT NULL
+    expressions.forEach((exp, index) => {
+        const value = exp.value.toLowerCase().trim()
+        if (value === "null" && NotNulls[index].checked) {
+            console.log("DEFAULT 'NULL' not allowed if column is NOT NULL");
             return;
         }
     });
