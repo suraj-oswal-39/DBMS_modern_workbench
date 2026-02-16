@@ -2,6 +2,16 @@ console.log("JavaScript file is linked successfully.");
 
 let svgId = "";
 
+function outputWindow(outputMsg) {
+    const result = document.querySelector(".result");
+    const outputScreen = document.querySelector(".outputScreen");
+    if (outputScreen.style.display !== "block") {
+        outputScreen.style.display = "block";
+    }
+    result.innerText = "";
+    result.innerText = outputMsg;
+}
+
 function NoBtn(noBtn, routingContainer, popUpWindow) {
     noBtn.onclick = () => {
         routingContainer.removeAttribute("style");
@@ -10,14 +20,9 @@ function NoBtn(noBtn, routingContainer, popUpWindow) {
 }
 
 function removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross) {
-    nameInput.value = "";
-    addSvg.removeAttribute("style");
-    tooltip.removeAttribute("style");
-    red.removeAttribute("style");
-    yellow.removeAttribute("style");
-    routingContainer.removeAttribute("style");
-    NameInput.removeAttribute("style");
-    CloseCross.removeAttribute("style");
+    [nameInput, addSvg, tooltip, red, yellow, routingContainer, CloseCross, NameInput].forEach(el => {
+        if (el && el.style) el.removeAttribute("style");
+    });
 }
 
 function enableSvgSearch(containerSelector) {
@@ -94,7 +99,10 @@ function fetchDatabases(SvgGridTemplate) {
                 SvgGridTemplate.insertBefore(newDBSvg, SvgGridTemplate.firstElementChild);
             })
         )
-        .catch(err => console.log(err.message));
+        .catch(err => {
+            let errorMsg = "Databases " + err.message + "\n\n" + err.stack;
+            outputWindow(errorMsg)
+        });
 }
 
 function createDatabases(newDBname) {
@@ -108,7 +116,10 @@ function createDatabases(newDBname) {
             console.log(data.message);
             location.reload();
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            let errorMsg = err.message + "\n\n" + err.stack;
+            outputWindow(errorMsg);
+        });
 }
 
 function deleteDatabases(dbNameForDel, dbSvgForRemove) {
@@ -122,7 +133,10 @@ function deleteDatabases(dbNameForDel, dbSvgForRemove) {
             console.log(data.message);
             dbSvgForRemove.remove();
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            let errorMsg = err.message + "\n\n" + err.stack;
+            outputWindow(errorMsg);
+        });
 }
 
 function fetchTables(SvgGridTemplate, svgId) {
@@ -149,7 +163,6 @@ function fetchTables(SvgGridTemplate, svgId) {
 	            		<stop offset="100%" class="yellow"/>
 	            	</linearGradient>
 	                </defs>
-                    </style>
                         <path
                             d="M4 15V16.8002C4 17.9203 4 18.4801 4.21799 18.9079C4.40973 19.2842 4.71547 19.5905 5.0918 19.7822C5.5192 20 6.07899 20 7.19691 20H12M4 15V9M4 15H12M4 9V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H12M4 9H12M12 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20 5.5192 20 6.07899 20 7.19691V9M12 4V9M12 9V15M12 9H20M12 15V20M12 15H20M12 20H16.8036C17.9215 20 18.4805 20 18.9079 19.7822C19.2842 19.5905 19.5905 19.2842 19.7822 18.9079C20 18.4805 20 17.9215 20 16.8036V15M20 15V9"
                             stroke="url(#${TableName}SvgGrow)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
@@ -175,7 +188,10 @@ function fetchTables(SvgGridTemplate, svgId) {
                 SvgGridTemplate.insertBefore(newTbSvg, SvgGridTemplate.firstElementChild);
             })
         })
-        .catch(err => console.log(err.message));
+        .catch(err => {
+            let errorMsg = "Tables " + err.message + "\n\n" + err.stack;
+            outputWindow(errorMsg);
+        });
 }
 
 function deleteTables(realTbNameForDel, TbSvgForRemove, dbName) {
@@ -194,7 +210,10 @@ function deleteTables(realTbNameForDel, TbSvgForRemove, dbName) {
             console.log(data.message);
             TbSvgForRemove.remove();
         })
-        .catch(err => console.log(err.message));
+        .catch(err => {
+            let errorMsg = err.message + "\n\n" + err.stack;
+            outputWindow(errorMsg);
+        });
 }
 
 function deletionPopUpMessage(containerSelector, NameForDel, SvgForRemove, dbName) {
@@ -260,29 +279,27 @@ function ruleChecker() {
     const primaryKeys = document.querySelectorAll('input[name="pk"]');
     const NotNulls = document.querySelectorAll("input[name='nn']");
     const expressions = document.querySelectorAll(".expression");
+    const errorMsg = [];
 
     // Table name must be valid
     tableNameInput.addEventListener("change", () => {
         const tableName = tableNameInput.value.trim();
         if (!/^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/.test(tableName)) {
-            console.log("Invalid table name");
-            return;
+            errorMsg.push("Invalid table name!");
         }
     });
 
     columnNames.forEach((columnName) => {
         // Column name is mandatory
         if (columnName.value === "") {
-            console.log("Column name is mandatory");
-            return;
+            errorMsg.push("Column name is mandatory!");
         }
         // Column names must be unique
         const name = columnName.value.trim();
         if (names.includes(name)) {
-            console.log("Duplicate column name");
+            errorMsg.push("Duplicate column name!");
             names = [];
             columnName.value = "";
-            return;
         }
         names.push(name);
     });
@@ -290,23 +307,20 @@ function ruleChecker() {
     //  Data type is mandatory
     selectedDataType.forEach((dataType) => {
         if (dataType.innerText === "Select Data Type") {
-            console.log("you must select data type");
-            return;
+            errorMsg.push("you must select data type!");
         }
     });
 
     // Data type must be indexable
     primaryKeys.forEach((pk, index) => {
         if (pk.checked && (selectedDataType[index].innerText === "TEXT()" || selectedDataType[index].innerText === "BOOLEAN")) {
-            console.log("primary key cannot with 'TEXT' or 'BOOLEAN' datatype");
-            return;
+            errorMsg.push("primary key cannot with 'TEXT' or 'BOOLEAN' datatype!");
         }
     });
     const uniques = document.querySelectorAll('input[name="uq"]');
     uniques.forEach((up, index) => {
         if (up.checked && (selectedDataType[index].innerText === "TEXT()" || selectedDataType[index].innerText === "BOOLEAN")) {
-            console.log("unique key cannot with 'TEXT' or 'BOOLEAN' datatype");
-            return;
+            errorMsg.push("unique key cannot with 'TEXT' or 'BOOLEAN' datatype!");
         }
     });
     
@@ -314,19 +328,16 @@ function ruleChecker() {
     expressions.forEach((exp, index) => {
         const value = exp.value.toLowerCase().trim()
         if (value === "null" && NotNulls[index].checked) {
-            console.log("DEFAULT 'NULL' not allowed if column is NOT NULL");
-            return;
+            errorMsg.push("DEFAULT 'NULL' not allowed if column is NOT NULL!");
         }
     });
 
-}
-
-function outputWindow(outputMsg) {
-    const result = document.querySelector(".result");
-    const outputScreen = document.querySelector(".outputScreen");
-    outputScreen.style.display = "block";
-    result.innerText = "";
-    result.innerText = outputMsg;
+    if (errorMsg.length !== 0) {
+        outputWindow(errorMsg.join("\n"));
+        return false;
+    } else if (errorMsg.length === 0) {
+        return true;
+    }
 }
 
 async function executeQuery() {
@@ -364,8 +375,101 @@ function queryRunner(routingContainer) {
 
     executeBtn.onclick = () => {
         executeQuery();
+        popUpQueryWindow.style.display = "none";
     };
 
+}
+
+function fromDisplay2buttonFeature() {
+    const rowContainer = document.querySelector(".rowContainer");
+
+    // PRIMARY KEY implies NOT NULL
+    rowContainer.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const pk = event.target.closest('input[name="pk"]');
+        if (!pk) return;
+        const row = pk.closest(".row");
+        const nn = row.querySelector('input[name="nn"]');
+        if (pk.checked) {
+            nn.checked = true;
+            nn.style.border = "0.2rem solid #ffff00";
+        }
+    });
+
+    // UNSIGNED Only with numeric types
+    rowContainer.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const us = event.target.closest('input[name="us"]');
+        if (!us) return;
+        console.log(us);
+        const row = us.closest(".row");
+        const dataType = row.querySelector('.selectedDataType');
+        if (!["INT()", "BIGINT()", "DECIMAL()", "FLOAT", "DOUBLE"].includes(dataType.innerText)) {
+            us.checked = false;
+            us.removeAttribute("style");
+            console.log("Data type must be INT, BIGINT, DECIMAL, FLOAT or DOUBLE.");
+        }
+    });
+
+    // AUTO_INCREMENT Must be with integer type and either PRIMARY KEY or UNIQUE.
+    rowContainer.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const ai = event.target.closest('input[name="ai"]');
+        if (!ai) return;
+        const row = ai.closest(".row");
+        const dataType = row.querySelector('.selectedDataType');
+        const pk = row.querySelector('input[name="pk"]');
+        const uq = row.querySelector('input[name="uq"]');
+        const exp = row.querySelector('.expression');
+        if (!["INT()", "BIGINT()"].includes(dataType.innerText) || !(pk.checked || uq.checked)) {
+            ai.checked = false;
+            ai.removeAttribute("style");
+            console.log("Data type must be INT or BIGINT and either PRIMARY KEY or UNIQUE.");
+        }
+        if (ai.checked && exp.value === "") {
+            exp.setAttribute("disabled", "true");
+            exp.value = "";
+            exp.placeholder = "disabled";
+        }
+    });
+
+}
+
+function outputScreenClose(routingContainer) {
+    const outputScreen = document.querySelector(".outputScreen");
+    const outputScreenClose = document.querySelector(".outputScreenClose");
+    outputScreenClose.onclick = () => {
+        outputScreen.style.display = "none";
+        routingContainer.removeAttribute("style");
+    };
+}
+
+function createTable() {
+    const tableNameInput = document.querySelector(".tableNameInput");
+    const columnNames = document.querySelectorAll(".columnName");
+    const selectedDataTypes = document.querySelectorAll(".selectedDataType");
+    const sizeInputs = document.querySelectorAll(".sizeInput");
+    const primaryKeys = document.querySelectorAll('input[name="pk"]');
+    const notNulls = document.querySelectorAll('input[name="nn"]');
+    const uniques = document.querySelectorAll('input[name="uq"]');
+    const Unsigneds = document.querySelectorAll('input[name="us"]');
+    const AutoIncrements = document.querySelectorAll('input[name="ai"]');
+    const expressions = document.querySelectorAll(".expression");
+
+    const table = {
+        tableName: tableNameInput.value,
+        columns: Array.from(columnNames).map((columnName, index) => ({
+            columnName: columnName.value,
+            dataType: selectedDataTypes[index].innerText,
+            size: sizeInputs[index].value,
+            primaryKey: primaryKeys[index].checked,
+            notNull: notNulls[index].checked,
+            unique: uniques[index].checked,
+            unsigned: Unsigneds[index].checked,
+            autoIncrement: AutoIncrements[index].checked,
+            expression: expressions[index].value,
+        })),
+    };
 }
 
 function initDatabaseView($location, $rootScope) {
@@ -382,8 +486,6 @@ function initDatabaseView($location, $rootScope) {
     const noBtn = document.querySelector(".no");
     const yesBtn = document.querySelector(".yes");
     const message = document.querySelector(".message");
-    const outputScreen = document.querySelector(".outputScreen");
-    const outputScreenClose = document.querySelector(".outputScreenClose");
 
     message.textContent = "This will permanently delete the selected database. All tables, records, and related data will be removed. This action cannot be undone.";
 
@@ -416,29 +518,30 @@ function initDatabaseView($location, $rootScope) {
             let tooltipNodeList = document.querySelectorAll(".tooltip");
 
             if (newDBname === "") {
-                console.log("Database name cannot be empty!");
+                outputWindow("Database name cannot be empty!");
                 return
             }
 
             const invalidPattern = /(^[0-9])|[\s\-@#%&*!]|[^\x00-\x7F]/;
 
             if (invalidPattern.test(newDBname)) {
-                console.log(
+                let errorMsg =
                     "Invalid database name!\n\n" +
                     "Rules:\n" +
                     "- Must NOT start with a number\n" +
                     "- No spaces\n" +
                     "- No hyphens (-)\n" +
                     "- No special characters (@ # % & * !)\n" +
-                    "- No emoji or unicode characters"
-                );
+                    "- No emoji or unicode characters";
+                outputWindow(errorMsg);
+                removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross);
                 return;
             }
 
             const existingDBNames = Array.from(tooltipNodeList).map(oneTooltip => oneTooltip.textContent);
 
             if (existingDBNames.includes(newDBname)) {
-                console.log("Database name already exists!");
+                outputWindow("Database name already exists!");
                 return;
             }
 
@@ -498,65 +601,7 @@ function initDatabaseView($location, $rootScope) {
     };
 
     queryRunner(routingContainer);
-
-    outputScreenClose.onclick = () => {
-        outputScreen.style.display = "none";
-    };
-}
-
-function fromDisplay2buttonFeature() {
-    const rowContainer = document.querySelector(".rowContainer");
-
-    // PRIMARY KEY implies NOT NULL
-    rowContainer.addEventListener('click', (event) => {
-        event.stopPropagation();
-        const pk = event.target.closest('input[name="pk"]');
-        if (!pk) return;
-        const row = pk.closest(".row");
-        const nn = row.querySelector('input[name="nn"]');
-        if (pk.checked) {
-            nn.checked = true;
-            nn.style.border = "0.2rem solid #ffff00";
-        }
-    });
-
-    // UNSIGNED Only with numeric types
-    rowContainer.addEventListener('click', (event) => {
-        event.stopPropagation();
-        const us = event.target.closest('input[name="us"]');
-        if (!us) return;
-        console.log(us);
-        const row = us.closest(".row");
-        const dataType = row.querySelector('.selectedDataType');
-        if (!["INT()", "BIGINT()", "DECIMAL()", "FLOAT", "DOUBLE"].includes(dataType.innerText)) {
-            us.checked = false;
-            us.removeAttribute("style");
-            console.log("Data type must be INT, BIGINT, DECIMAL, FLOAT or DOUBLE.");
-        }
-    });
-
-    // AUTO_INCREMENT Must be with integer type and either PRIMARY KEY or UNIQUE.
-    rowContainer.addEventListener('click', (event) => {
-        event.stopPropagation();
-        const ai = event.target.closest('input[name="ai"]');
-        if (!ai) return;
-        const row = ai.closest(".row");
-        const dataType = row.querySelector('.selectedDataType');
-        const pk = row.querySelector('input[name="pk"]');
-        const uq = row.querySelector('input[name="uq"]');
-        const exp = row.querySelector('.expression');
-        if (!["INT()", "BIGINT()"].includes(dataType.innerText) || !(pk.checked || uq.checked)) {
-            ai.checked = false;
-            ai.removeAttribute("style");
-            console.log("Data type must be INT or BIGINT and either PRIMARY KEY or UNIQUE.");
-        }
-        if (ai.checked && exp.value === "") {
-            exp.setAttribute("disabled", "true");
-            exp.value = "";
-            exp.placeholder = "disabled";
-        }
-    });
-
+    outputScreenClose(routingContainer);
 }
 
 function initTableView(dbName) {
@@ -570,8 +615,6 @@ function initTableView(dbName) {
     const message = document.querySelector(".message");
     const fromDisplay2 = document.querySelector(".fromDisplay2");
     const rowContainer = document.querySelector(".rowContainer");
-    const outputScreen = document.querySelector(".outputScreen");
-    const outputScreenClose = document.querySelector(".outputScreenClose");
 
     let btn;
     let dataTypeList;
@@ -717,7 +760,7 @@ function initTableView(dbName) {
     RemoveRow.addEventListener("click", () => {
         // Table must have at least one row
         if (rowCount <= 0) {
-            console.log("at least have 1 row");
+            outputWindow("Table create form at least have 1 row");
             return;
         }
 
@@ -740,14 +783,14 @@ function initTableView(dbName) {
 
     const createBtn = document.querySelector("#createBtn");
     createBtn.addEventListener("click", () => {
-        ruleChecker();
+        let allCorrect = ruleChecker();
+        if (allCorrect) {
+            createTable();
+        }
     });
 
     fromDisplay2buttonFeature();
 
     queryRunner(routingContainer);
-
-    outputScreenClose.onclick = () => {
-        outputScreen.style.display = "none";
-    };
+    outputScreenClose(routingContainer);
 }

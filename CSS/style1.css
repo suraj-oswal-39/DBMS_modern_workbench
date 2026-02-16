@@ -182,6 +182,7 @@ hr {
     width: 50vw;
     min-height: 50vh;
     padding: 1rem;
+    z-index: 999;
 }
 
 .outputScreen .popUpTitle {
