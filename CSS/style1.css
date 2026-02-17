@@ -5,11 +5,26 @@
     color: white;
 }
 
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 1rem;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ffff00, #ff0000);
+    border-radius: 1rem;
+    cursor: default;
+}
+
 body {
     position: relative;
     background-color: #060000;
     height: 100%;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 header {
@@ -43,7 +58,7 @@ input::placeholder {
 .searchBar input:focus {
     background:
         linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+        linear-gradient(135deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
 }
 
@@ -60,7 +75,7 @@ input::placeholder {
     align-items: center;
     background:
         linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+        linear-gradient(135deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     padding: 0.5rem;
@@ -71,7 +86,7 @@ input::placeholder {
 hr {
     background:
         linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+        linear-gradient(135deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     margin: 1rem 3rem;
@@ -88,7 +103,7 @@ hr {
     width: 25%;
     background:
         linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+        linear-gradient(135deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     position: absolute;
@@ -137,7 +152,7 @@ hr {
         "queryBox queryBox"
         "btn1 btn2";
     place-items: center;
-    background: linear-gradient(#060000, #060000) padding-box, linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    background: linear-gradient(#060000, #060000) padding-box, linear-gradient(135deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     position: fixed;
@@ -170,10 +185,13 @@ hr {
     user-select: none;
     font-family: monospace;
     font-size: 1em;
+    overflow: hidden;
+    white-space: pre;
 }
 
 .queryBox {
     padding: 1em 1rem;
+    margin-right: 0.5rem;
     font-size: 0.8rem;
     background-color: #060000;
     width: inherit;
@@ -183,11 +201,20 @@ hr {
     font-family: monospace;
 }
 
+.queryBox::-webkit-scrollbar {
+    width: 10px;
+}
+
+.queryBox::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 1rem;
+}
+
 .outputScreen {
     display: none;
     background:
         linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+        linear-gradient(135deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     position: absolute;

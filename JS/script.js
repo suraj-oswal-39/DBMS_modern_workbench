@@ -498,14 +498,13 @@ function initDatabaseView($location, $rootScope) {
     const textarea = document.getElementById("sqlEditor");
     const lineNumbers = document.getElementById("lineNumbers");
 
-    textarea.addEventListener("input", updateLineNumbers);
-
-    // Sync scrolling
+    textarea.addEventListener("input", function () {
+        updateLineNumbers(textarea, lineNumbers);
+    });
     textarea.addEventListener("scroll", () => {
         lineNumbers.scrollTop = textarea.scrollTop;
     });
 
-    // Initialize
     updateLineNumbers(textarea, lineNumbers);
 
     message.textContent = "This will permanently delete the selected database. All tables, records, and related data will be removed. This action cannot be undone.";
@@ -648,6 +647,19 @@ function initTableView(dbName) {
     const h3Tag = document.querySelector(".DBTabletTitle");
     let capitalizedDBName = dbName.charAt(0).toUpperCase() + dbName.slice(1);
     h3Tag.textContent = `${capitalizedDBName} database tables`;
+
+    const textarea = document.getElementById("sqlEditor");
+    const lineNumbers = document.getElementById("lineNumbers");
+
+    textarea.addEventListener("input", function () {
+        updateLineNumbers(textarea, lineNumbers)
+    });
+
+    textarea.addEventListener("scroll", () => {
+        lineNumbers.scrollTop = textarea.scrollTop;
+    });
+
+    updateLineNumbers(textarea, lineNumbers);
 
     message.textContent = "Are you sure you want to permanently delete this table? This will remove all data in the table and cannot be undone.";
 
