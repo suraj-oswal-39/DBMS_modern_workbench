@@ -23,11 +23,11 @@ h2 {
 }
 
 .searchBar {
-    width: 100%;
+    width: stretch;
 }
 
 .searchBar input {
-    width: 92%;
+    width: stretch;
     padding: 0.6rem 1em;
     border-radius: 1rem;
     border: 0.2rem solid #303030;
@@ -127,46 +127,60 @@ hr {
 }
 
 .popUpQueryWindow {
-    width: auto;
-    height: 24rem;
+    width: 50%;
+    height: 21.8rem;
     display: none;
-    grid-template-rows: 0.1fr 1fr 0.3fr;
-    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     grid-template-areas:
         "title title"
         "queryBox queryBox"
         "btn1 btn2";
     place-items: center;
-    background:
-        linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+    background: linear-gradient(#060000, #060000) padding-box, linear-gradient(145deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
-    position: absolute;
+    position: fixed;
+    top: 14vh;
     left: 25vw;
-    top: 12vh;
 }
 
 .popUpQueryWindow .popUpTitle {
     grid-area: title;
-    padding: 1em;
-    display: flex;
-    justify-content: flex-start;
-    width: 90%;
+    padding: 1em 1em 0.5em 1em;
+    width: stretch;
     font-weight: bold;
+    text-align: left;
+}
+
+.editor {
+    grid-area: queryBox;
+    font-size: 0.8rem;
+    width: stretch;
+    height: 16rem;
+    display: flex;
+    overflow: hidden;
+}
+
+.lineNumbers {
+    background: #111;
+    color: #888;
+    padding: 1em 0.5em;
+    text-align: right;
+    user-select: none;
+    font-family: monospace;
+    font-size: 1em;
 }
 
 .queryBox {
-    grid-area: queryBox;
-    padding: 1em 2em 2em 2em;
+    padding: 1em 1rem;
     font-size: 0.8rem;
     background-color: #060000;
-    width: 32rem;
-    height: 15.4rem;
-    border-radius: 1rem;
+    width: inherit;
     outline: none;
     border: none;
     resize: none;
+    font-family: monospace;
 }
 
 .outputScreen {
@@ -205,4 +219,5 @@ hr {
 .result {
     display: flex;
     min-height: 16rem;
+    white-space: preserve;
 }

@@ -323,7 +323,7 @@ function ruleChecker() {
             errorMsg.push("unique key cannot with 'TEXT' or 'BOOLEAN' datatype!");
         }
     });
-    
+
     // DEFAULT 'NULL' not allowed if column is NOT NULL
     expressions.forEach((exp, index) => {
         const value = exp.value.toLowerCase().trim()
@@ -472,6 +472,15 @@ function createTable() {
     };
 }
 
+function updateLineNumbers(textarea, lineNumbers) {
+    const lines = textarea.value.split("\n").length;
+    let numbers = "";
+    for (let i = 1; i <= lines; i++) {
+        numbers += i + "\n";
+    }
+    lineNumbers.textContent = numbers;
+}
+
 function initDatabaseView($location, $rootScope) {
     const nameInput = document.getElementById("nameInput");
     const addSvg = document.querySelector(".addSvg");
@@ -486,6 +495,18 @@ function initDatabaseView($location, $rootScope) {
     const noBtn = document.querySelector(".no");
     const yesBtn = document.querySelector(".yes");
     const message = document.querySelector(".message");
+    const textarea = document.getElementById("sqlEditor");
+    const lineNumbers = document.getElementById("lineNumbers");
+
+    textarea.addEventListener("input", updateLineNumbers);
+
+    // Sync scrolling
+    textarea.addEventListener("scroll", () => {
+        lineNumbers.scrollTop = textarea.scrollTop;
+    });
+
+    // Initialize
+    updateLineNumbers(textarea, lineNumbers);
 
     message.textContent = "This will permanently delete the selected database. All tables, records, and related data will be removed. This action cannot be undone.";
 

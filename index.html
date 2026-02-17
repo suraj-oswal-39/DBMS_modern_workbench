@@ -48,7 +48,10 @@
     <form class="popUpQueryWindow">
         <p class="popUpTitle">SQl Query</p>
 
-        <textarea class="queryBox" placeholder="Enter your query"></textarea>
+        <div class="editor">
+            <div class="lineNumbers" id="lineNumbers">1</div>
+            <textarea class="queryBox" id="sqlEditor" spellcheck="false" placeholder="Enter your query"></textarea>
+        </div>
 
         <button class="cancel">Cancel</button>
         <button class="execute" type="button">Execute</button>
