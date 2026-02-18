@@ -113,8 +113,10 @@ function createDatabases(newDBname) {
     })
         .then(res => res.json())
         .then(data => {
-            console.log(data.message);
-            location.reload();
+            outputWindow(data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
         })
         .catch(err => {
             let errorMsg = err.message + "\n\n" + err.stack;
@@ -130,7 +132,7 @@ function deleteDatabases(dbNameForDel, dbSvgForRemove) {
     })
         .then(res => res.json())
         .then(data => {
-            console.log(data.message);
+            outputWindow(data.message);
             dbSvgForRemove.remove();
         })
         .catch(err => {
@@ -207,13 +209,63 @@ function deleteTables(realTbNameForDel, TbSvgForRemove, dbName) {
     })
         .then(res => res.json())
         .then(data => {
-            console.log(data.message);
+            outputWindow(data.message);
             TbSvgForRemove.remove();
         })
         .catch(err => {
             let errorMsg = err.message + "\n\n" + err.stack;
             outputWindow(errorMsg);
         });
+}
+
+async function createTable(dbName) {
+    const tableNameInput = document.querySelector("#tableNameInput");
+    const columnNames = document.querySelectorAll(".columnName");
+    const selectedDataTypes = document.querySelectorAll(".selectedDataType");
+    const sizeInputs = document.querySelectorAll(".sizeInput");
+    const primaryKeys = document.querySelectorAll('input[name="pk"]');
+    const notNulls = document.querySelectorAll('input[name="nn"]');
+    const uniques = document.querySelectorAll('input[name="uq"]');
+    const Unsigneds = document.querySelectorAll('input[name="us"]');
+    const AutoIncrements = document.querySelectorAll('input[name="ai"]');
+    const expressions = document.querySelectorAll(".expression");
+
+    const table = {
+        databaseName: dbName,
+        tableName: tableNameInput.value,
+        columns: Array.from(columnNames).map((columnName, index) => ({
+            columnName: columnName.value,
+            dataType: selectedDataTypes[index].innerText,
+            size: sizeInputs[index].value,
+            primaryKey: primaryKeys[index].checked,
+            notNull: notNulls[index].checked,
+            unique: uniques[index].checked,
+            unsigned: Unsigneds[index].checked,
+            autoIncrement: AutoIncrements[index].checked,
+            expression: expressions[index].value,
+        })),
+    };
+
+    try {
+        const response = await fetch("http://localhost:8080/create-table", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(table)
+        });
+
+        const data = await response.json();
+        if (data.error) {
+            outputWindow(data.error);
+        } else if (data.message) {
+            outputWindow(data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
+    } catch (err) {
+        let errorMsg = err.message + "\n\n" + err.stack;
+        outputWindow(errorMsg);
+    }
 }
 
 function deletionPopUpMessage(containerSelector, NameForDel, SvgForRemove, dbName) {
@@ -267,6 +319,11 @@ function OptionSelection() {
             exp.placeholder = "disabled";
         }
 
+        if (cleanType === "VARCHAR") {
+            sizeInput.value = "50";
+            sizeInput.setAttribute("required", "true");
+        }
+
     });
 }
 
@@ -280,6 +337,7 @@ function ruleChecker() {
     const NotNulls = document.querySelectorAll("input[name='nn']");
     const expressions = document.querySelectorAll(".expression");
     const errorMsg = [];
+    const sizeInputs = document.querySelectorAll(".sizeInput");
 
     // Table name must be valid
     tableNameInput.addEventListener("change", () => {
@@ -305,9 +363,12 @@ function ruleChecker() {
     });
 
     //  Data type is mandatory
-    selectedDataType.forEach((dataType) => {
+    selectedDataType.forEach((dataType, index) => {
         if (dataType.innerText === "Select Data Type") {
             errorMsg.push("you must select data type!");
+        } 
+        if (dataType.innerText === "VARCHAR()" &&sizeInputs[index].value === "") {
+            errorMsg.push("VARCHAR datatype must have size specified!");
         }
     });
 
@@ -342,7 +403,7 @@ function ruleChecker() {
 
 async function executeQuery() {
     const query = document.querySelector(".queryBox").value;
-    console.log(query);
+    // console.log(query);
     const response = await fetch("http://localhost:8080/execute", {
         method: "POST",
         headers: {
@@ -354,7 +415,7 @@ async function executeQuery() {
     const data = await response.json();
 
     const responseJson = JSON.stringify(data, null, 2);
-    outputWindow(responseJson);
+    outputWindow(responseJson + "\n\nyour query:\n" + query);
 }
 
 function queryRunner(routingContainer) {
@@ -441,34 +502,6 @@ function outputScreenClose(routingContainer) {
     outputScreenClose.onclick = () => {
         outputScreen.style.display = "none";
         routingContainer.removeAttribute("style");
-    };
-}
-
-function createTable() {
-    const tableNameInput = document.querySelector(".tableNameInput");
-    const columnNames = document.querySelectorAll(".columnName");
-    const selectedDataTypes = document.querySelectorAll(".selectedDataType");
-    const sizeInputs = document.querySelectorAll(".sizeInput");
-    const primaryKeys = document.querySelectorAll('input[name="pk"]');
-    const notNulls = document.querySelectorAll('input[name="nn"]');
-    const uniques = document.querySelectorAll('input[name="uq"]');
-    const Unsigneds = document.querySelectorAll('input[name="us"]');
-    const AutoIncrements = document.querySelectorAll('input[name="ai"]');
-    const expressions = document.querySelectorAll(".expression");
-
-    const table = {
-        tableName: tableNameInput.value,
-        columns: Array.from(columnNames).map((columnName, index) => ({
-            columnName: columnName.value,
-            dataType: selectedDataTypes[index].innerText,
-            size: sizeInputs[index].value,
-            primaryKey: primaryKeys[index].checked,
-            notNull: notNulls[index].checked,
-            unique: uniques[index].checked,
-            unsigned: Unsigneds[index].checked,
-            autoIncrement: AutoIncrements[index].checked,
-            expression: expressions[index].value,
-        })),
     };
 }
 
@@ -734,7 +767,7 @@ function initTableView(dbName) {
         });
     });
 
-    AddRow.addEventListener("click", () => {
+    AddRow.onclick = () => {
         rowCount++;
         const newRow = document.createElement("div");
         newRow.classList.add("row");
@@ -781,16 +814,16 @@ function initTableView(dbName) {
                     <label for="ai${rowCount}" class="btn Ai">Auto Increment</label>
 
                     <div class="defaultValueDiv">
-                        <input type="text" class="expression" name="expression" placeholder="Enter Default Value" />
+                        <input type="text" class="expression" name="expression" placeholder="Enter Default Value / Expression" />
                     </div>
         `;
         rowContainer.appendChild(newRow);
         fromDisplay2buttonFeature();
-    });
+    };
 
     OptionSelection();
 
-    RemoveRow.addEventListener("click", () => {
+    RemoveRow.onclick = () => {
         // Table must have at least one row
         if (rowCount <= 0) {
             outputWindow("Table create form at least have 1 row");
@@ -801,7 +834,7 @@ function initTableView(dbName) {
         rowContainer.removeChild(lastRow);
         rowCount--;
         fromDisplay2buttonFeature();
-    });
+    };
 
     resetBtn.addEventListener("click", () => {
         let selectedDataTypeList = document.querySelectorAll(".selectedDataType");
@@ -818,7 +851,7 @@ function initTableView(dbName) {
     createBtn.addEventListener("click", () => {
         let allCorrect = ruleChecker();
         if (allCorrect) {
-            createTable();
+            createTable(dbName);
         }
     });
 

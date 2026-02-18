@@ -26,6 +26,56 @@ app.post("/execute", (req, res) => {
     });
 });
 
+// table creation
+// Create table
+app.post("/create-table", (req, res) => {
+
+    const { databaseName, tableName, columns } = req.body;
+
+    if (!databaseName || !tableName || !columns.length) {
+        return res.status(400).json({ error: "Missing table data" });
+    }
+
+    const safeDb = mysql.escapeId(databaseName);
+    const safeTable = mysql.escapeId(tableName);
+
+    let columnDefinitions = columns.map(col => {
+
+        let type = col.dataType.replace(/\(.*\)/, "");
+        let size = col.size ? `(${col.size})` : "";
+
+        let sql = `${mysql.escapeId(col.columnName)} ${type}${size}`;
+
+        if (col.unsigned) sql += " UNSIGNED";
+        if (col.notNull) sql += " NOT NULL";
+        if (col.unique) sql += " UNIQUE";
+        if (col.autoIncrement) sql += " AUTO_INCREMENT";
+        if (col.expression) sql += ` DEFAULT '${col.expression}'`;
+
+        return sql;
+    });
+
+    // Add PRIMARY KEY separately
+    const pkColumn = columns.find(col => col.primaryKey);
+    if (pkColumn) {
+        columnDefinitions.push(`PRIMARY KEY (${mysql.escapeId(pkColumn.columnName)})`);
+    }
+
+    const sql = `
+        CREATE TABLE ${safeDb}.${safeTable} (
+            ${columnDefinitions.join(",\n")}
+        )
+    `;
+
+    db.query(sql, (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ message: "Table created successfully" });
+    });
+});
+
 // Delete table
 app.post("/delete-Table", (req, res) => {
     const { TbName, databaseName } = req.body;
@@ -48,6 +98,7 @@ app.post("/delete-Table", (req, res) => {
         });
     });
 });
+
 //fetch table logic
 app.get("/Tables", (req, res) => {
     const { databaseName } = req.query;

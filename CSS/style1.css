@@ -224,6 +224,13 @@ hr {
     min-height: 50vh;
     padding: 1rem;
     z-index: 999;
+    cursor: move;
+    user-select: none;
+}
+
+.output.dragging {
+    position: fixed;
+    z-index: 1000;
 }
 
 .outputScreen .popUpTitle {
