@@ -39,16 +39,31 @@ h2 {
 
 .searchBar {
     display: flex;
-    justify-content: center;
-    align-items: center;
     width: stretch;
+    background: 
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(135deg, #303030, #303030) border-box;
+    border: 0.2rem solid transparent;
+    border-radius: 1rem;
+    align-items: center;
+    padding: 0.2rem 0.5rem;
+}
+
+.searchBar:hover {
+    background: 
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(135deg, #ffff00, #ff0000) border-box;
+}
+
+.searchBar:focus-within {
+    background: 
+        linear-gradient(#060000, #060000) padding-box,
+        linear-gradient(135deg, #ffff00, #ff0000) border-box;
 }
 
 .searchBar input {
     width: stretch;
-    padding: 0.6rem 1em;
-    border-radius: 1rem;
-    border: 0.2rem solid #303030;
+    border: none;
     background-color: #060000;
     color: white;
     outline: none;
@@ -58,17 +73,11 @@ input::placeholder {
     color: #888;
 }
 
-.searchBar input:focus, .searchBar input:hover {
-    background:
-        linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(135deg, #ffff00, #ff0000) border-box;
-    border: 0.2rem solid transparent;
-}
-
 .topLeftbtns {
     display: flex;
     justify-content: flex-end;
     column-gap: 0.5rem;
+    height: 2.5rem;
 }
 
 .runQuery, .OpScrBtn {
@@ -125,7 +134,6 @@ hr {
     position: fixed;
     left: 37vw;
     top: 24vh;
-    cursor: grab;
     will-change: transform;
 }
 
@@ -176,7 +184,6 @@ hr {
     position: fixed;
     top: 14vh;
     left: 25vw;
-    cursor: grab;
     will-change: transform;
 }
 
@@ -243,7 +250,6 @@ hr {
     max-height: 75vh;
     padding: 1rem;
     z-index: 999;
-    cursor: grab;
     will-change: transform;
 }
 

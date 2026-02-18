@@ -45,15 +45,27 @@ h3 {
 }
 
 .addSvg .red,
-.addSvg .yellow {
+.addSvg .yellow,
+.searchSvg .red,
+.searchSvg .yellow {
     stop-color: #303030;
 }
 
-.addSvg:hover .red {
+.addSvg:hover .red,
+.searchBar:hover .red {
     stop-color: #ff0000;
 }
 
-.addSvg:hover .yellow {
+.addSvg:hover .yellow,
+.searchBar:hover .yellow {
+    stop-color: #ffff00;
+}
+
+.searchBar:focus-within .red {
+    stop-color: #ff0000;
+}
+
+.searchBar:focus-within .yellow {
     stop-color: #ffff00;
 }
 

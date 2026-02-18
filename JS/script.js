@@ -527,7 +527,7 @@ function makeDraggable(element) {
         startX = e.clientX - offsetX;
         startY = e.clientY - offsetY;
 
-        element.style.cursor = "grabbing";
+        element.style.cursor = "move";
     });
 
     document.addEventListener('mousemove', (e) => {
@@ -542,7 +542,6 @@ function makeDraggable(element) {
 
     document.addEventListener('mouseup', () => {
         isDragging = false;
-        element.style.cursor = "grab";
     });
 }
 
