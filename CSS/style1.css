@@ -62,14 +62,13 @@ input::placeholder {
     border: 0.2rem solid transparent;
 }
 
-.SqlQuery {
-    width: auto;
+.topLeftbtns {
     display: flex;
     justify-content: flex-end;
-    cursor: default;
+    column-gap: 0.5rem;
 }
 
-.runQuery {
+.runQuery, .OpScrBtn {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -81,6 +80,8 @@ input::placeholder {
     padding: 0.5rem;
     font-size: 0.7rem;
     width: 3rem;
+    height: stretch;
+    cursor: default;
 }
 
 hr {
@@ -106,9 +107,11 @@ hr {
         linear-gradient(135deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
-    position: absolute;
+    position: fixed;
     left: 37vw;
     top: 24vh;
+    cursor: grab;
+    will-change: transform;
 }
 
 .message {
@@ -158,6 +161,8 @@ hr {
     position: fixed;
     top: 14vh;
     left: 25vw;
+    cursor: grab;
+    will-change: transform;
 }
 
 .popUpQueryWindow .popUpTitle {
@@ -212,25 +217,19 @@ hr {
 
 .outputScreen {
     display: none;
-    background:
-        linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(135deg, #ffff00, #ff0000) border-box;
+    background: linear-gradient(#060000, #060000) padding-box, linear-gradient(135deg, #ffff00, #ff0000) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
-    position: absolute;
+    position: fixed;
     left: 25vw;
     top: 12vh;
     width: 50vw;
     min-height: 50vh;
+    max-height: 75vh;
     padding: 1rem;
     z-index: 999;
-    cursor: move;
-    user-select: none;
-}
-
-.output.dragging {
-    position: fixed;
-    z-index: 1000;
+    cursor: grab;
+    will-change: transform;
 }
 
 .outputScreen .popUpTitle {
@@ -251,7 +250,8 @@ hr {
 }
 
 .result {
-    display: flex;
     min-height: 16rem;
     white-space: preserve;
+    overflow-y: scroll;
+    max-height: 70vh;
 }

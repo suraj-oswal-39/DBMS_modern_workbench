@@ -366,8 +366,8 @@ function ruleChecker() {
     selectedDataType.forEach((dataType, index) => {
         if (dataType.innerText === "Select Data Type") {
             errorMsg.push("you must select data type!");
-        } 
-        if (dataType.innerText === "VARCHAR()" &&sizeInputs[index].value === "") {
+        }
+        if (dataType.innerText === "VARCHAR()" && sizeInputs[index].value === "") {
             errorMsg.push("VARCHAR datatype must have size specified!");
         }
     });
@@ -415,7 +415,7 @@ async function executeQuery() {
     const data = await response.json();
 
     const responseJson = JSON.stringify(data, null, 2);
-    outputWindow(responseJson + "\n\nyour query:\n" + query);
+    outputWindow(responseJson + "\n\nYour SQL Query:\n" + query);
 }
 
 function queryRunner(routingContainer) {
@@ -436,7 +436,6 @@ function queryRunner(routingContainer) {
 
     executeBtn.onclick = () => {
         executeQuery();
-        popUpQueryWindow.style.display = "none";
     };
 
 }
@@ -514,6 +513,39 @@ function updateLineNumbers(textarea, lineNumbers) {
     lineNumbers.textContent = numbers;
 }
 
+function makeDraggable(element) {
+
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    element.addEventListener('mousedown', (e) => {
+        isDragging = true;
+
+        startX = e.clientX - offsetX;
+        startY = e.clientY - offsetY;
+
+        element.style.cursor = "grabbing";
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        offsetX = e.clientX - startX;
+        offsetY = e.clientY - startY;
+
+        element.style.transform =
+            `translate(${offsetX}px, ${offsetY}px)`;
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        element.style.cursor = "grab";
+    });
+}
+
 function initDatabaseView($location, $rootScope) {
     const nameInput = document.getElementById("nameInput");
     const addSvg = document.querySelector(".addSvg");
@@ -530,6 +562,9 @@ function initDatabaseView($location, $rootScope) {
     const message = document.querySelector(".message");
     const textarea = document.getElementById("sqlEditor");
     const lineNumbers = document.getElementById("lineNumbers");
+    const outputScreen = document.querySelector('.outputScreen');
+    const popUpQueryWindow = document.querySelector('.popUpQueryWindow');
+    const OpScrBtn = document.querySelector('.OpScrBtn');
 
     textarea.addEventListener("input", function () {
         updateLineNumbers(textarea, lineNumbers);
@@ -655,6 +690,14 @@ function initDatabaseView($location, $rootScope) {
 
     queryRunner(routingContainer);
     outputScreenClose(routingContainer);
+
+    makeDraggable(outputScreen);
+    makeDraggable(popUpWindow);
+    makeDraggable(popUpQueryWindow);
+
+    OpScrBtn.onclick = () => {
+        outputScreen.style.display = "block";
+    };
 }
 
 function initTableView(dbName) {
@@ -668,7 +711,6 @@ function initTableView(dbName) {
     const message = document.querySelector(".message");
     const fromDisplay2 = document.querySelector(".fromDisplay2");
     const rowContainer = document.querySelector(".rowContainer");
-
     let btn;
     let dataTypeList;
     let realTbNameForDel = "";
@@ -680,9 +722,11 @@ function initTableView(dbName) {
     const h3Tag = document.querySelector(".DBTabletTitle");
     let capitalizedDBName = dbName.charAt(0).toUpperCase() + dbName.slice(1);
     h3Tag.textContent = `${capitalizedDBName} database tables`;
-
     const textarea = document.getElementById("sqlEditor");
     const lineNumbers = document.getElementById("lineNumbers");
+    const createBtn = document.querySelector("#createBtn");
+    const outputScreen = document.querySelector('.outputScreen');
+    const popUpQueryWindow = document.querySelector('.popUpQueryWindow');
 
     textarea.addEventListener("input", function () {
         updateLineNumbers(textarea, lineNumbers)
@@ -847,7 +891,6 @@ function initTableView(dbName) {
         });
     });
 
-    const createBtn = document.querySelector("#createBtn");
     createBtn.addEventListener("click", () => {
         let allCorrect = ruleChecker();
         if (allCorrect) {
@@ -859,4 +902,14 @@ function initTableView(dbName) {
 
     queryRunner(routingContainer);
     outputScreenClose(routingContainer);
+
+    makeDraggable(outputScreen);
+    makeDraggable(popUpWindow);
+    makeDraggable(popUpQueryWindow);
+
+    const OpScrBtn = document.querySelector('.OpScrBtn');
+    OpScrBtn.onclick = () => {
+        outputScreen.style.display = "block";
+    };
+
 }
