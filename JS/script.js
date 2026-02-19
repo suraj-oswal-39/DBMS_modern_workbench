@@ -420,11 +420,11 @@ async function executeQuery() {
 
 function queryRunner(routingContainer) {
     const popUpQueryWindow = document.querySelector(".popUpQueryWindow");
-    const runQuery = document.querySelector(".runQuery");
+    const SqlQuery = document.querySelector(".SqlQuery");
     const executeBtn = document.querySelector(".execute");
     const cancelBtn = document.querySelector(".cancel");
 
-    runQuery.onclick = () => {
+    SqlQuery.onclick = () => {
         popUpQueryWindow.style.display = "grid";
         routingContainer.style.filter = "blur(3px)";
     };
@@ -545,6 +545,56 @@ function makeDraggable(element) {
     });
 }
 
+function openOutputScreen(outputScreen) {
+    const outputScreenButton = document.querySelector('.outputScreenButton');
+    outputScreenButton.onclick = () => {
+        outputScreen.style.display = "block";
+    };
+}
+
+function settingOpen() {
+    const settingBtn = document.querySelector(".settingBtn");
+    const settingMenu = document.querySelector(".settingMenu");
+    let themeBtn = document.querySelector(".themeBtn");
+    let themeTitle = document.querySelector(".themeBtn p");
+    let isOpen = false;
+    let isLight = false; 
+    settingBtn.onclick = () => {
+        if (!isOpen) {
+            settingMenu.style.right = 0 + "%";
+            settingBtn.style.background= 'linear-gradient(#060000, #060000) padding-box, linear-gradient(135deg, #ffff00, #ff0000) border-box';
+            isOpen = !isOpen;
+        } else {
+            settingMenu.removeAttribute("style");
+            settingBtn.removeAttribute("style");
+            isOpen = !isOpen;
+        }
+    };
+    themeBtn.onclick = () => {
+        document.body.classList.toggle("light");
+        if (!isLight) {
+            themeBtn.style.backgroundColor = "#e3e3e3";
+            const sunSvg = document.querySelector(".sunSvg");
+            const moonSvg = document.createElement("img");
+            moonSvg.setAttribute("src", "/SVG/moonSvg.svg");
+            moonSvg.setAttribute("class", "moonSvg");
+            themeBtn.replaceChild(moonSvg, sunSvg);
+            themeTitle.style.color = "#000";
+            isLight = !isLight;
+        } else {
+            themeBtn.style.backgroundColor = "#000";
+            themeBtn.removeAttribute("style");
+            const moonSvg = document.querySelector(".moonSvg");
+            const sunSvg = document.createElement("img");
+            sunSvg.setAttribute("src", "/SVG/sunSvg.svg");
+            sunSvg.setAttribute("class", "sunSvg");
+            themeBtn.replaceChild(sunSvg, moonSvg);
+            themeTitle.removeAttribute("style");
+            isLight = !isLight;
+        }
+    }
+}
+
 function initDatabaseView($location, $rootScope) {
     const nameInput = document.getElementById("nameInput");
     const addSvg = document.querySelector(".addSvg");
@@ -563,7 +613,6 @@ function initDatabaseView($location, $rootScope) {
     const lineNumbers = document.getElementById("lineNumbers");
     const outputScreen = document.querySelector('.outputScreen');
     const popUpQueryWindow = document.querySelector('.popUpQueryWindow');
-    const OpScrBtn = document.querySelector('.OpScrBtn');
 
     textarea.addEventListener("input", function () {
         updateLineNumbers(textarea, lineNumbers);
@@ -694,9 +743,9 @@ function initDatabaseView($location, $rootScope) {
     makeDraggable(popUpWindow);
     makeDraggable(popUpQueryWindow);
 
-    OpScrBtn.onclick = () => {
-        outputScreen.style.display = "block";
-    };
+    openOutputScreen(outputScreen);
+
+    settingOpen();
 }
 
 function initTableView(dbName) {
@@ -906,9 +955,8 @@ function initTableView(dbName) {
     makeDraggable(popUpWindow);
     makeDraggable(popUpQueryWindow);
 
-    const OpScrBtn = document.querySelector('.OpScrBtn');
-    OpScrBtn.onclick = () => {
-        outputScreen.style.display = "block";
-    };
+    openOutputScreen(outputScreen);
 
+    settingOpen();
 }
+

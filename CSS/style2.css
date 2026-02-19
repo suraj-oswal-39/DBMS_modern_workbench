@@ -30,8 +30,8 @@ h3 {
 
 .addSvg {
     background:
-        linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(145deg, #060000, #060000) border-box;
+        linear-gradient(var(--color3), var(--color3)) padding-box,
+        linear-gradient(145deg, var(--color3), var(--color3)) border-box;
     border: 0.3rem solid transparent;
     border-radius: 1rem;
     padding: 0.5rem;
@@ -40,8 +40,8 @@ h3 {
 
 .addSvg:hover {
     background:
-        linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+        linear-gradient(var(--color3), var(--color3)) padding-box,
+        linear-gradient(145deg, var(--color1), var(--color2)) border-box;
 }
 
 .addSvg .red,
@@ -53,26 +53,26 @@ h3 {
 
 .addSvg:hover .red,
 .searchBar:hover .red {
-    stop-color: #ff0000;
+    stop-color: var(--color2);
 }
 
 .addSvg:hover .yellow,
 .searchBar:hover .yellow {
-    stop-color: #ffff00;
+    stop-color: var(--color1);
 }
 
 .searchBar:focus-within .red {
-    stop-color: #ff0000;
+    stop-color: var(--color2);
 }
 
 .searchBar:focus-within .yellow {
-    stop-color: #ffff00;
+    stop-color: var(--color1);
 }
 
 .tooltip {
     background:
-        linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+        linear-gradient(var(--color3), var(--color3)) padding-box,
+        linear-gradient(145deg, var(--color1), var(--color2)) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     padding: 0.5rem;
@@ -94,8 +94,8 @@ h3 {
 
 #NameInput {
     background:
-        linear-gradient(#060000, #060000) padding-box,
-        linear-gradient(145deg, #ffff00, #ff0000) border-box;
+        linear-gradient(var(--color3), var(--color3)) padding-box,
+        linear-gradient(145deg, var(--color1), var(--color2)) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     padding: 0.7em;
@@ -106,7 +106,7 @@ h3 {
 }
 
 #nameInput {
-    background-color: #060000;
+    background-color: var(--color3);
     color: white;
     outline: none;
     border: transparent;
@@ -118,7 +118,7 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-    -webkit-box-shadow: inset 0 0 0 1000px #060000;
+    -webkit-box-shadow: inset 0 0 0 1000px var(--color3);
     -webkit-text-fill-color: white;
     caret-color: white;
 }
@@ -146,14 +146,14 @@ input:-webkit-autofill:active {
 .crossDelete:hover .red,
 .CloseCross2:hover .red,
 .outputScreenClose:hover .red {
-    stop-color: #ff0000;
+    stop-color: var(--color2);
 }
 
 .CloseCross:hover .yellow,
 .crossDelete:hover .yellow,
 .CloseCross2:hover .yellow,
 .outputScreenClose:hover .yellow {
-    stop-color: #ffff00;
+    stop-color: var(--color1);
 }
 
 .tooltipWrapper {
