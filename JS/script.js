@@ -1,6 +1,8 @@
 console.log("JavaScript file is linked successfully.");
 
 let svgId = "";
+let isOpen = false;
+let isLight = false;
 
 function outputWindow(outputMsg) {
     const result = document.querySelector(".result");
@@ -557,8 +559,6 @@ function settingOpen() {
     const settingMenu = document.querySelector(".settingMenu");
     const themeBtn = document.querySelector(".themeBtn");
     const themeTitle = document.querySelector(".themeBtn p");
-    let isOpen = false;
-    let isLight = false; 
     settingBtn.onclick = () => {
         if (!isOpen) {
             settingMenu.style.right = 0 + "%";
