@@ -417,6 +417,7 @@ async function executeQuery() {
     const data = await response.json();
 
     const responseJson = JSON.stringify(data, null, 2);
+    
     outputWindow(responseJson + "\n\nYour SQL Query:\n" + query);
 }
 

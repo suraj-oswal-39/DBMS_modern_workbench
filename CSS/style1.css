@@ -338,7 +338,7 @@ hr {
 
 .result {
     min-height: 16rem;
-    white-space: pre;
+    white-space: preserve;
     overflow-y: auto;
     overflow-x: hidden;
     max-height: 70vh;
