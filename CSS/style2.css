@@ -48,7 +48,7 @@ h3 {
 .addSvg .yellow,
 .searchSvg .red,
 .searchSvg .yellow {
-    stop-color: #303030;
+    stop-color: var(--color6);
 }
 
 .addSvg:hover .red,
@@ -107,11 +107,11 @@ h3 {
 
 #nameInput {
     background-color: var(--color3);
-    color: white;
+    color: var(--color4);
     outline: none;
     border: transparent;
     width: -webkit-fill-available;
-    caret-color: white;
+    caret-color: var(--color4);
 }
 
 input:-webkit-autofill,
@@ -119,8 +119,8 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
     -webkit-box-shadow: inset 0 0 0 1000px var(--color3);
-    -webkit-text-fill-color: white;
-    caret-color: white;
+    -webkit-text-fill-color: var(--color4);
+    caret-color: var(--color4);
 }
 
 .CloseCross {
@@ -139,7 +139,7 @@ input:-webkit-autofill:active {
 .CloseCross2 .yellow,
 .outputScreenClose .red,
 .outputScreenClose .yellow {
-    stop-color: #303030;
+    stop-color: var(--color6);
 }
 
 .CloseCross:hover .red,

@@ -4,14 +4,24 @@
     --color3: #060000;
     --color4: #ffffff;
     --color5: #ffff00;
+    --color6: #303030;
+    --color7: #202020;
+    --color8: rgb(17, 17, 17);
+    --color9: rgb(136, 136, 136);
+    --color10: #ffff00;
 }
 
 body.light {
     --color1: #00c0ff;
-    --color2: #00f;
+    --color2: #0000ff;
     --color3: #e3e3e3;
     --color4: #000000;
-    --color5: #00f;
+    --color5: #00000f;
+    --color6: #9f9f9f;
+    --color7: #bfbfbf;
+    --color8: #cccccc;
+    --color9: #777777;
+    --color10: #0000ff;
 }
 
 * {
@@ -59,7 +69,7 @@ h2 {
     width: stretch;
     background: 
         linear-gradient(var(--color3), var(--color3)) padding-box,
-        linear-gradient(135deg, #303030, #303030) border-box;
+        linear-gradient(135deg, var(--color6), var(--color6)) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     align-items: center;
@@ -82,12 +92,12 @@ h2 {
     width: stretch;
     border: none;
     background-color: var(--color3);
-    color: white;
+    color: var(--color4);
     outline: none;
 }
 
 input::placeholder {
-    color: #888;
+    color: var(--color9);
 }
 
 .topLeftBtns {
@@ -104,7 +114,7 @@ input::placeholder {
     align-items: center;
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,
-        linear-gradient(135deg, #303030, #303030) border-box;
+        linear-gradient(135deg, var(--color6), var(--color6)) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
     padding: 0.5rem;
@@ -123,7 +133,7 @@ input::placeholder {
 .SqlQuery:active, .outputScreenButton:active, .settingBtn:active {
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,
-        linear-gradient(135deg, #303030, #303030) border-box;
+        linear-gradient(135deg, var(--color6), var(--color6)) border-box;
 }
 
 .settingMenu {
@@ -145,7 +155,7 @@ input::placeholder {
 }
 
 .themeBtn {
-    background-color: #111;
+    background-color: var(--color8);
     outline: none;
     border: none;
     width: 100%;
@@ -215,7 +225,7 @@ hr {
 
 .no:hover, .yes:hover,
 .cancel:hover, .execute:hover {
-    background-color: #181818;
+    background-color: var(--color8);
     font-size: 1.1rem;
 }
 
@@ -259,8 +269,8 @@ hr {
 }
 
 .lineNumbers {
-    background: #111;
-    color: #888;
+    background: var(--color8);
+    color: var(--color9);
     padding: 1em 0.5em;
     text-align: right;
     user-select: none;
@@ -328,7 +338,8 @@ hr {
 
 .result {
     min-height: 16rem;
-    white-space: preserve;
-    overflow-y: scroll;
+    white-space: pre;
+    overflow-y: auto;
+    overflow-x: hidden;
     max-height: 70vh;
 }

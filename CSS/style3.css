@@ -9,7 +9,7 @@
 #tableCreation {
     position: relative;
     background: 
-        linear-gradient(#101010, #101010) padding-box, 
+        linear-gradient(var(--color3), var(--color3)) padding-box, 
         linear-gradient(145deg, var(--color1), var(--color2)) border-box;
     border: 0.2rem solid transparent;
     border-radius: 1rem;
@@ -36,11 +36,11 @@
 }
 
 #tableNameInput {
-    background-color: #202020;
-    color: var(color4);
-    caret-color: var(color4);
+    background-color: var(--color7);
+    color: var(--color4);
+    caret-color: var(--color4);
     padding: 0.4rem;
-    border: 0.2rem solid #202020;
+    border: 0.2rem solid var(--color7);
     outline: none;
     margin-left: 1rem;
     width: 16rem;
@@ -49,11 +49,11 @@
 .columnName,
 .expression,
 .sizeInput {
-    background-color: #202020;
-    color: var(color4);
-    caret-color: var(color4);
+    background-color: var(--color7);
+    color: var(--color4);
+    caret-color: var(--color4);
     padding: 0.4rem;
-    border: 0.2rem solid #202020;
+    border: 0.2rem solid var(--color7);
     outline: none;
 }
 
@@ -71,14 +71,14 @@
 #tableNameInput:hover,
 .expression:hover,
 .sizeInput:hover {
-    border-color: var(--color1);
+    border-color: var(--color10);
 }
 
 .columnName:active,
 #tableNameInput:active,
 .expression:active,
 .sizeInput:active {
-    border-color: #202020;
+    border-color: var(--color7);
 }
 
 .columnName:-webkit-autofill,
@@ -93,11 +93,11 @@
 .columnName:-webkit-autofill:active,
 #tableNameInput:-webkit-autofill:active,
 .expression:-webkit-autofill:active {
-    -webkit-box-shadow: inset 0 0 0 1000px #202020;
-    -webkit-text-fill-color: var(color4);
-    caret-color: var(color4);
+    -webkit-box-shadow: inset 0 0 0 1000px var(--color7);
+    -webkit-text-fill-color: var(--color4);
+    caret-color: var(--color4);
     outline: none;
-    border: 0.2rem solid #202020;
+    border: 0.2rem solid var(--color7);
 }
 
 .tableNameInputDiv {
@@ -123,19 +123,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #202020;
-    border: 0.2rem solid #202020;
+    background-color: var(--color7);
+    border: 0.2rem solid var(--color7);
     cursor: default;
     padding: 0.4rem;
     width: 7.53rem;
 }
 
 .dataType:hover {
-    border: 0.2rem solid var(--color1);
+    border: 0.2rem solid var(--color10);
 }
 
 .dataType:active {
-    border: 0.2rem solid #202020;
+    border: 0.2rem solid var(--color7);
 }
 
 .dataTypeList {
@@ -147,7 +147,7 @@
     align-items: center;
     list-style-type: none;
     background:
-        linear-gradient(#101010, #101010) padding-box,
+        linear-gradient(var(--color3), var(--color3)) padding-box,
         linear-gradient(145deg, var(--color1), var(--color2)) border-box;
     border: 0.2rem solid transparent;
     border-radius: 0.5rem;
@@ -169,7 +169,7 @@ li {
 }
 
 li:hover {
-    background-color: rgb(56, 56, 56);
+    background-color: var(--color7);
     width: 100%;
 }
 
@@ -188,8 +188,8 @@ li[value="BOOLEAN"]:hover {
 }
 
 .btn {
-    background-color: #202020;
-    color: var(color4);
+    background-color: var(--color7);
+    color: var(--color4);
     border: 0.2rem solid transparent;
     padding: 0.45rem;
     font-size: 0.84rem;
@@ -198,11 +198,11 @@ li[value="BOOLEAN"]:hover {
 input[type="checkbox"]:checked+label.btn,
 input[type="radio"]:checked+label.Pk,
 input[type="radio"]:checked+label.Ai {
-    border: 0.2rem solid var(--color1);
+    border: 0.2rem solid var(--color10);
 }
 
 input[type="checkbox"]:not(:checked)+label.btn {
-    border: 0.2rem solid #202020;
+    border: 0.2rem solid var(--color7);
 }
 
 .AddRemoveRow {
@@ -213,19 +213,21 @@ input[type="checkbox"]:not(:checked)+label.btn {
 #AddRow,
 #RemoveRow {
     width: 50%;
-    background-color: #101010;
-    border: 0.2rem solid #202020;
+    background-color: var(--color3);
+    border: 0.2rem solid var(--color7);
     font-size: 2rem;
 }
 
 #AddRow:hover,
-#RemoveRow:hover {
-    border-color: var(--color1);
+#RemoveRow:hover,
+#resetBtn:hover,
+#createBtn:hover {
+    border-color: var(--color10);
 }
 
 #AddRow:active,
 #RemoveRow:active {
-    border-color: #202020;
+    border-color: var(--color7);
 }
 
 .formButtons {
@@ -238,19 +240,14 @@ input[type="checkbox"]:not(:checked)+label.btn {
 
 #resetBtn,
 #createBtn {
-    background-color: #101010;
-    border: 0.2rem solid #202020;
+    background-color: var(--color3);
+    border: 0.2rem solid var(--color7);
     padding: 0.5rem;
     font-size: 1rem;
     border-radius: 0.5rem;
 }
 
-#resetBtn:hover,
-#createBtn:hover {
-    border-color: var(--color1);
-}
-
 #resetBtn:active,
 #createBtn:active {
-    border-color: #202020;
+    border-color: var(--color7);
 }
