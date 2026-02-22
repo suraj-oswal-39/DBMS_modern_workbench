@@ -11,6 +11,30 @@ const db = mysql.createConnection({
     port: 3306
 });
 
+//fetch table logic
+app.get("/TableData", (req, res) => {
+    const { databaseName, tableName } = req.query;
+    if (!databaseName || !/^[a-zA-Z0-9_]+$/.test(databaseName)) {
+        return res.status(400).json({ error: "Invalid database name" });
+    }
+
+    if (!tableName || !/^[a-zA-Z0-9_]+$/.test(tableName)) {
+        return res.status(400).json({ error: "Invalid table name" });
+    }
+
+    const safeDbName = mysql.escapeId(databaseName);
+    const safeTableName = mysql.escapeId(tableName);
+    const sql = `SELECT * FROM ${safeDbName}.${safeTableName}`;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Table data fetch query failed" });
+        }
+        res.json(results);
+    });
+});
+
 app.post("/execute", (req, res) => {
     const query = req.body.query;
 
@@ -199,6 +223,6 @@ app.post("/create-database", (req, res) => {
         res.json({ message: "Database created successfully" });
     });
 });
-app.listen(8080, () => {
-    console.log("Server running on port 8080");
+app.listen(3000, () => {
+    console.log("Server running on port 3000");
 });

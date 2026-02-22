@@ -1,6 +1,7 @@
 console.log("JavaScript file is linked successfully.");
 
 let svgId = "";
+let svgId2 = "";
 let isOpen = false;
 let isLight = false;
 
@@ -56,7 +57,7 @@ function enableSvgSearch(containerSelector) {
 }
 
 function fetchDatabases(SvgGridTemplate) {
-    fetch("http://localhost:8080/databases", {
+    fetch("http://localhost:3000/databases", {
         method: "GET",
         headers: { "Content-Type": "application/json" }
     })
@@ -108,7 +109,7 @@ function fetchDatabases(SvgGridTemplate) {
 }
 
 function createDatabases(newDBname) {
-    fetch("http://localhost:8080/create-database", {
+    fetch("http://localhost:3000/create-database", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dbName: newDBname })
@@ -127,7 +128,7 @@ function createDatabases(newDBname) {
 }
 
 function deleteDatabases(dbNameForDel, dbSvgForRemove) {
-    fetch("http://localhost:8080/delete-database", {
+    fetch("http://localhost:3000/delete-database", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dbNameForDel: dbNameForDel })
@@ -149,7 +150,7 @@ function fetchTables(SvgGridTemplate, svgId) {
         return;
     }
 
-    fetch(`http://localhost:8080/Tables?databaseName=${encodeURIComponent(svgId)}`)
+    fetch(`http://localhost:3000/Tables?databaseName=${encodeURIComponent(svgId)}`)
         .then(res => res.json())
         .then(data => {
             data.forEach(function (Tb) {
@@ -201,7 +202,7 @@ function fetchTables(SvgGridTemplate, svgId) {
 function deleteTables(realTbNameForDel, TbSvgForRemove, dbName) {
     console.log("Deleting table:", realTbNameForDel, "from database:", dbName);
 
-    fetch("http://localhost:8080/delete-Table", {
+    fetch("http://localhost:3000/delete-Table", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -249,7 +250,7 @@ async function createTable(dbName) {
     };
 
     try {
-        const response = await fetch("http://localhost:8080/create-table", {
+        const response = await fetch("http://localhost:3000/create-table", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(table)
@@ -406,7 +407,7 @@ function ruleChecker() {
 async function executeQuery() {
     const query = document.querySelector(".queryBox").value;
     // console.log(query);
-    const response = await fetch("http://localhost:8080/execute", {
+    const response = await fetch("http://localhost:3000/execute", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -417,7 +418,7 @@ async function executeQuery() {
     const data = await response.json();
 
     const responseJson = JSON.stringify(data, null, 2);
-    
+
     outputWindow(responseJson + "\n\nYour SQL Query:\n" + query);
 }
 
@@ -530,7 +531,6 @@ function makeDraggable(element) {
         startX = e.clientX - offsetX;
         startY = e.clientY - offsetY;
 
-        element.style.cursor = "move";
     });
 
     document.addEventListener('mousemove', (e) => {
@@ -550,6 +550,7 @@ function makeDraggable(element) {
 
 function openOutputScreen(outputScreen) {
     const outputScreenButton = document.querySelector('.outputScreenButton');
+    // if (!outputScreenButton) return;
     outputScreenButton.onclick = () => {
         outputScreen.style.display = "block";
     };
@@ -747,7 +748,7 @@ function initDatabaseView($location, $rootScope) {
     settingOpen();
 }
 
-function initTableView(dbName) {
+function initTableView($location, $rootScope, dbName) {
     const addSvg = document.querySelector(".addSvg");
     const routingContainer = document.querySelector(".routingContainer");
     const SvgGridTemplate = document.querySelector(".SvgGridTemplate");
@@ -810,14 +811,20 @@ function initTableView(dbName) {
         popUpWindow.style.display = "grid";
     });
 
-    // Redirect to table data page
+    // Redirect to table view page
     SvgGridTemplate.addEventListener("click", function (event) {
         const svg = event.target.closest(".SvgBlock > svg[id]");
         if (!svg) return;
 
         if (event.target.closest(".deleteSvg")) return;
-        console.log("Clicked Tb:", svg.id);
-        window.location.hash = "#!/tableData";
+        console.log("Clicked Tb:", svg.id.replace(/Svg$/, ""));
+
+        const tableName = svg.id.replace(/Svg$/, "");
+        svgId2 = tableName;
+
+        $rootScope.$apply(() => {
+            $location.path(`/tableDataView/${dbName}/${tableName}`);
+        });
     });
 
     enableSvgSearch(".SvgGridTemplate");
@@ -959,3 +966,75 @@ function initTableView(dbName) {
     settingOpen();
 }
 
+function fetchTableData(tableTemplate, svgId, svgId2) {
+
+    if (!svgId) {
+        console.log("No database selected");
+        return;
+    }
+
+    if (!svgId2) {
+        console.log("No table selected");
+        return;
+    }
+
+    const columnNames = tableTemplate.querySelector(".columnNames");
+    const tbody = tableTemplate.querySelector("tbody");
+
+    fetch(`http://localhost:3000/TableData?databaseName=${encodeURIComponent(svgId)}&tableName=${encodeURIComponent(svgId2)}`)
+        .then(res => res.json())
+        .then(data => {
+            Object.keys(data[0]).forEach(key => {
+                let th = document.createElement("th");
+                th.innerHTML = `<input type="text" value="${key}" name="{key}" readonly/>`;
+                columnNames.appendChild(th);
+            });
+
+            data.forEach(row => {
+                let tr = document.createElement("tr");
+                Object.values(row).forEach(value => {
+                    let td = document.createElement("td");
+                    td.innerHTML = `<input type="text" value="${value}" name="{value}" readonly/>`;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        })
+        .catch(err => outputWindow(`Table ${svgId2} is empty`));
+
+}
+
+function initTableDataView(dbName, tableName) {
+    console.log("this is table data view page");
+    const h3Tag = document.querySelector(".DBTabletTitle");
+    h3Tag.textContent = `Data from ${tableName} table in ${dbName} database`;
+
+    const routingContainer = document.querySelector(".routingContainer");
+    const popUpWindow = document.querySelector(".popUpWindow");;
+    const textarea = document.getElementById("sqlEditor");
+    const lineNumbers = document.getElementById("lineNumbers");
+    const outputScreen = document.querySelector('.outputScreen');
+    const popUpQueryWindow = document.querySelector('.popUpQueryWindow');
+
+    textarea.addEventListener("input", function () {
+        updateLineNumbers(textarea, lineNumbers)
+    });
+
+    textarea.addEventListener("scroll", () => {
+        lineNumbers.scrollTop = textarea.scrollTop;
+    });
+
+    updateLineNumbers(textarea, lineNumbers);
+
+    queryRunner(routingContainer);
+    outputScreenClose(routingContainer);
+
+    makeDraggable(outputScreen);
+    makeDraggable(popUpWindow);
+    makeDraggable(popUpQueryWindow);
+
+    openOutputScreen(outputScreen);
+
+    settingOpen();
+
+}

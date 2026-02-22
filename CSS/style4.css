@@ -1,0 +1,25 @@
+.tableTemplate {
+    margin: 1rem 2rem;
+    overflow-y: auto;
+    max-height: 75vh;
+}
+
+th, td {
+    background-color: var(--color8);
+    border: 0.1em solid var(--color10);
+    padding: 0.5rem;
+}
+
+th input, td input {
+    border: none;
+    outline: none;
+    background-color: var(--color8);
+    width: stretch;
+    color: var(--color4);
+    font-weight: bold;
+    text-align: center;
+}
+
+td input {
+    font-weight: normal;
+}
