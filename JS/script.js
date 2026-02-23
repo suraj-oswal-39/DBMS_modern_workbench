@@ -22,8 +22,8 @@ function NoBtn(noBtn, routingContainer, popUpWindow) {
     };
 }
 
-function removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross) {
-    [nameInput, addSvg, tooltip, red, yellow, routingContainer, CloseCross, NameInput].forEach(el => {
+function removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay) {
+    [nameInput, addSvg, tooltip, red, yellow, routingContainer, CloseCross, NameInput, fromDisplay].forEach(el => {
         if (el && el.style) el.removeAttribute("style");
     });
 }
@@ -613,6 +613,7 @@ function initDatabaseView($location, $rootScope) {
     const lineNumbers = document.getElementById("lineNumbers");
     const outputScreen = document.querySelector('.outputScreen');
     const popUpQueryWindow = document.querySelector('.popUpQueryWindow');
+    const fromDisplay = document.querySelector('.fromDisplay');
 
     textarea.addEventListener("input", function () {
         updateLineNumbers(textarea, lineNumbers);
@@ -639,6 +640,7 @@ function initDatabaseView($location, $rootScope) {
         red.style.stopColor = "#ff0000";
         yellow.style.stopColor = "#ffff00";
         routingContainer.style.filter = "blur(3px)";
+        fromDisplay.style.zIndex="0";
         NameInput.style.opacity = 1;
         NameInput.style.width = "10rem";
         CloseCross.style.opacity = 1;
@@ -670,7 +672,7 @@ function initDatabaseView($location, $rootScope) {
                     "- No special characters (@ # % & * !)\n" +
                     "- No emoji or unicode characters";
                 outputWindow(errorMsg);
-                removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross);
+                removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay);
                 return;
             }
 
@@ -685,13 +687,13 @@ function initDatabaseView($location, $rootScope) {
 
             newDBname = "";
 
-            removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross);
+            removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross,fromDisplay);
         }
     });
 
     // Close input field on click event
     CloseCross.onclick = () => {
-        removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross);
+        removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay);
     };
 
     // Delete database on click event
@@ -979,28 +981,59 @@ function fetchTableData(tableTemplate, svgId, svgId2) {
     }
 
     const columnNames = tableTemplate.querySelector(".columnNames");
-    const tbody = tableTemplate.querySelector("tbody");
+    const tableData = tableTemplate.querySelector(".tableData");
 
     fetch(`http://localhost:3000/TableData?databaseName=${encodeURIComponent(svgId)}&tableName=${encodeURIComponent(svgId2)}`)
         .then(res => res.json())
         .then(data => {
             Object.keys(data[0]).forEach(key => {
-                let th = document.createElement("th");
-                th.innerHTML = `<input type="text" value="${key}" name="{key}" readonly/>`;
-                columnNames.appendChild(th);
+                let newInput = document.createElement("input");
+                newInput.setAttribute("type","text");
+                newInput.setAttribute("value",key);
+                newInput.setAttribute("name",key);
+                newInput.readOnly = true;
+                columnNames.appendChild(newInput);
             });
 
             data.forEach(row => {
-                let tr = document.createElement("tr");
+                let newDiv = document.createElement("div");
+                newDiv.setAttribute("class","dataRow");
                 Object.values(row).forEach(value => {
-                    let td = document.createElement("td");
-                    td.innerHTML = `<input type="text" value="${value}" name="{value}" readonly/>`;
-                    tr.appendChild(td);
+                    let displayValue = value;
+                    if (typeof value === "string" && value.includes("T") && value.endsWith("Z")) {
+                        const date = new Date(value);
+                        displayValue = date.toLocaleString("en-IN", {
+                            year: "numeric",
+                            month: "short",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit"
+                        });
+                    }
+                    let newInput = document.createElement("input");
+                    newInput.setAttribute("type","text");
+                    newInput.setAttribute("value",displayValue);
+                    newInput.setAttribute("name",displayValue);
+                    newInput.readOnly = true;
+                    newDiv.appendChild(newInput);
                 });
-                tbody.appendChild(tr);
+                tableData.appendChild(newDiv);
             });
+
+            let newDiv = document.createElement("div");
+            newDiv.setAttribute("class","dataRow");
+            Object.keys(data[0]).forEach(key => {
+                let newInput = document.createElement("input");
+                newInput.setAttribute("type","text");
+                newInput.setAttribute("value",null);
+                newInput.setAttribute("name",null);
+                newInput.readOnly = true;
+                newDiv.appendChild(newInput);
+            });
+            tableData.appendChild(newDiv);  
         })
-        .catch(err => outputWindow(`Table ${svgId2} is empty`));
+        .catch(err => console.log(err));
 
 }
 
@@ -1037,4 +1070,21 @@ function initTableDataView(dbName, tableName) {
 
     settingOpen();
 
+    const tableTemplate = document.querySelector(".tableTemplate");
+    tableTemplate.addEventListener("dblclick", (event) => {
+        const targetElement = event.target;
+        if (targetElement.tagName === "INPUT") {
+            let inputTag = tableTemplate.querySelector(`input[name="${targetElement.name}"]
+            `);
+            inputTag.removeAttribute("readonly");
+        }
+    });
+
+    // const changeData = document.querySelector(".changeData");
+    // changeData.addEventListener("click", () => {
+    //     let form = document.querySelector(".tableTemplate");
+    //     console.log(form);
+    //     const formData = new FormData(form);
+    //     console.log(formData);
+    // });
 }

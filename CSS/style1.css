@@ -6,8 +6,8 @@
     --color5: #ffff00;
     --color6: #303030;
     --color7: #202020;
-    --color8: rgb(17, 17, 17);
-    --color9: rgb(136, 136, 136);
+    --color8: #111111;
+    --color9: #888888;
     --color10: #ffff00;
 }
 
@@ -50,7 +50,8 @@ body {
     position: relative;
     background-color: var(--color3);
     height: 100%;
-    overflow: hidden;
+    overflow-y: hidden;
+    overflow-x: auto;
 }
 
 header {
@@ -108,7 +109,12 @@ input::placeholder {
     height: 2.5rem;
 }
 
-.SqlQuery, .outputScreenButton, .settingBtn {
+.SqlQuery, 
+.outputScreenButton, 
+.settingBtn, 
+.viewData, 
+.editData,
+.changeData {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -124,24 +130,34 @@ input::placeholder {
     cursor: default;
 }
 
-.SqlQuery:hover, .outputScreenButton:hover, .settingBtn:hover {
+.SqlQuery:hover,
+.outputScreenButton:hover,
+.settingBtn:hover,
+.viewData:hover,
+.editData:hover,
+.changeData:hover {
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,
         linear-gradient(135deg, var(--color1), var(--color2)) border-box;
 }
 
-.SqlQuery:active, .outputScreenButton:active, .settingBtn:active {
+.SqlQuery:active,
+.outputScreenButton:active,
+.settingBtn:active,
+.viewData:active,
+.editData:active,
+.changeData:active {
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,
         linear-gradient(135deg, var(--color6), var(--color6)) border-box;
 }
 
 .settingMenu {
-    position: absolute;
+    position: fixed;
     right: -100%;
-    top: 8vh;
+    top: 16vh;
     width: 14rem;
-    height: 87vh;
+    height: 82vh;
     overflow-y: auto;
     z-index: 999;
     background: 

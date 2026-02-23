@@ -187,9 +187,6 @@ app.get("/databases", (req, res) => {
         "information_schema",
         "performance_schema",
         "sys",
-        "world",
-        "sakila",
-        "inventory_db"
     ];
     db.query("SHOW DATABASES", (err, results) => {
         if (err) {
