@@ -14,7 +14,6 @@
     border-bottom: 2px solid var(--color10);
 }
 
-
 .tableData {
     width: 100.55%;
     overflow-y: auto;
@@ -23,11 +22,13 @@
 }
 
 .dataRow {
+    position: relative;
     display: flex;
+    align-items: center;
 }
 
 .columnNames input, .tableData input {
-    border: 1px solid var(--color6);
+    border: 2px solid var(--color6);
     outline: none;
     background-color: var(--color8);
     color: var(--color4);
@@ -46,4 +47,20 @@
     display: flex;
     padding: 0.5rem;
     column-gap: 0.5rem;
+}
+
+.deleteRow {
+    position: absolute;
+    left: 0.5%;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+}
+
+.deleteRow:hover {
+    border: 2px solid var(--color10);
+}
+
+.deleteRow:active {
+    border: 2px solid transparent;
 }

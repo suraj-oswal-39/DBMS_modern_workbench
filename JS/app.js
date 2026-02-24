@@ -21,17 +21,14 @@ app.run(function ($rootScope, $routeParams, $location) {
         } else if ($location.path().startsWith('/tableDataView')) {
             const dbName = $routeParams.dbName;
             const tableName = $routeParams.tableName;
-            if (dbName, tableName) {
-                console.log("from app.js", dbName, tableName);
-                fetchTableData(document.querySelector(".tableTemplate"), dbName, tableName);
+            if (dbName && tableName) {
+                initTableDataView(dbName, tableName);
             }
-            initTableDataView(dbName, tableName);
         } else if ($location.path().startsWith('/table')) {
             const dbName = $routeParams.dbName;
             if (dbName) {
-                fetchTables(document.querySelector(".SvgGridTemplate"), dbName);
+                initTableView($location, $rootScope, dbName);
             }
-            initTableView($location, $rootScope, dbName);
         }
     });
 });

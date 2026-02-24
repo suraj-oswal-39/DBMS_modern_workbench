@@ -111,9 +111,8 @@ input::placeholder {
 
 .SqlQuery, 
 .outputScreenButton, 
-.settingBtn, 
-.viewData, 
-.editData,
+.settingBtn,  
+.addDataRow,
 .changeData {
     display: flex;
     justify-content: center;
@@ -133,8 +132,7 @@ input::placeholder {
 .SqlQuery:hover,
 .outputScreenButton:hover,
 .settingBtn:hover,
-.viewData:hover,
-.editData:hover,
+.addDataRow:hover,
 .changeData:hover {
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,
@@ -144,8 +142,7 @@ input::placeholder {
 .SqlQuery:active,
 .outputScreenButton:active,
 .settingBtn:active,
-.viewData:active,
-.editData:active,
+.addDataRow:active,
 .changeData:active {
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,

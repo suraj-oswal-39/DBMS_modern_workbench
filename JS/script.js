@@ -1,7 +1,7 @@
 console.log("JavaScript file is linked successfully.");
 
-let svgId = "";
-let svgId2 = "";
+let NameOfDatabase = "";
+let NameOfTable = "";
 let isOpen = false;
 let isLight = false;
 
@@ -144,13 +144,13 @@ function deleteDatabases(dbNameForDel, dbSvgForRemove) {
         });
 }
 
-function fetchTables(SvgGridTemplate, svgId) {
-    if (!svgId) {
+function fetchTables(SvgGridTemplate, NameOfDatabase) {
+    if (!NameOfDatabase) {
         console.log("No database selected");
         return;
     }
 
-    fetch(`http://localhost:3000/Tables?databaseName=${encodeURIComponent(svgId)}`)
+    fetch(`http://localhost:3000/Tables?databaseName=${encodeURIComponent(NameOfDatabase)}`)
         .then(res => res.json())
         .then(data => {
             data.forEach(function (Tb) {
@@ -721,7 +721,7 @@ function initDatabaseView($location, $rootScope) {
         console.log("Clicked DB:", svg.id.replace(/Svg$/, ""));
 
         const dbName = svg.id.replace(/Svg$/, "");
-        svgId = dbName;
+        NameOfDatabase = dbName;
 
         $rootScope.$apply(() => {
             $location.path(`/table/${dbName}`);
@@ -778,6 +778,8 @@ function initTableView($location, $rootScope, dbName) {
     const outputScreen = document.querySelector('.outputScreen');
     const popUpQueryWindow = document.querySelector('.popUpQueryWindow');
 
+    fetchTables(SvgGridTemplate, dbName);
+
     textarea.addEventListener("input", function () {
         updateLineNumbers(textarea, lineNumbers)
     });
@@ -822,7 +824,7 @@ function initTableView($location, $rootScope, dbName) {
         console.log("Clicked Tb:", svg.id.replace(/Svg$/, ""));
 
         const tableName = svg.id.replace(/Svg$/, "");
-        svgId2 = tableName;
+        NameOfTable = tableName;
 
         $rootScope.$apply(() => {
             $location.path(`/tableDataView/${dbName}/${tableName}`);
@@ -968,22 +970,32 @@ function initTableView($location, $rootScope, dbName) {
     settingOpen();
 }
 
-function fetchTableData(tableTemplate, svgId, svgId2) {
+function RemoveRow2() {
+    const deleteRow = document.querySelectorAll(".deleteRow");
+        deleteRow.forEach(btn => {
+            btn.onclick = (event) => {
+                event.target.closest(".dataRow").remove();
+            };
+    });
+}
 
-    if (!svgId) {
+function fetchTableData(tableTemplate, NameOfDatabase, NameOfTable) {
+
+    if (!NameOfDatabase) {
         console.log("No database selected");
         return;
     }
 
-    if (!svgId2) {
+    if (!NameOfTable) {
         console.log("No table selected");
         return;
     }
 
     const columnNames = tableTemplate.querySelector(".columnNames");
     const tableData = tableTemplate.querySelector(".tableData");
+    const addDataRow = document.querySelector(".addDataRow");
 
-    fetch(`http://localhost:3000/TableData?databaseName=${encodeURIComponent(svgId)}&tableName=${encodeURIComponent(svgId2)}`)
+    fetch(`http://localhost:3000/TableData?databaseName=${encodeURIComponent(NameOfDatabase)}&tableName=${encodeURIComponent(NameOfTable)}`)
         .then(res => res.json())
         .then(data => {
             Object.keys(data[0]).forEach(key => {
@@ -1021,24 +1033,50 @@ function fetchTableData(tableTemplate, svgId, svgId2) {
                 tableData.appendChild(newDiv);
             });
 
-            let newDiv = document.createElement("div");
-            newDiv.setAttribute("class","dataRow");
-            Object.keys(data[0]).forEach(key => {
-                let newInput = document.createElement("input");
-                newInput.setAttribute("type","text");
-                newInput.setAttribute("value",null);
-                newInput.setAttribute("name",null);
-                newInput.readOnly = true;
-                newDiv.appendChild(newInput);
+            addDataRow.addEventListener("click", () => {
+                let newDiv = document.createElement("div");
+                newDiv.setAttribute("class","dataRow");
+                let div = document.createElement("div");
+                div.innerHTML = `
+                    <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path id="Vector" d="M14 16H20M21 10V9C21 7.89543 20.1046 7 19 7H5C3.89543 7 3 7.89543 3 9V11C3 12.1046 3.89543 13 5 13H11" stroke="var(--color4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+                div.classList.add("deleteRow");
+                newDiv.appendChild(div);
+                Object.keys(data[0]).forEach(key => {
+                    let newInput = document.createElement("input");
+                    newInput.setAttribute("type","text");
+                    newInput.setAttribute("value",null);
+                    newInput.setAttribute("name",null);
+                    newInput.readOnly = true;
+                    newDiv.appendChild(newInput);
+                });
+                tableData.appendChild(newDiv);
+                RemoveRow2();
             });
-            tableData.appendChild(newDiv);  
+
+            const dataRow = document.querySelectorAll(".dataRow");
+            dataRow.forEach(row => {
+                let div = document.createElement("div");
+                div.innerHTML = `
+                    <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path id="Vector" d="M14 16H20M21 10V9C21 7.89543 20.1046 7 19 7H5C3.89543 7 3 7.89543 3 9V11C3 12.1046 3.89543 13 5 13H11" stroke="var(--color4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+                div.classList.add("deleteRow");
+                row.insertBefore(div, row.firstElementChild);
+            });
+
+            RemoveRow2();
+
         })
         .catch(err => console.log(err));
 
 }
 
 function initTableDataView(dbName, tableName) {
-    console.log("this is table data view page");
+    console.log("this is table data view page = "+dbName+" and "+tableName);
     const h3Tag = document.querySelector(".DBTabletTitle");
     h3Tag.textContent = `Data from ${tableName} table in ${dbName} database`;
 
@@ -1048,6 +1086,9 @@ function initTableDataView(dbName, tableName) {
     const lineNumbers = document.getElementById("lineNumbers");
     const outputScreen = document.querySelector('.outputScreen');
     const popUpQueryWindow = document.querySelector('.popUpQueryWindow');
+
+    const tableTemplate = document.querySelector(".tableTemplate");
+    fetchTableData(tableTemplate, dbName, tableName);
 
     textarea.addEventListener("input", function () {
         updateLineNumbers(textarea, lineNumbers)
@@ -1070,21 +1111,12 @@ function initTableDataView(dbName, tableName) {
 
     settingOpen();
 
-    const tableTemplate = document.querySelector(".tableTemplate");
     tableTemplate.addEventListener("dblclick", (event) => {
         const targetElement = event.target;
         if (targetElement.tagName === "INPUT") {
-            let inputTag = tableTemplate.querySelector(`input[name="${targetElement.name}"]
-            `);
-            inputTag.removeAttribute("readonly");
+            targetElement.removeAttribute("readonly");
+            targetElement.style.border = "2px solid #ff0";
         }
     });
 
-    // const changeData = document.querySelector(".changeData");
-    // changeData.addEventListener("click", () => {
-    //     let form = document.querySelector(".tableTemplate");
-    //     console.log(form);
-    //     const formData = new FormData(form);
-    //     console.log(formData);
-    // });
 }
