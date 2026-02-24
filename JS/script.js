@@ -640,7 +640,7 @@ function initDatabaseView($location, $rootScope) {
         red.style.stopColor = "#ff0000";
         yellow.style.stopColor = "#ffff00";
         routingContainer.style.filter = "blur(3px)";
-        fromDisplay.style.zIndex="0";
+        fromDisplay.style.zIndex = "0";
         NameInput.style.opacity = 1;
         NameInput.style.width = "10rem";
         CloseCross.style.opacity = 1;
@@ -687,7 +687,7 @@ function initDatabaseView($location, $rootScope) {
 
             newDBname = "";
 
-            removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross,fromDisplay);
+            removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay);
         }
     });
 
@@ -972,14 +972,18 @@ function initTableView($location, $rootScope, dbName) {
 
 function RemoveRow2() {
     const deleteRow = document.querySelectorAll(".deleteRow");
-        deleteRow.forEach(btn => {
-            btn.onclick = (event) => {
-                event.target.closest(".dataRow").remove();
-            };
+    deleteRow.forEach(btn => {
+        btn.onclick = (event) => {
+            event.target.closest(".dataRow").remove();
+        };
     });
 }
 
-function fetchTableData(tableTemplate, NameOfDatabase, NameOfTable) {
+async function fetchTableData(tableTemplate, NameOfDatabase, NameOfTable) {
+
+    const columnNames = tableTemplate.querySelector(".columnNames");
+    const tableData = tableTemplate.querySelector(".tableData");
+    const addDataRow = document.querySelector(".addDataRow");
 
     if (!NameOfDatabase) {
         console.log("No database selected");
@@ -991,92 +995,113 @@ function fetchTableData(tableTemplate, NameOfDatabase, NameOfTable) {
         return;
     }
 
-    const columnNames = tableTemplate.querySelector(".columnNames");
-    const tableData = tableTemplate.querySelector(".tableData");
-    const addDataRow = document.querySelector(".addDataRow");
+    const metaResponse = await fetch(
+        `http://localhost:3000/TableMeta?databaseName=${NameOfDatabase}&tableName=${NameOfTable}`
+    );
 
-    fetch(`http://localhost:3000/TableData?databaseName=${encodeURIComponent(NameOfDatabase)}&tableName=${encodeURIComponent(NameOfTable)}`)
-        .then(res => res.json())
-        .then(data => {
-            Object.keys(data[0]).forEach(key => {
-                let newInput = document.createElement("input");
-                newInput.setAttribute("type","text");
-                newInput.setAttribute("value",key);
-                newInput.setAttribute("name",key);
-                newInput.readOnly = true;
-                columnNames.appendChild(newInput);
-            });
+    const metaData = await metaResponse.json();
 
-            data.forEach(row => {
-                let newDiv = document.createElement("div");
-                newDiv.setAttribute("class","dataRow");
-                Object.values(row).forEach(value => {
-                    let displayValue = value;
-                    if (typeof value === "string" && value.includes("T") && value.endsWith("Z")) {
-                        const date = new Date(value);
-                        displayValue = date.toLocaleString("en-IN", {
-                            year: "numeric",
-                            month: "short",
-                            day: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit"
-                        });
-                    }
-                    let newInput = document.createElement("input");
-                    newInput.setAttribute("type","text");
-                    newInput.setAttribute("value",displayValue);
-                    newInput.setAttribute("name",displayValue);
-                    newInput.readOnly = true;
-                    newDiv.appendChild(newInput);
+    const pkColumns = metaData
+        .filter(col => col.CONSTRAINT_TYPE === "PRIMARY KEY")
+        .map(col => col.COLUMN_NAME);
+
+    const fkColumns = metaData
+        .filter(col => col.CONSTRAINT_TYPE === "FOREIGN KEY")
+        .map(col => col.COLUMN_NAME);
+
+    const dataResponse = await fetch(
+        `http://localhost:3000/TableData?databaseName=${NameOfDatabase}&tableName=${NameOfTable}`
+    );
+
+    const data = await dataResponse.json();
+
+    if (!data || data.length === 0) {
+        outputWindow("No data available");
+        return;
+    }
+
+    Object.keys(data[0]).forEach(key => {
+        let label = key;
+        if (pkColumns.includes(key)) {
+            label += " (PK)";
+        }
+        if (fkColumns.includes(key)) {
+            label += " (FK)";
+        }
+        let newInput = document.createElement("input");
+        newInput.type = "text";
+        newInput.value = label;
+        newInput.name = label;
+        newInput.readOnly = true;
+        columnNames.appendChild(newInput);
+    });
+
+    data.forEach(row => {
+        let newDiv = document.createElement("div");
+        newDiv.setAttribute("class", "dataRow");
+        Object.values(row).forEach(value => {
+            let displayValue = value;
+            if (typeof value === "string" && value.includes("T") && value.endsWith("Z")) {
+                const date = new Date(value);
+                displayValue = date.toLocaleString("en-IN", {
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
                 });
-                tableData.appendChild(newDiv);
-            });
+            }
+            let newInput = document.createElement("input");
+            newInput.setAttribute("type", "text");
+            newInput.setAttribute("value", displayValue);
+            newInput.setAttribute("name", displayValue);
+            newInput.readOnly = true;
+            newDiv.appendChild(newInput);
+        });
+        tableData.appendChild(newDiv);
+    });
 
-            addDataRow.addEventListener("click", () => {
-                let newDiv = document.createElement("div");
-                newDiv.setAttribute("class","dataRow");
-                let div = document.createElement("div");
-                div.innerHTML = `
+    addDataRow.addEventListener("click", () => {
+        let newDiv = document.createElement("div");
+        newDiv.setAttribute("class", "dataRow");
+        let div = document.createElement("div");
+        div.innerHTML = `
                     <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path id="Vector" d="M14 16H20M21 10V9C21 7.89543 20.1046 7 19 7H5C3.89543 7 3 7.89543 3 9V11C3 12.1046 3.89543 13 5 13H11" stroke="var(--color4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 `;
-                div.classList.add("deleteRow");
-                newDiv.appendChild(div);
-                Object.keys(data[0]).forEach(key => {
-                    let newInput = document.createElement("input");
-                    newInput.setAttribute("type","text");
-                    newInput.setAttribute("value",null);
-                    newInput.setAttribute("name",null);
-                    newInput.readOnly = true;
-                    newDiv.appendChild(newInput);
-                });
-                tableData.appendChild(newDiv);
-                RemoveRow2();
-            });
+        div.classList.add("deleteRow");
+        newDiv.appendChild(div);
+        Object.keys(data[0]).forEach(key => {
+            let newInput = document.createElement("input");
+            newInput.setAttribute("type", "text");
+            newInput.setAttribute("value", null);
+            newInput.setAttribute("name", null);
+            newInput.readOnly = true;
+            newDiv.appendChild(newInput);
+        });
+        tableData.appendChild(newDiv);
+        RemoveRow2();
+    });
 
-            const dataRow = document.querySelectorAll(".dataRow");
-            dataRow.forEach(row => {
-                let div = document.createElement("div");
-                div.innerHTML = `
+    const dataRow = document.querySelectorAll(".dataRow");
+    dataRow.forEach(row => {
+        let div = document.createElement("div");
+        div.innerHTML = `
                     <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path id="Vector" d="M14 16H20M21 10V9C21 7.89543 20.1046 7 19 7H5C3.89543 7 3 7.89543 3 9V11C3 12.1046 3.89543 13 5 13H11" stroke="var(--color4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                 `;
-                div.classList.add("deleteRow");
-                row.insertBefore(div, row.firstElementChild);
-            });
+        div.classList.add("deleteRow");
+        row.insertBefore(div, row.firstElementChild);
+    });
 
-            RemoveRow2();
-
-        })
-        .catch(err => console.log(err));
-
+    RemoveRow2();
 }
 
 function initTableDataView(dbName, tableName) {
-    console.log("this is table data view page = "+dbName+" and "+tableName);
+    console.log("this is table data view page = " + dbName + " and " + tableName);
     const h3Tag = document.querySelector(".DBTabletTitle");
     h3Tag.textContent = `Data from ${tableName} table in ${dbName} database`;
 

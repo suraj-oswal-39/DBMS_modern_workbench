@@ -11,6 +11,37 @@ const db = mysql.createConnection({
     port: 3306
 });
 
+//
+app.get("/TableMeta", (req, res) => {
+    const { databaseName, tableName } = req.query;
+
+    if (!databaseName || !tableName) {
+        return res.status(400).json({ error: "Missing parameters" });
+    }
+
+    const sql = `
+        SELECT 
+            k.COLUMN_NAME,
+            k.CONSTRAINT_NAME,
+            t.CONSTRAINT_TYPE
+        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE k
+        JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS t
+            ON k.CONSTRAINT_NAME = t.CONSTRAINT_NAME
+            AND k.TABLE_SCHEMA = t.TABLE_SCHEMA
+            AND k.TABLE_NAME = t.TABLE_NAME
+        WHERE k.TABLE_SCHEMA = ?
+        AND k.TABLE_NAME = ?
+    `;
+
+    db.query(sql, [databaseName, tableName], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+
+        res.json(results);
+    });
+});
+
 //fetch table logic
 app.get("/TableData", (req, res) => {
     const { databaseName, tableName } = req.query;
