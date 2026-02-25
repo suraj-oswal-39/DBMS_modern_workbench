@@ -113,7 +113,8 @@ input::placeholder {
 .outputScreenButton, 
 .settingBtn,  
 .addDataRow,
-.changeData {
+.changeData,
+.insertData {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -133,7 +134,8 @@ input::placeholder {
 .outputScreenButton:hover,
 .settingBtn:hover,
 .addDataRow:hover,
-.changeData:hover {
+.changeData:hover,
+.insertData:hover {
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,
         linear-gradient(135deg, var(--color1), var(--color2)) border-box;
@@ -143,7 +145,8 @@ input::placeholder {
 .outputScreenButton:active,
 .settingBtn:active,
 .addDataRow:active,
-.changeData:active {
+.changeData:active,
+.insertData:active {
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,
         linear-gradient(135deg, var(--color6), var(--color6)) border-box;

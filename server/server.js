@@ -11,33 +11,130 @@ const db = mysql.createConnection({
     port: 3306
 });
 
-//
-app.get("/TableMeta", (req, res) => {
-    const { databaseName, tableName } = req.query;
+// insert data in new whole row
+app.post("/insert-row", (req, res) => {
 
-    if (!databaseName || !tableName) {
+    const { databaseName, tableName, columns, values } = req.body;
+
+    if (!databaseName || !tableName || !columns || !values) {
         return res.status(400).json({ error: "Missing parameters" });
     }
 
-    const sql = `
-        SELECT 
-            k.COLUMN_NAME,
-            k.CONSTRAINT_NAME,
-            t.CONSTRAINT_TYPE
-        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE k
-        JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS t
-            ON k.CONSTRAINT_NAME = t.CONSTRAINT_NAME
-            AND k.TABLE_SCHEMA = t.TABLE_SCHEMA
-            AND k.TABLE_NAME = t.TABLE_NAME
-        WHERE k.TABLE_SCHEMA = ?
-        AND k.TABLE_NAME = ?
+    if (!Array.isArray(columns) || !Array.isArray(values)) {
+        return res.status(400).json({ error: "Invalid data format" });
+    }
+
+    if (columns.length !== values.length) {
+        return res.status(400).json({ error: "Columns and values mismatch" });
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(databaseName) ||
+        !/^[a-zA-Z0-9_]+$/.test(tableName)) {
+        return res.status(400).json({ error: "Invalid name" });
+    }
+
+    const safeDb = mysql.escapeId(databaseName);
+    const safeTable = mysql.escapeId(tableName);
+
+    const escapedColumns = columns.map(col => mysql.escapeId(col)).join(", ");
+
+    const placeholders = columns.map(() => "?").join(", ");
+
+    const insertQuery = `
+        INSERT INTO ${safeDb}.${safeTable}
+        (${escapedColumns})
+        VALUES (${placeholders})
     `;
 
-    db.query(sql, [databaseName, tableName], (err, results) => {
+    db.query(insertQuery, values, (err, result) => {
+
         if (err) {
             return res.status(500).json({ error: err.message });
         }
 
+        res.json({ message: "Row inserted successfully" });
+    });
+});
+
+// delete data of whole row
+app.post("/delete-row", (req, res) => {
+
+    const { databaseName, tableName, pkValue } = req.body;
+
+    if (!databaseName || !tableName || !pkValue) {
+        return res.status(400).json({ error: "Missing parameters" });
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(databaseName) ||
+        !/^[a-zA-Z0-9_]+$/.test(tableName)) {
+        return res.status(400).json({ error: "Invalid name" });
+    }
+
+    const safeDb = mysql.escapeId(databaseName);
+    const safeTable = mysql.escapeId(tableName);
+
+    const pkQuery = `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = ?
+        AND CONSTRAINT_NAME = 'PRIMARY'
+    `;
+
+    db.query(pkQuery, [databaseName, tableName], (err, results) => {
+
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+
+        if (results.length === 0) {
+            return res.status(400).json({ error: "Primary key not found" });
+        }
+
+        const pkColumn = mysql.escapeId(results[0].COLUMN_NAME);
+
+        const deleteQuery = `
+            DELETE FROM ${safeDb}.${safeTable}
+            WHERE ${pkColumn} = ?
+        `;
+
+        db.query(deleteQuery, [pkValue], (err2) => {
+
+            if (err2) {
+                return res.status(500).json({ error: err2.message });
+            }
+
+            res.json({ message: "Row deleted successfully" });
+        });
+    });
+});
+
+app.get("/TableMeta", (req, res) => {
+    const { databaseName, tableName } = req.query;
+
+    const sql = `
+        SELECT 
+            c.COLUMN_NAME,
+            c.DATA_TYPE,
+            c.IS_NULLABLE,
+            k.CONSTRAINT_NAME,
+            t.CONSTRAINT_TYPE
+        FROM INFORMATION_SCHEMA.COLUMNS c
+        LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE k
+            ON c.TABLE_SCHEMA = k.TABLE_SCHEMA
+            AND c.TABLE_NAME = k.TABLE_NAME
+            AND c.COLUMN_NAME = k.COLUMN_NAME
+        LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS t
+            ON k.CONSTRAINT_NAME = t.CONSTRAINT_NAME
+            AND k.TABLE_SCHEMA = t.TABLE_SCHEMA
+            AND k.TABLE_NAME = t.TABLE_NAME
+        WHERE c.TABLE_SCHEMA = ?
+        AND c.TABLE_NAME = ?
+        ORDER BY c.ORDINAL_POSITION
+    `;
+
+    db.query(sql, [databaseName, tableName], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
         res.json(results);
     });
 });
