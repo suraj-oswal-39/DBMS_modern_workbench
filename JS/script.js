@@ -595,6 +595,233 @@ function settingOpen() {
     }
 }
 
+function deleteRowSvgAdd() {
+    const dataRow = document.querySelectorAll(".dataRow");
+    dataRow.forEach(row => {
+        let div = document.createElement("div");
+        div.innerHTML = `
+                    <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path id="Vector" d="M14 16H20M21 10V9C21 7.89543 20.1046 7 19 7H5C3.89543 7 3 7.89543 3 9V11C3 12.1046 3.89543 13 5 13H11" stroke="var(--color4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+        div.classList.add("deleteRow");
+        div.title = "remove row";
+        row.insertBefore(div, row.firstElementChild);
+    });
+}
+
+async function fetchTableData(tableTemplate, NameOfDatabase, NameOfTable) {
+
+    const columnNames = tableTemplate.querySelector(".columnNames");
+    const tableData = tableTemplate.querySelector(".tableData");
+    const addDataRow = document.querySelector(".addDataRow");
+
+    if (!NameOfDatabase) {
+        console.log("No database selected");
+        return;
+    }
+
+    if (!NameOfTable) {
+        console.log("No table selected");
+        return;
+    }
+
+    const metaResponse = await fetch(
+        `http://localhost:3000/TableMeta?databaseName=${NameOfDatabase}&tableName=${NameOfTable}`
+    );
+
+    const metaData = await metaResponse.json();
+
+    const pkColumns = metaData
+        .filter(col => col.CONSTRAINT_TYPE === "PRIMARY KEY")
+        .map(col => col.COLUMN_NAME);
+
+    const fkColumns = metaData
+        .filter(col => col.CONSTRAINT_TYPE === "FOREIGN KEY")
+        .map(col => col.COLUMN_NAME);
+
+    const nnColumns = metaData
+        .filter(col => col.IS_NULLABLE === "NO")
+        .map(col => col.COLUMN_NAME);
+
+
+    const dataResponse = await fetch(
+        `http://localhost:3000/TableData?databaseName=${NameOfDatabase}&tableName=${NameOfTable}`
+    );
+
+    // append column name 
+    const columnList = metaData.map(col => col.COLUMN_NAME);
+    columnList.forEach(colName => {
+        let label = colName;
+        const colMeta = metaData.find(c => c.COLUMN_NAME === colName);
+        if (colMeta.CONSTRAINT_TYPE === "PRIMARY KEY") {
+            label += " (PK)";
+        }
+        if (colMeta.CONSTRAINT_TYPE === "FOREIGN KEY") {
+            label += " (FK)";
+        }
+        if (colMeta.IS_NULLABLE === "NO") {
+            label += " (NN)";
+        }
+        let newInput = document.createElement("input");
+        newInput.type = "text";
+        newInput.value = label;
+        newInput.readOnly = true;
+        columnNames.appendChild(newInput);
+    });
+
+    const data = await dataResponse.json();
+
+    // append column's data
+    data.forEach(row => {
+        let newDiv = document.createElement("div");
+        newDiv.setAttribute("class", "dataRow");
+        Object.values(row).forEach((value, index) => {
+            let displayValue = value;
+            if (typeof value === "string" && value.includes("T") && value.endsWith("Z")) {
+                const date = new Date(value);
+                displayValue = date.toLocaleString("en-IN", {
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+                });
+            }
+            let newInput = document.createElement("input");
+            newInput.setAttribute("type", "text");
+            newInput.setAttribute("value", displayValue);
+            let label;
+            if (pkColumns.includes(Object.keys(data[0])[index])) {
+                label = "PK";
+                newInput.classList.add(label);
+            }
+            if (fkColumns.includes(Object.keys(data[0])[index])) {
+                label = "FK";
+                newInput.classList.add(label);
+            }
+            if (nnColumns.includes(Object.keys(data[0])[index])) {
+                label = "NN";
+                newInput.classList.add(label);
+            }
+            newInput.name = Object.keys(data[0])[index];
+            newInput.readOnly = true;
+            newDiv.appendChild(newInput);
+        });
+        tableData.appendChild(newDiv);
+    });
+
+    deleteRowSvgAdd();
+
+    // add new row
+    addDataRow.addEventListener("click", () => {
+        addDataRow.disabled = true;
+        let newDiv = document.createElement("div");
+        newDiv.setAttribute("class", "dataRow");
+        let div = document.createElement("div");
+        div.innerHTML = `
+                    <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path id="Vector" d="M14 16H20M21 10V9C21 7.89543 20.1046 7 19 7H5C3.89543 7 3 7.89543 3 9V11C3 12.1046 3.89543 13 5 13H11" stroke="var(--color4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+        div.classList.add("deleteRow");
+        div.title = "remove row";
+        newDiv.appendChild(div);
+        columnList.forEach(colName => {
+            let label;
+            const colMeta = metaData.find(c => c.COLUMN_NAME === colName);
+            let newInput = document.createElement("input");
+            newInput.type = "text";
+            newInput.value = "";
+            newInput.name = colName;
+            if (colMeta.CONSTRAINT_TYPE === "PRIMARY KEY") {
+                label = "PK";
+                newInput.classList.add(label);
+            }
+            if (colMeta.CONSTRAINT_TYPE === "FOREIGN KEY") {
+                label = "FK";
+                newInput.classList.add(label);
+            }
+            if (colMeta.IS_NULLABLE === "NO") {
+                label = "NN";
+                newInput.classList.add(label);
+            }
+            newInput.readOnly = true;
+            newDiv.appendChild(newInput);
+        });
+        tableData.appendChild(newDiv);
+        DeleteRow(NameOfDatabase, NameOfTable);
+    });
+
+    DeleteRow(NameOfDatabase, NameOfTable);
+}
+
+async function insertNewData(NameOfDatabase, NameOfTable, tableTemplate) {
+    let newData = {
+        "ColumnName": [],
+        "newColumnData": [],
+    };
+    const insertData = document.querySelector(".insertData");
+    let targetElement;
+    tableTemplate.addEventListener("dblclick", (event) => {
+        targetElement = event.target;
+        if (targetElement.tagName === "INPUT") {
+            targetElement.removeAttribute("readonly");
+            targetElement.style.border = "2px solid #ff0";
+        }
+        targetElement.addEventListener("change", () => {
+            if (newData.ColumnName.includes(targetElement.name)) return;
+            newData.ColumnName.push(targetElement.name);
+            let value = targetElement.value;
+            
+            if (targetElement.value.match(/\d{1,2}\s\w+\s\d{4}/)) {
+                const parsedDate = new Date(targetElement.value);
+                if (!isNaN(parsedDate)) {
+                    value = parsedDate.toISOString().slice(0, 19).replace("T", " ");
+                    newData.newColumnData.push(value);
+                }
+            } else {
+                newData.newColumnData.push(value);
+            }            
+        });
+    });
+
+    insertData.addEventListener("click", async () => {
+        try {
+            const response = await fetch("http://localhost:3000/insert-row", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    databaseName: NameOfDatabase,
+                    tableName: NameOfTable,
+                    columns: newData.ColumnName,
+                    values: newData.newColumnData
+                })
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                outputWindow(data.error);
+                const dataRow = targetElement.closest(".dataRow");
+                dataRow.remove();
+                // newData.ColumnName.length = 0;
+                // newData.newColumnData.length = 0;
+                console.log(newData);
+                return;
+            } else if (data.message) {
+                outputWindow(data.message);
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            }
+        } catch (err) {
+            let errorMsg = err.message + "\n\n" + err.stack;
+            outputWindow(errorMsg);
+        }
+    });
+};
+
 function initDatabaseView($location, $rootScope) {
     const nameInput = document.getElementById("nameInput");
     const addSvg = document.querySelector(".addSvg");
@@ -970,21 +1197,6 @@ function initTableView($location, $rootScope, dbName) {
     settingOpen();
 }
 
-function deleteRowSvgAdd() {
-    const dataRow = document.querySelectorAll(".dataRow");
-    dataRow.forEach(row => {
-        let div = document.createElement("div");
-        div.innerHTML = `
-                    <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path id="Vector" d="M14 16H20M21 10V9C21 7.89543 20.1046 7 19 7H5C3.89543 7 3 7.89543 3 9V11C3 12.1046 3.89543 13 5 13H11" stroke="var(--color4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                `;
-        div.classList.add("deleteRow");
-        div.title = "remove row";
-        row.insertBefore(div, row.firstElementChild);
-    });
-}
-
 function DeleteRow(NameOfDatabase, NameOfTable) {
 
     document.querySelectorAll(".deleteRow").forEach(btn => {
@@ -1026,152 +1238,6 @@ function DeleteRow(NameOfDatabase, NameOfTable) {
     });
 }
 
-async function fetchTableData(tableTemplate, NameOfDatabase, NameOfTable) {
-
-    const columnNames = tableTemplate.querySelector(".columnNames");
-    const tableData = tableTemplate.querySelector(".tableData");
-    const addDataRow = document.querySelector(".addDataRow");
-
-    if (!NameOfDatabase) {
-        console.log("No database selected");
-        return;
-    }
-
-    if (!NameOfTable) {
-        console.log("No table selected");
-        return;
-    }
-
-    const metaResponse = await fetch(
-        `http://localhost:3000/TableMeta?databaseName=${NameOfDatabase}&tableName=${NameOfTable}`
-    );
-
-    const metaData = await metaResponse.json();
-
-    const pkColumns = metaData
-        .filter(col => col.CONSTRAINT_TYPE === "PRIMARY KEY")
-        .map(col => col.COLUMN_NAME);
-
-    const fkColumns = metaData
-        .filter(col => col.CONSTRAINT_TYPE === "FOREIGN KEY")
-        .map(col => col.COLUMN_NAME);
-
-    const nnColumns = metaData
-        .filter(col => col.IS_NULLABLE === "NO")
-        .map(col => col.COLUMN_NAME);
-
-
-    const dataResponse = await fetch(
-        `http://localhost:3000/TableData?databaseName=${NameOfDatabase}&tableName=${NameOfTable}`
-    );
-
-    // append column name 
-    const columnList = metaData.map(col => col.COLUMN_NAME);
-    columnList.forEach(colName => {
-        let label = colName;
-        const colMeta = metaData.find(c => c.COLUMN_NAME === colName);
-        if (colMeta.CONSTRAINT_TYPE === "PRIMARY KEY") {
-            label += " (PK)";
-        }
-        if (colMeta.CONSTRAINT_TYPE === "FOREIGN KEY") {
-            label += " (FK)";
-        }
-        if (colMeta.IS_NULLABLE === "NO") {
-            label += " (NN)";
-        }
-        let newInput = document.createElement("input");
-        newInput.type = "text";
-        newInput.value = label;
-        newInput.readOnly = true;
-        columnNames.appendChild(newInput);
-    });
-
-    const data = await dataResponse.json();
-
-    // append column's data
-    data.forEach(row => {
-        let newDiv = document.createElement("div");
-        newDiv.setAttribute("class", "dataRow");
-        Object.values(row).forEach((value, index) => {
-            let displayValue = value;
-            if (typeof value === "string" && value.includes("T") && value.endsWith("Z")) {
-                const date = new Date(value);
-                displayValue = date.toLocaleString("en-IN", {
-                    year: "numeric",
-                    month: "short",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit"
-                });
-            }
-            let newInput = document.createElement("input");
-            newInput.setAttribute("type", "text");
-            newInput.setAttribute("value", displayValue);
-            let label;
-            if (pkColumns.includes(Object.keys(data[0])[index])) {
-                label = "PK";
-                newInput.classList.add(label);
-            }
-            if (fkColumns.includes(Object.keys(data[0])[index])) {
-                label = "FK";
-                newInput.classList.add(label);
-            }
-            if (nnColumns.includes(Object.keys(data[0])[index])) {
-                label = "NN";
-                newInput.classList.add(label);
-            }
-            newInput.name = Object.keys(data[0])[index];
-            newInput.readOnly = true;
-            newDiv.appendChild(newInput);
-        });
-        tableData.appendChild(newDiv);
-    });
-
-    deleteRowSvgAdd();
-
-    // add new row
-    addDataRow.addEventListener("click", () => {
-        let newDiv = document.createElement("div");
-        newDiv.setAttribute("class", "dataRow");
-        let div = document.createElement("div");
-        div.innerHTML = `
-                    <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path id="Vector" d="M14 16H20M21 10V9C21 7.89543 20.1046 7 19 7H5C3.89543 7 3 7.89543 3 9V11C3 12.1046 3.89543 13 5 13H11" stroke="var(--color4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                `;
-        div.classList.add("deleteRow");
-        div.title = "remove row";
-        newDiv.appendChild(div);
-        columnList.forEach(colName => {
-            let label;
-            const colMeta = metaData.find(c => c.COLUMN_NAME === colName);
-            let newInput = document.createElement("input");
-            newInput.type = "text";
-            newInput.value = "";
-            newInput.name = colName;
-            if (colMeta.CONSTRAINT_TYPE === "PRIMARY KEY") {
-                label = "PK";
-                newInput.classList.add(label);
-            }
-            if (colMeta.CONSTRAINT_TYPE === "FOREIGN KEY") {
-                label = "FK";
-                newInput.classList.add(label);
-            }
-            if (colMeta.IS_NULLABLE === "NO") {
-                label = "NN";
-                newInput.classList.add(label);
-            }
-            newInput.readOnly = true;
-            newDiv.appendChild(newInput);
-        });
-        tableData.appendChild(newDiv);
-        DeleteRow(NameOfDatabase, NameOfTable);
-    });
-
-    DeleteRow(NameOfDatabase, NameOfTable);
-}
-
 function initTableDataView(dbName, tableName) {
     console.log("this is table data view page = " + dbName + " and " + tableName);
     const h3Tag = document.querySelector(".DBTabletTitle");
@@ -1210,67 +1276,3 @@ function initTableDataView(dbName, tableName) {
 
     insertNewData(dbName, tableName, tableTemplate);
 }
-
-async function insertNewData(NameOfDatabase, NameOfTable, tableTemplate) {
-    let newData = {
-        "ColumnName": [],
-        "newColumnData": [],
-    };
-    const insertData = document.querySelector(".insertData");
-    let targetElement;
-    tableTemplate.addEventListener("dblclick", (event) => {
-        targetElement = event.target;
-        if (targetElement.tagName === "INPUT") {
-            targetElement.removeAttribute("readonly");
-            targetElement.style.border = "2px solid #ff0";
-        }
-        targetElement.addEventListener("change", () => {
-            newData.ColumnName.push(targetElement.name);
-            let value = targetElement.value;
-            
-            if (targetElement.value.match(/\d{1,2}\s\w+\s\d{4}/)) {
-                const parsedDate = new Date(targetElement.value);
-                if (!isNaN(parsedDate)) {
-                    value = parsedDate.toISOString().slice(0, 19).replace("T", " ");
-                    newData.newColumnData.push(value);
-                }
-            } else {
-                newData.newColumnData.push(value);
-            }            
-        });
-    });
-
-    insertData.addEventListener("click", async () => {
-        console.log("this data is going to be inserted => ", newData);
-        try {
-            const response = await fetch("http://localhost:3000/insert-row", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    databaseName: NameOfDatabase,
-                    tableName: NameOfTable,
-                    columns: newData.ColumnName,
-                    values: newData.newColumnData
-                })
-            });
-
-            const data = await response.json();
-            if (data.error) {
-                outputWindow(data.error);
-                const dataRow = targetElement.closest(".dataRow");
-                dataRow.remove();
-                newData.ColumnName.length = 0;
-                newData.newColumnData.length = 0;
-                return;
-            } else if (data.message) {
-                outputWindow(data.message);
-                setTimeout(() => {
-                    location.reload();
-                }, 2000);
-            }
-        } catch (err) {
-            let errorMsg = err.message + "\n\n" + err.stack;
-            outputWindow(errorMsg);
-        }
-    });
-};
