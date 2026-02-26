@@ -188,8 +188,9 @@ app.post("/insert-row", (req, res) => {
 
 // delete data of whole row
 app.post("/delete-row", (req, res) => {
-    const { databaseName, tableName, pkValue } = req.body;
+    const { databaseName, tableName, pkColumnName, pkValue } = req.body;
 
+    console.log(databaseName, tableName, pkValue);
     if (!databaseName || !tableName || !pkValue || !pkColumnName) {
         return res.status(400).json({ error: "Missing parameters" });
     }

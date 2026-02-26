@@ -15,8 +15,8 @@ function outputWindow(outputMsg) {
 
 function NoBtn(noBtn, routingContainer, popUpWindow) {
     noBtn.onclick = () => {
-        routingContainer.removeAttribute("style");
-        popUpWindow.removeAttribute("style");
+        if (routingContainer.style) routingContainer.removeAttribute("style");
+        if (popUpWindow.style) popUpWindow.removeAttribute("style");
     };
 }
 
@@ -463,13 +463,12 @@ function fromDisplay2buttonFeature() {
         event.stopPropagation();
         const us = event.target.closest('input[name="us"]');
         if (!us) return;
-        console.log(us);
         const row = us.closest(".row");
         const dataType = row.querySelector('.selectedDataType');
         if (!["INT()", "BIGINT()", "DECIMAL()", "FLOAT", "DOUBLE"].includes(dataType.innerText)) {
             us.checked = false;
             us.removeAttribute("style");
-            console.log("Data type must be INT, BIGINT, DECIMAL, FLOAT or DOUBLE.");
+            outputWindow("Data type must be INT, BIGINT, DECIMAL, FLOAT or DOUBLE.");
         }
     });
 
@@ -486,7 +485,7 @@ function fromDisplay2buttonFeature() {
         if (!["INT()", "BIGINT()"].includes(dataType.innerText) || !(pk.checked || uq.checked)) {
             ai.checked = false;
             ai.removeAttribute("style");
-            console.log("Data type must be INT or BIGINT and either PRIMARY KEY or UNIQUE.");
+            outputWindow("Data type must be INT or BIGINT and either PRIMARY KEY or UNIQUE.");
         }
         if (ai.checked && exp.value === "") {
             exp.setAttribute("disabled", "true");
@@ -610,7 +609,7 @@ function deleteRowSvgAdd() {
 
 function DeleteRow(dbName, tableName) {
     document.querySelectorAll(".deleteRow").forEach(btn => {
-        btn.onclick = async (event) => {
+        btn.onclick = (event) => {
             const row = event.target.closest(".dataRow");
             const pkInput = row.querySelector(".PK");
 
@@ -621,29 +620,41 @@ function DeleteRow(dbName, tableName) {
 
             const pkValue = pkInput.value;
             const pkColumnName = pkInput.name;
+            const popUpWindow = document.querySelector(".popUpWindow");
+            const message = document.querySelector(".message");
+            const routingContainer = document.querySelector(".routingContainer");
+            const noBtn = document.querySelector(".no");
+            const yesBtn = document.querySelector(".yes");
+            popUpWindow.style.display = "grid";
+            message.textContent = "Are you sure you want to delete this row? it will delete all data in this row.";
+            NoBtn(noBtn, routingContainer, popUpWindow);
+            yesBtn.onclick = async () => {
+                routingContainer.removeAttribute("style");
+                popUpWindow.removeAttribute("style");
+                console.log(pkColumnName, pkValue);
+                const response = await fetch("http://localhost:3000/delete-row", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        databaseName: dbName,
+                        tableName: tableName,
+                        pkColumnName: pkColumnName,
+                        pkValue: pkValue
+                    }),
+                });
 
-            const response = await fetch("http://localhost:3000/delete-row", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    databaseName: dbName,
-                    tableName: tableName,
-                    pkColumnName: pkColumnName,
-                    pkValue: pkValue
-                }),
-            });
+                const data = await response.json();
 
-            const data = await response.json();
-
-            if (data.error) {
-                outputWindow(data.error);
-                return;
-            } else {
-                outputWindow(data.message);
-                row.remove();
-            }
+                if (data.error) {
+                    outputWindow(data.error);
+                    return;
+                } else {
+                    outputWindow(data.message);
+                    row.remove();
+                }
+            };
         };
     });
 }
@@ -759,6 +770,7 @@ function getChangeData(dbName, tableName, tableTemplate) {
     const changeData = document.querySelector(".changeData");
 
     insertData.addEventListener("click", () => {
+        changeData.style.display = "none";
         insertNewData(dbName, tableName, newData);
     });
 
@@ -869,10 +881,10 @@ async function fetchTableData(tableTemplate, dbName, tableName) {
 
     deleteRowSvgAdd();
     const insertData = document.querySelector(".insertData");
+    const changeData = document.querySelector(".changeData");
     // add new row
     addDataRow.addEventListener("click", () => {
-        // addDataRow.disabled = true;
-        // addDataRow.style.background = "linear-gradient(var(--color3), var(--color3)) padding-box, linear-gradient(135deg, var(--color3), var(--color3)) border-box";
+        changeData.style.display = "none";
         addDataRow.style.display = "none";
         insertData.style.display = "block";
         let newDiv = document.createElement("div");
@@ -913,6 +925,110 @@ async function fetchTableData(tableTemplate, dbName, tableName) {
     });
 
     DeleteRow(dbName, tableName);
+}
+
+async function fetchColumnMetaData(dbName, tableName) {
+    try {
+        const response = await fetch(
+            `http://localhost:3000/TableSchema?databaseName=${dbName}&tableName=${tableName}`
+        );
+
+        const columns = await response.json();
+        if (!columns.length) {
+            outputWindow("No schema found");
+            return;
+        }
+
+        const tableNameInput = document.querySelector("#tableNameInput");
+        tableNameInput.value = tableName;
+        let rowContainer = document.querySelector(".rowContainer");
+        rowContainer.innerHTML = "";
+
+        let rowCount = 0
+        columns.forEach(col => {
+            console.log(col);
+            rowCount++;
+            const newRow = document.createElement("div");
+            newRow.classList.add("row");
+            newRow.innerHTML = `
+                        <div class="columnNameInputDiv">
+                            <input type="text" class="columnName" name="columnName" value="${col.columnName}" placeholder="Enter Column Name" required />
+                        </div>
+
+                        <button type="button" class="dataType">
+                            <p class="selectedDataType">${col.dataType}</p>
+                            <ul class="dataTypeList">
+                                <li>INT()</li>
+                                <li>BIGINT()</li>
+                                <li>DECIMAL()</li>
+                                <li>FLOAT</li>
+                                <li>DOUBLE</li>
+                                <li>VARCHAR()</li>
+                                <li>CHAR()</li>
+                                <li>TEXT()</li>
+                                <li>DATE</li>
+                                <li>DATETIME()</li>
+                                <li>TIMESTAMP()</li>
+                                <li>BOOLEAN</li>
+                            </ul>
+                        </button>
+
+                        <div class="sizeInputDiv">
+                            <input type="number" class="sizeInput" name="sizeValue" value="${col.size}" placeholder="size" disabled/>
+                        </div>
+                        <!-- Only ONE PRIMARY KEY per table -->
+                        <input type="radio" id="pk${rowCount}" name="pk" value="pk${rowCount}" hidden />
+                        <label for="pk${rowCount}" class="btn Pk">Primary Key</label>
+
+                        <input type="checkbox" id="nn${rowCount}" name="nn" value="nn${rowCount}" hidden />
+                        <label for="nn${rowCount}" class="btn NN">Not Null</label>
+
+                        <input type="checkbox" id="uq${rowCount}" name="uq" value="uq${rowCount}" hidden />
+                        <label for="uq${rowCount}" class="btn">Unique</label>
+
+                        <input type="checkbox" id="us${rowCount}" name="us" value="us${rowCount}" hidden />
+                        <label for="us${rowCount}" class="btn">Unsigned</label>
+
+                        <input type="radio" id="ai${rowCount}" name="ai" value="ai${rowCount}" hidden />
+                        <label for="ai${rowCount}" class="btn Ai">Auto Increment</label>
+
+                        <div class="defaultValueDiv">
+                            <input type="text" class="expression" name="expression" value="${col.defaultValue}" placeholder="Enter Default Value / Expression" />
+                        </div>
+            `;
+            rowContainer.appendChild(newRow);
+
+            const pkEl = document.querySelector(`#pk${rowCount}`);
+            const nnEl = document.querySelector(`#nn${rowCount}`);
+            const uqEl = document.querySelector(`#uq${rowCount}`);
+            const usEl = document.querySelector(`#us${rowCount}`);
+            const aiEl = document.querySelector(`#ai${rowCount}`);
+
+            if (col.primaryKey) {
+                pkEl.checked = true;
+            }
+            if (col.notNull) {
+                nnEl.checked = true;
+            }
+            if (col.unique) {
+                uqEl.checked = true;
+            }
+            if (col.unsigned) {
+                usEl.checked = true;
+            }
+            if (col.autoIncrement) {
+                aiEl.checked = true;
+            }
+
+            fromDisplay2buttonFeature();
+            OptionSelection();
+
+            console.log(rowCount);
+        });
+
+    } catch (err) {
+        outputWindow(err.message);
+    }
 }
 
 function initDatabaseView($location, $rootScope) {
@@ -1116,7 +1232,7 @@ function initTableView($location, $rootScope, dbName) {
     addSvg.onclick = () => {
         routingContainer.style.filter = "blur(3px)";
         fromDisplay2.style.display = "flex";
-        createBtn.textContent = "Create";
+        createBtn.style.display = "block";
     };
 
     // Delete table on click event
@@ -1165,6 +1281,7 @@ function initTableView($location, $rootScope, dbName) {
     CloseCross2.onclick = () => {
         fromDisplay2.style.display = "none";
         routingContainer.removeAttribute("style");
+        createBtn.removeAttribute("style");
     };
 
     rowContainer.addEventListener("click", function (event) {
@@ -1328,7 +1445,7 @@ function initTableDataView(dbName, tableName) {
     settingOpen();
 
     getChangeData(dbName, tableName, tableTemplate);
-    
+
     const editTableColumn = document.querySelector(".editTableColumn");
     const fromDisplay2 = document.querySelector(".fromDisplay2");
     const CloseCross2 = document.querySelector(".CloseCross2");
@@ -1338,18 +1455,72 @@ function initTableDataView(dbName, tableName) {
     const resetBtn = document.querySelector("#resetBtn");
     const updateBtn = document.querySelector(".updateBtn");
     const rowContainer = document.querySelector(".rowContainer");
+    const tableNameInput = document.querySelector("#tableNameInput");
 
     editTableColumn.addEventListener("click", (event) => {
         event.stopPropagation();
         routingContainer.style.filter = "blur(3px)";
         fromDisplay2.style.display = "flex";
-        updateBtn.textContent = "Update";
-        editColumn(dbName, tableName);
+        updateBtn.style.display = "block";
+        fetchColumnMetaData(dbName, tableName);
     });
 
     CloseCross2.onclick = () => {
         fromDisplay2.style.display = "none";
         routingContainer.removeAttribute("style");
+        updateBtn.removeAttribute("style");
+        tableNameInput.value = "";
+        rowContainer.innerHTML = "";
+        const newRow = document.createElement("div");
+        newRow.classList.add("row");
+        newRow.innerHTML = `
+                    <div class="columnNameInputDiv">
+                        <input type="text" class="columnName" name="columnName" placeholder="Enter Column Name" required />
+                    </div>
+
+                    <button type="button" class="dataType">
+                        <p class="selectedDataType">Select Data Type</p>
+                        <ul class="dataTypeList">
+                            <li>INT()</li>
+                            <li>BIGINT()</li>
+                            <li>DECIMAL()</li>
+                            <li>FLOAT</li>
+                            <li>DOUBLE</li>
+                            <li>VARCHAR()</li>
+                            <li>CHAR()</li>
+                            <li>TEXT()</li>
+                            <li>DATE</li>
+                            <li>DATETIME()</li>
+                            <li>TIMESTAMP()</li>
+                            <li>BOOLEAN</li>
+                        </ul>
+                    </button>
+
+                    <div class="sizeInputDiv">
+                        <input type="number" class="sizeInput" name="sizeValue" placeholder="size" disabled/>
+                    </div>
+                    <!-- Only ONE PRIMARY KEY per table -->
+                    <input type="radio" id="pk0" name="pk" value="pk0" hidden />
+                    <label for="pk0" class="btn Pk">Primary Key</label>
+
+                    <input type="checkbox" id="nn0" name="nn" value="nn0" hidden />
+                    <label for="nn0" class="btn NN">Not Null</label>
+
+                    <input type="checkbox" id="uq0" name="uq" value="uq0" hidden />
+                    <label for="uq0" class="btn">Unique</label>
+
+                    <input type="checkbox" id="us0" name="us" value="us0" hidden />
+                    <label for="us0" class="btn">Unsigned</label>
+
+                    <input type="radio" id="ai0" name="ai" value="ai0" hidden />
+                    <label for="ai0" class="btn Ai">Auto Increment</label>
+
+                    <div class="defaultValueDiv">
+                        <input type="text" class="expression" name="expression" placeholder="Enter Default Value / Expression" />
+                    </div>
+        `;
+        rowContainer.appendChild(newRow);
+        fromDisplay2buttonFeature();
     };
 
     AddRow.onclick = () => {
@@ -1461,108 +1632,4 @@ function initTableDataView(dbName, tableName) {
         }
     });
 
-}
-
-async function editColumn(dbName, tableName) {
-    try {
-        const response = await fetch(
-            `http://localhost:3000/TableSchema?databaseName=${dbName}&tableName=${tableName}`
-        );
-
-        const columns = await response.json();
-        if (!columns.length) {
-            outputWindow("No schema found");
-            return;
-        }
-    
-        const tableNameInput = document.querySelector("#tableNameInput");
-        tableNameInput.value = tableName;
-        let rowContainer = document.querySelector(".rowContainer");
-        rowContainer.innerHTML = "";
-        
-        let rowCount = 0
-        columns.forEach(col=> {
-            console.log(col);
-            rowCount++;
-            const newRow = document.createElement("div");
-            newRow.classList.add("row");
-            newRow.innerHTML = `
-                        <div class="columnNameInputDiv">
-                            <input type="text" class="columnName" name="columnName" value="${col.columnName}" placeholder="Enter Column Name" required />
-                        </div>
-
-                        <button type="button" class="dataType">
-                            <p class="selectedDataType">${col.dataType}</p>
-                            <ul class="dataTypeList">
-                                <li>INT()</li>
-                                <li>BIGINT()</li>
-                                <li>DECIMAL()</li>
-                                <li>FLOAT</li>
-                                <li>DOUBLE</li>
-                                <li>VARCHAR()</li>
-                                <li>CHAR()</li>
-                                <li>TEXT()</li>
-                                <li>DATE</li>
-                                <li>DATETIME()</li>
-                                <li>TIMESTAMP()</li>
-                                <li>BOOLEAN</li>
-                            </ul>
-                        </button>
-
-                        <div class="sizeInputDiv">
-                            <input type="number" class="sizeInput" name="sizeValue" value="${col.size}" placeholder="size" disabled/>
-                        </div>
-                        <!-- Only ONE PRIMARY KEY per table -->
-                        <input type="radio" id="pk${rowCount}" name="pk" value="pk${rowCount}" hidden />
-                        <label for="pk${rowCount}" class="btn Pk">Primary Key</label>
-
-                        <input type="checkbox" id="nn${rowCount}" name="nn" value="nn${rowCount}" hidden />
-                        <label for="nn${rowCount}" class="btn NN">Not Null</label>
-
-                        <input type="checkbox" id="uq${rowCount}" name="uq" value="uq${rowCount}" hidden />
-                        <label for="uq${rowCount}" class="btn">Unique</label>
-
-                        <input type="checkbox" id="us${rowCount}" name="us" value="us${rowCount}" hidden />
-                        <label for="us${rowCount}" class="btn">Unsigned</label>
-
-                        <input type="radio" id="ai${rowCount}" name="ai" value="ai${rowCount}" hidden />
-                        <label for="ai${rowCount}" class="btn Ai">Auto Increment</label>
-
-                        <div class="defaultValueDiv">
-                            <input type="text" class="expression" name="expression" value="${col.defaultValue}" placeholder="Enter Default Value / Expression" />
-                        </div>
-            `;
-            rowContainer.appendChild(newRow);
-            
-            const pkEl = document.querySelector(`#pk${rowCount}`);
-            const nnEl = document.querySelector(`#nn${rowCount}`);
-            const uqEl = document.querySelector(`#uq${rowCount}`);
-            const usEl = document.querySelector(`#us${rowCount}`);
-            const aiEl = document.querySelector(`#ai${rowCount}`);
-            
-            if (col.primaryKey) {
-                pkEl.checked = true;
-            }
-            if (col.notNull) {
-                nnEl.checked = true;
-            }
-            if (col.unique) {
-                uqEl.checked = true;
-            }
-            if (col.unsigned) {
-                usEl.checked = true;
-            }
-            if (col.autoIncrement) {
-                aiEl.checked = true;
-            }
-
-            fromDisplay2buttonFeature();
-            OptionSelection();
-
-            console.log(rowCount);
-        }); 
-
-    } catch (err) {
-        outputWindow(err.message);
-    }
 }
