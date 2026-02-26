@@ -1,7 +1,5 @@
 console.log("JavaScript file is linked successfully.");
 
-// let NameOfDatabase = "";
-// let NameOfTable = "";
 let isOpen = false;
 let isLight = false;
 
@@ -610,6 +608,165 @@ function deleteRowSvgAdd() {
     });
 }
 
+function DeleteRow(dbName, tableName) {
+    document.querySelectorAll(".deleteRow").forEach(btn => {
+        btn.onclick = async (event) => {
+            const row = event.target.closest(".dataRow");
+            const pkInput = row.querySelector(".PK");
+
+            if (!pkInput) {
+                console.log("Primary key not found");
+                return;
+            }
+
+            const pkValue = pkInput.value;
+            const pkColumnName = pkInput.name;
+
+            const response = await fetch("http://localhost:3000/delete-row", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    databaseName: dbName,
+                    tableName: tableName,
+                    pkColumnName: pkColumnName,
+                    pkValue: pkValue
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                outputWindow(data.error);
+                return;
+            } else {
+                outputWindow(data.message);
+                row.remove();
+            }
+        };
+    });
+}
+
+async function insertNewData(dbName, tableName, newData) {
+    try {
+        const response = await fetch("http://localhost:3000/insert-row", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                databaseName: dbName,
+                tableName: tableName,
+                columns: newData.ColumnName,
+                values: newData.newColumnData
+            })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+            outputWindow(data.error);
+            const dataRow = targetElement.closest(".dataRow");
+            dataRow.remove();
+            // newData.ColumnName.length = 0;
+            // newData.newColumnData.length = 0;
+            console.log(newData);
+            return;
+        } else if (data.message) {
+            outputWindow(data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
+    } catch (err) {
+        let errorMsg = err.message + "\n\n" + err.stack;
+        outputWindow(errorMsg);
+    }
+};
+
+async function updateOldData(dbName, tableName, newData) {
+    console.log(newData);
+    try {
+        const response = await fetch("http://localhost:3000/update-data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                databaseName: dbName,
+                tableName: tableName,
+                columns: newData.ColumnName,
+                values: newData.newColumnData,
+                pkColumnName: newData.pkColumnName,
+                pkValue: newData.pkValue
+            })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+            outputWindow(data.error);
+            // newData.ColumnName.length = 0;
+            // newData.newColumnData.length = 0;
+            console.log(newData);
+            return;
+        } else if (data.message) {
+            outputWindow(data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
+    } catch (err) {
+        let errorMsg = err.message + "\n\n" + err.stack;
+        outputWindow(errorMsg);
+    }
+};
+
+function getChangeData(dbName, tableName, tableTemplate) {
+    let newData = {
+        "ColumnName": [],
+        "newColumnData": [],
+        "pkColumnName": "",
+        "pkValue": ""
+    };
+    let targetElement;
+    tableTemplate.addEventListener("dblclick", (event) => {
+        targetElement = event.target;
+        if (targetElement.tagName === "INPUT") {
+            targetElement.removeAttribute("readonly");
+            targetElement.style.border = "2px solid #ff0";
+            if (newData.pkValue.length === 0 && newData.pkColumnName.length === 0) {
+                let dataRow = targetElement.closest(".dataRow");
+                let pkVal = dataRow.querySelector(".PK").value;
+                newData.pkColumnName = dataRow.querySelector(".PK").name;
+                newData.pkValue = pkVal;
+            }
+        }
+        targetElement.addEventListener("change", () => {
+            if (newData.ColumnName.includes(targetElement.name)) return;
+            newData.ColumnName.push(targetElement.name);
+            let value = targetElement.value;
+
+            if (targetElement.value.match(/\d{1,2}\s\w+\s\d{4}/)) {
+                const parsedDate = new Date(targetElement.value);
+                if (!isNaN(parsedDate)) {
+                    value = parsedDate.toISOString().slice(0, 19).replace("T", " ");
+                    newData.newColumnData.push(value);
+                }
+            } else {
+                newData.newColumnData.push(value);
+            }
+            console.log(newData);
+        });
+    });
+
+    const insertData = document.querySelector(".insertData");
+    const changeData = document.querySelector(".changeData");
+
+    insertData.addEventListener("click", () => {
+        insertNewData(dbName, tableName, newData);
+    });
+
+    changeData.addEventListener("click", () => {
+        updateOldData(dbName, tableName, newData);
+    });
+}
+
 async function fetchTableData(tableTemplate, dbName, tableName) {
 
     const columnNames = tableTemplate.querySelector(".columnNames");
@@ -756,165 +913,6 @@ async function fetchTableData(tableTemplate, dbName, tableName) {
     });
 
     DeleteRow(dbName, tableName);
-}
-
-async function insertNewData(dbName, tableName, newData) {
-    try {
-        const response = await fetch("http://localhost:3000/insert-row", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                databaseName: dbName,
-                tableName: tableName,
-                columns: newData.ColumnName,
-                values: newData.newColumnData
-            })
-        });
-
-        const data = await response.json();
-        if (data.error) {
-            outputWindow(data.error);
-            const dataRow = targetElement.closest(".dataRow");
-            dataRow.remove();
-            // newData.ColumnName.length = 0;
-            // newData.newColumnData.length = 0;
-            console.log(newData);
-            return;
-        } else if (data.message) {
-            outputWindow(data.message);
-            setTimeout(() => {
-                location.reload();
-            }, 2000);
-        }
-    } catch (err) {
-        let errorMsg = err.message + "\n\n" + err.stack;
-        outputWindow(errorMsg);
-    }
-};
-
-async function updateOldData(dbName, tableName, newData) {
-    console.log(newData);
-    try {
-        const response = await fetch("http://localhost:3000/update-data", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                databaseName: dbName,
-                tableName: tableName,
-                columns: newData.ColumnName,
-                values: newData.newColumnData,
-                pkColumnName: newData.pkColumnName,
-                pkValue: newData.pkValue
-            })
-        });
-
-        const data = await response.json();
-        if (data.error) {
-            outputWindow(data.error);
-            // newData.ColumnName.length = 0;
-            // newData.newColumnData.length = 0;
-            console.log(newData);
-            return;
-        } else if (data.message) {
-            outputWindow(data.message);
-            setTimeout(() => {
-                location.reload();
-            }, 2000);
-        }
-    } catch (err) {
-        let errorMsg = err.message + "\n\n" + err.stack;
-        outputWindow(errorMsg);
-    }
-};
-
-function getChangeData(dbName, tableName, tableTemplate) {
-    let newData = {
-        "ColumnName": [],
-        "newColumnData": [],
-        "pkColumnName": "",
-        "pkValue": ""
-    };
-    let targetElement;
-    tableTemplate.addEventListener("dblclick", (event) => {
-        targetElement = event.target;
-        if (targetElement.tagName === "INPUT") {
-            targetElement.removeAttribute("readonly");
-            targetElement.style.border = "2px solid #ff0";
-            if (newData.pkValue.length === 0 && newData.pkColumnName.length === 0) {
-                let dataRow = targetElement.closest(".dataRow");
-                let pkVal = dataRow.querySelector(".PK").value;
-                newData.pkColumnName = dataRow.querySelector(".PK").name;
-                newData.pkValue = pkVal;
-            }
-        }
-        targetElement.addEventListener("change", () => {
-            if (newData.ColumnName.includes(targetElement.name)) return;
-            newData.ColumnName.push(targetElement.name);
-            let value = targetElement.value;
-
-            if (targetElement.value.match(/\d{1,2}\s\w+\s\d{4}/)) {
-                const parsedDate = new Date(targetElement.value);
-                if (!isNaN(parsedDate)) {
-                    value = parsedDate.toISOString().slice(0, 19).replace("T", " ");
-                    newData.newColumnData.push(value);
-                }
-            } else {
-                newData.newColumnData.push(value);
-            }
-            console.log(newData);
-        });
-    });
-
-    const insertData = document.querySelector(".insertData");
-    const changeData = document.querySelector(".changeData");
-
-    insertData.addEventListener("click", () => {
-        insertNewData(dbName, tableName, newData);
-    });
-
-    changeData.addEventListener("click", () => {
-        updateOldData(dbName, tableName, newData);
-    });
-}
-
-function DeleteRow(dbName, tableName) {
-    document.querySelectorAll(".deleteRow").forEach(btn => {
-        btn.onclick = async (event) => {
-            const row = event.target.closest(".dataRow");
-            const pkInput = row.querySelector(".PK");
-
-            if (!pkInput) {
-                console.log("Primary key not found");
-                return;
-            }
-
-            const pkValue = pkInput.value;
-            const pkColumnName = pkInput.name;
-
-            const response = await fetch("http://localhost:3000/delete-row", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    databaseName: dbName,
-                    tableName: tableName,
-                    pkColumnName: pkColumnName,
-                    pkValue: pkValue
-                }),
-            });
-
-            const data = await response.json();
-
-            if (data.error) {
-                outputWindow(data.error);
-                return;
-            } else {
-                outputWindow(data.message);
-                row.remove();
-            }
-        };
-    });
 }
 
 function initDatabaseView($location, $rootScope) {

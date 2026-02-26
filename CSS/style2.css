@@ -80,6 +80,7 @@ h3 {
     opacity: 0;
     transition: opacity 0.2s linear 0.5s;
     pointer-events: none;
+    overflow-wrap: anywhere;
 }
 
 .fromDisplay {

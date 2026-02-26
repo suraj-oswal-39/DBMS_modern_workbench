@@ -97,6 +97,10 @@ h2 {
     outline: none;
 }
 
+input {
+    text-overflow: ellipsis;
+}
+
 input::placeholder {
     color: var(--color9);
 }
