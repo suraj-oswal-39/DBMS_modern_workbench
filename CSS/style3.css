@@ -221,7 +221,7 @@ input[type="checkbox"]:not(:checked)+label.btn {
 #AddRow:hover,
 #RemoveRow:hover,
 #resetBtn:hover,
-#createBtn:hover {
+.createBtn:hover {
     border-color: var(--color10);
 }
 
@@ -239,7 +239,7 @@ input[type="checkbox"]:not(:checked)+label.btn {
 }
 
 #resetBtn,
-#createBtn {
+.createBtn {
     background-color: var(--color3);
     border: 0.2rem solid var(--color7);
     padding: 0.5rem;
@@ -248,6 +248,6 @@ input[type="checkbox"]:not(:checked)+label.btn {
 }
 
 #resetBtn:active,
-#createBtn:active {
+.createBtn:active {
     border-color: var(--color7);
 }

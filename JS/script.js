@@ -1094,7 +1094,7 @@ function initTableView($location, $rootScope, dbName) {
     h3Tag.textContent = `${capitalizedDBName} database tables`;
     const textarea = document.getElementById("sqlEditor");
     const lineNumbers = document.getElementById("lineNumbers");
-    const createBtn = document.querySelector("#createBtn");
+    const createBtn = document.querySelector(".createBtn");
     const outputScreen = document.querySelector('.outputScreen');
     const popUpQueryWindow = document.querySelector('.popUpQueryWindow');
 
@@ -1116,6 +1116,7 @@ function initTableView($location, $rootScope, dbName) {
     addSvg.onclick = () => {
         routingContainer.style.filter = "blur(3px)";
         fromDisplay2.style.display = "flex";
+        createBtn.textContent = "Create";
     };
 
     // Delete table on click event
@@ -1327,4 +1328,241 @@ function initTableDataView(dbName, tableName) {
     settingOpen();
 
     getChangeData(dbName, tableName, tableTemplate);
+    
+    const editTableColumn = document.querySelector(".editTableColumn");
+    const fromDisplay2 = document.querySelector(".fromDisplay2");
+    const CloseCross2 = document.querySelector(".CloseCross2");
+    const AddRow = document.querySelector("#AddRow");
+    let rowCount = 0;
+    const RemoveRow = document.querySelector("#RemoveRow");
+    const resetBtn = document.querySelector("#resetBtn");
+    const updateBtn = document.querySelector(".updateBtn");
+    const rowContainer = document.querySelector(".rowContainer");
+
+    editTableColumn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        routingContainer.style.filter = "blur(3px)";
+        fromDisplay2.style.display = "flex";
+        updateBtn.textContent = "Update";
+        editColumn(dbName, tableName);
+    });
+
+    CloseCross2.onclick = () => {
+        fromDisplay2.style.display = "none";
+        routingContainer.removeAttribute("style");
+    };
+
+    AddRow.onclick = () => {
+        rowCount++;
+        const newRow = document.createElement("div");
+        newRow.classList.add("row");
+        newRow.innerHTML = `
+                    <div class="columnNameInputDiv">
+                        <input type="text" class="columnName" name="columnName" placeholder="Enter Column Name" required />
+                    </div>
+
+                    <button type="button" class="dataType">
+                        <p class="selectedDataType">Select Data Type</p>
+                        <ul class="dataTypeList">
+                            <li>INT()</li>
+                            <li>BIGINT()</li>
+                            <li>DECIMAL()</li>
+                            <li>FLOAT</li>
+                            <li>DOUBLE</li>
+                            <li>VARCHAR()</li>
+                            <li>CHAR()</li>
+                            <li>TEXT()</li>
+                            <li>DATE</li>
+                            <li>DATETIME()</li>
+                            <li>TIMESTAMP()</li>
+                            <li>BOOLEAN</li>
+                        </ul>
+                    </button>
+
+                    <div class="sizeInputDiv">
+                        <input type="number" class="sizeInput" name="sizeValue" placeholder="size" disabled/>
+                    </div>
+                    <!-- Only ONE PRIMARY KEY per table -->
+                    <input type="radio" id="pk${rowCount}" name="pk" value="pk${rowCount}" hidden />
+                    <label for="pk${rowCount}" class="btn Pk">Primary Key</label>
+
+                    <input type="checkbox" id="nn${rowCount}" name="nn" value="nn${rowCount}" hidden />
+                    <label for="nn${rowCount}" class="btn NN">Not Null</label>
+
+                    <input type="checkbox" id="uq${rowCount}" name="uq" value="uq${rowCount}" hidden />
+                    <label for="uq${rowCount}" class="btn">Unique</label>
+
+                    <input type="checkbox" id="us${rowCount}" name="us" value="us${rowCount}" hidden />
+                    <label for="us${rowCount}" class="btn">Unsigned</label>
+
+                    <input type="radio" id="ai${rowCount}" name="ai" value="ai${rowCount}" hidden />
+                    <label for="ai${rowCount}" class="btn Ai">Auto Increment</label>
+
+                    <div class="defaultValueDiv">
+                        <input type="text" class="expression" name="expression" placeholder="Enter Default Value / Expression" />
+                    </div>
+        `;
+        rowContainer.appendChild(newRow);
+        fromDisplay2buttonFeature();
+    };
+
+    RemoveRow.onclick = () => {
+        // Table must have at least one row
+        if (rowCount <= 0) {
+            outputWindow("Table create form at least have 1 row");
+            return;
+        }
+
+        let lastRow = rowContainer.lastChild;
+        rowContainer.removeChild(lastRow);
+        rowCount--;
+        fromDisplay2buttonFeature();
+    };
+
+    fromDisplay2buttonFeature();
+
+    rowContainer.addEventListener("click", function (event) {
+        btn = event.target.closest(".dataType");
+        if (!btn) return;
+
+        dataTypeList = btn.querySelector(".dataTypeList");
+        dataTypeList.style.opacity = "1";
+        dataTypeList.style.width = "7rem";
+        dataTypeList.style.height = "18.3rem";
+    });
+
+    document.addEventListener("click", function (event) {
+        // If click is inside any .dataType → do nothing
+        if (event.target.closest(".dataType")) return;
+        // Otherwise close ALL open dropdowns
+        const openLists = document.querySelectorAll(".dataTypeList");
+        openLists.forEach((list) => {
+            list.removeAttribute("style");
+        });
+    });
+
+    OptionSelection();
+
+    resetBtn.addEventListener("click", () => {
+        let selectedDataTypeList = document.querySelectorAll(".selectedDataType");
+
+        selectedDataTypeList.forEach((selectedDT) => {
+            selectedDT.innerText = "Select Data Type";
+            if (dataTypeList.style) {
+                dataTypeList.removeAttribute("style");
+            }
+        });
+    });
+
+    updateBtn.addEventListener("click", () => {
+        let allCorrect = ruleChecker();
+        if (allCorrect) {
+            console.log("update metadata");
+        }
+    });
+
+}
+
+async function editColumn(dbName, tableName) {
+    try {
+        const response = await fetch(
+            `http://localhost:3000/TableSchema?databaseName=${dbName}&tableName=${tableName}`
+        );
+
+        const columns = await response.json();
+        if (!columns.length) {
+            outputWindow("No schema found");
+            return;
+        }
+    
+        const tableNameInput = document.querySelector("#tableNameInput");
+        tableNameInput.value = tableName;
+        let rowContainer = document.querySelector(".rowContainer");
+        rowContainer.innerHTML = "";
+        
+        let rowCount = 0
+        columns.forEach(col=> {
+            console.log(col);
+            rowCount++;
+            const newRow = document.createElement("div");
+            newRow.classList.add("row");
+            newRow.innerHTML = `
+                        <div class="columnNameInputDiv">
+                            <input type="text" class="columnName" name="columnName" value="${col.columnName}" placeholder="Enter Column Name" required />
+                        </div>
+
+                        <button type="button" class="dataType">
+                            <p class="selectedDataType">${col.dataType}</p>
+                            <ul class="dataTypeList">
+                                <li>INT()</li>
+                                <li>BIGINT()</li>
+                                <li>DECIMAL()</li>
+                                <li>FLOAT</li>
+                                <li>DOUBLE</li>
+                                <li>VARCHAR()</li>
+                                <li>CHAR()</li>
+                                <li>TEXT()</li>
+                                <li>DATE</li>
+                                <li>DATETIME()</li>
+                                <li>TIMESTAMP()</li>
+                                <li>BOOLEAN</li>
+                            </ul>
+                        </button>
+
+                        <div class="sizeInputDiv">
+                            <input type="number" class="sizeInput" name="sizeValue" value="${col.size}" placeholder="size" disabled/>
+                        </div>
+                        <!-- Only ONE PRIMARY KEY per table -->
+                        <input type="radio" id="pk${rowCount}" name="pk" value="pk${rowCount}" hidden />
+                        <label for="pk${rowCount}" class="btn Pk">Primary Key</label>
+
+                        <input type="checkbox" id="nn${rowCount}" name="nn" value="nn${rowCount}" hidden />
+                        <label for="nn${rowCount}" class="btn NN">Not Null</label>
+
+                        <input type="checkbox" id="uq${rowCount}" name="uq" value="uq${rowCount}" hidden />
+                        <label for="uq${rowCount}" class="btn">Unique</label>
+
+                        <input type="checkbox" id="us${rowCount}" name="us" value="us${rowCount}" hidden />
+                        <label for="us${rowCount}" class="btn">Unsigned</label>
+
+                        <input type="radio" id="ai${rowCount}" name="ai" value="ai${rowCount}" hidden />
+                        <label for="ai${rowCount}" class="btn Ai">Auto Increment</label>
+
+                        <div class="defaultValueDiv">
+                            <input type="text" class="expression" name="expression" value="${col.defaultValue}" placeholder="Enter Default Value / Expression" />
+                        </div>
+            `;
+            rowContainer.appendChild(newRow);
+            
+            const pkEl = document.querySelector(`#pk${rowCount}`);
+            const nnEl = document.querySelector(`#nn${rowCount}`);
+            const uqEl = document.querySelector(`#uq${rowCount}`);
+            const usEl = document.querySelector(`#us${rowCount}`);
+            const aiEl = document.querySelector(`#ai${rowCount}`);
+            
+            if (col.primaryKey) {
+                pkEl.checked = true;
+            }
+            if (col.notNull) {
+                nnEl.checked = true;
+            }
+            if (col.unique) {
+                uqEl.checked = true;
+            }
+            if (col.unsigned) {
+                usEl.checked = true;
+            }
+            if (col.autoIncrement) {
+                aiEl.checked = true;
+            }
+
+            fromDisplay2buttonFeature();
+            OptionSelection();
+
+            console.log(rowCount);
+        }); 
+
+    } catch (err) {
+        outputWindow(err.message);
+    }
 }

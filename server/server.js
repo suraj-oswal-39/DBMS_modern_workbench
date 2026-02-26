@@ -11,6 +11,86 @@ const db = mysql.createConnection({
     port: 3306
 });
 
+// fetch full structured table schema
+app.get("/TableSchema", (req, res) => {
+
+    const { databaseName, tableName } = req.query;
+
+    if (!databaseName || !tableName) {
+        return res.status(400).json({ error: "Missing parameters" });
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(databaseName) ||
+        !/^[a-zA-Z0-9_]+$/.test(tableName)) {
+        return res.status(400).json({ error: "Invalid name" });
+    }
+
+    const sql = `
+        SELECT 
+            c.COLUMN_NAME,
+            c.DATA_TYPE,
+            c.COLUMN_TYPE,
+            c.CHARACTER_MAXIMUM_LENGTH,
+            c.NUMERIC_PRECISION,
+            c.IS_NULLABLE,
+            c.COLUMN_DEFAULT,
+            c.EXTRA,
+            tc.CONSTRAINT_TYPE
+        FROM INFORMATION_SCHEMA.COLUMNS c
+        LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE k
+            ON c.TABLE_SCHEMA = k.TABLE_SCHEMA
+            AND c.TABLE_NAME = k.TABLE_NAME
+            AND c.COLUMN_NAME = k.COLUMN_NAME
+        LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
+            ON k.CONSTRAINT_NAME = tc.CONSTRAINT_NAME
+            AND k.TABLE_SCHEMA = tc.TABLE_SCHEMA
+            AND k.TABLE_NAME = tc.TABLE_NAME
+        WHERE c.TABLE_SCHEMA = ?
+        AND c.TABLE_NAME = ?
+        ORDER BY c.ORDINAL_POSITION
+    `;
+
+    db.query(sql, [databaseName, tableName], (err, results) => {
+
+    if (err) {
+        return res.status(500).json({ error: err.message });
+    }
+
+    const columns = results.map(col => {
+
+        const isPrimary = col.CONSTRAINT_TYPE === "PRIMARY KEY";
+        const isUnique = col.CONSTRAINT_TYPE === "UNIQUE";
+
+        return {
+            columnName: col.COLUMN_NAME,
+
+            dataType: col.DATA_TYPE.toUpperCase(),
+
+            size:
+                col.CHARACTER_MAXIMUM_LENGTH ||
+                col.NUMERIC_PRECISION ||
+                null,
+
+            primaryKey: isPrimary,
+
+            // PRIMARY KEY automatically means UNIQUE
+            unique: isPrimary || isUnique,
+
+            notNull: col.IS_NULLABLE === "NO",
+
+            unsigned: col.COLUMN_TYPE.includes("unsigned"),
+
+            autoIncrement: col.EXTRA.includes("auto_increment"),
+
+            defaultValue: col.COLUMN_DEFAULT
+        };
+    });
+
+    // return ONLY columns
+    res.json(columns);
+});
+});
+
 // update existing data in row based on primary key
 app.post("/update-data", (req, res) => {
 
