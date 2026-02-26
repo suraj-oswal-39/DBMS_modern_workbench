@@ -14,9 +14,9 @@ const db = mysql.createConnection({
 // update existing data in row based on primary key
 app.post("/update-data", (req, res) => {
 
-    const { databaseName, tableName, columns, values, pkValue } = req.body;
+    const { databaseName, tableName, columns, values, pkColumnName, pkValue } = req.body;
 
-    if (!databaseName || !tableName || !columns || !values || !pkValue) {
+    if (!databaseName || !tableName || !columns || !values || !pkColumnName || pkValue === undefined) {
         return res.status(400).json({ error: "Missing parameters" });
     }
 
@@ -36,50 +36,28 @@ app.post("/update-data", (req, res) => {
     const safeDb = mysql.escapeId(databaseName);
     const safeTable = mysql.escapeId(tableName);
 
-    // Step 1: Find primary key column dynamically
-    const pkQuery = `
-        SELECT COLUMN_NAME
-        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-        WHERE TABLE_SCHEMA = ?
-        AND TABLE_NAME = ?
-        AND CONSTRAINT_NAME = 'PRIMARY'
+    const setClause = columns
+        .map(col => `${mysql.escapeId(col)} = ?`)
+        .join(", ");
+
+    const safePkColumn = mysql.escapeId(pkColumnName);
+
+    const updateQuery = `
+        UPDATE ${safeDb}.${safeTable}
+        SET ${setClause}
+        WHERE ${safePkColumn} = ?
     `;
 
-    db.query(pkQuery, [databaseName, tableName], (err, results) => {
+    const queryValues = [...values, pkValue];
 
-        if (err) return res.status(500).json({ error: err.message });
-
-        if (results.length === 0) {
-            return res.status(400).json({ error: "Primary key not found" });
+    db.query(updateQuery, queryValues, (err2, result) => {
+        if (err2) {
+            return res.status(500).json({ error: err2.message });
         }
-
-        const pkColumn = mysql.escapeId(results[0].COLUMN_NAME);
-
-        // Step 2: Build SET clause dynamically
-        const setClause = columns
-            .map(col => `${mysql.escapeId(col)} = ?`)
-            .join(", ");
-
-        const updateQuery = `
-            UPDATE ${safeDb}.${safeTable}
-            SET ${setClause}
-            WHERE ${pkColumn} = ?
-        `;
-
-        const queryValues = [...values, pkValue];
-
-        db.query(updateQuery, queryValues, (err2, result) => {
-
-            if (err2) {
-                return res.status(500).json({ error: err2.message });
-            }
-
-            if (result.affectedRows === 0) {
-                return res.status(400).json({ error: "No row updated" });
-            }
-
-            res.json({ message: "Row updated successfully" });
-        });
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ error: "No row updated" });
+        }
+        res.json({ message: "Row updated successfully" });
     });
 });
 
@@ -130,13 +108,11 @@ app.post("/insert-row", (req, res) => {
 
 // delete data of whole row
 app.post("/delete-row", (req, res) => {
-
     const { databaseName, tableName, pkValue } = req.body;
 
-    if (!databaseName || !tableName || !pkValue) {
+    if (!databaseName || !tableName || !pkValue || !pkColumnName) {
         return res.status(400).json({ error: "Missing parameters" });
     }
-
     if (!/^[a-zA-Z0-9_]+$/.test(databaseName) ||
         !/^[a-zA-Z0-9_]+$/.test(tableName)) {
         return res.status(400).json({ error: "Invalid name" });
@@ -144,40 +120,19 @@ app.post("/delete-row", (req, res) => {
 
     const safeDb = mysql.escapeId(databaseName);
     const safeTable = mysql.escapeId(tableName);
+    const safePkColumn = mysql.escapeId(pkColumnName);
 
-    const pkQuery = `
-        SELECT COLUMN_NAME
-        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-        WHERE TABLE_SCHEMA = ?
-        AND TABLE_NAME = ?
-        AND CONSTRAINT_NAME = 'PRIMARY'
+    const deleteQuery = `
+        DELETE FROM ${safeDb}.${safeTable}
+        WHERE ${safePkColumn} = ?
     `;
 
-    db.query(pkQuery, [databaseName, tableName], (err, results) => {
-
-        if (err) {
-            return res.status(500).json({ error: err.message });
+    db.query(deleteQuery, [pkValue], (err2) => {
+        if (err2) {
+            return res.status(500).json({ error: err2.message });
         }
 
-        if (results.length === 0) {
-            return res.status(400).json({ error: "Primary key not found" });
-        }
-
-        const pkColumn = mysql.escapeId(results[0].COLUMN_NAME);
-
-        const deleteQuery = `
-            DELETE FROM ${safeDb}.${safeTable}
-            WHERE ${pkColumn} = ?
-        `;
-
-        db.query(deleteQuery, [pkValue], (err2) => {
-
-            if (err2) {
-                return res.status(500).json({ error: err2.message });
-            }
-
-            res.json({ message: "Row deleted successfully" });
-        });
+        res.json({ message: "Row deleted successfully" });
     });
 });
 
@@ -231,13 +186,13 @@ app.get("/TableData", (req, res) => {
             console.error(err);
             return res.status(500).json({ error: "Table data fetch query failed" });
         }
+
         res.json(results);
     });
 });
 
 app.post("/execute", (req, res) => {
     const query = req.body.query;
-
     if (!query) {
         return res.status(400).json({ error: "Query is empty" });
     }
@@ -246,16 +201,14 @@ app.post("/execute", (req, res) => {
         if (err) {
             return res.json({ error: err.message });
         }
+
         res.json({ result });
     });
 });
 
 // table creation
-// Create table
 app.post("/create-table", (req, res) => {
-
     const { databaseName, tableName, columns } = req.body;
-
     if (!databaseName || !tableName || !columns.length) {
         return res.status(400).json({ error: "Missing table data" });
     }
@@ -264,10 +217,8 @@ app.post("/create-table", (req, res) => {
     const safeTable = mysql.escapeId(tableName);
 
     let columnDefinitions = columns.map(col => {
-
         let type = col.dataType.replace(/\(.*\)/, "");
         let size = col.size ? `(${col.size})` : "";
-
         let sql = `${mysql.escapeId(col.columnName)} ${type}${size}`;
 
         if (col.unsigned) sql += " UNSIGNED";
@@ -275,7 +226,6 @@ app.post("/create-table", (req, res) => {
         if (col.unique) sql += " UNIQUE";
         if (col.autoIncrement) sql += " AUTO_INCREMENT";
         if (col.expression) sql += ` DEFAULT '${col.expression}'`;
-
         return sql;
     });
 
@@ -296,6 +246,7 @@ app.post("/create-table", (req, res) => {
             console.error(err);
             return res.status(500).json({ error: err.message });
         }
+
         res.json({ message: "Table created successfully" });
     });
 });
@@ -307,8 +258,10 @@ app.post("/delete-Table", (req, res) => {
     if (!TbName || !databaseName) {
         return res.status(400).json({ error: "table and database required" });
     }
+
     const safeDb = mysql.escapeId(databaseName);
     const safeTb = mysql.escapeId(TbName);
+
     const sql = `DROP TABLE IF EXISTS ${safeDb}.${safeTb}`;
     db.query(sql, err => {
         if (err) {
@@ -317,6 +270,7 @@ app.post("/delete-Table", (req, res) => {
                 error: "table deletion failed"
             });
         }
+
         res.json({
             message: "table deleted successfully"
         });
@@ -348,6 +302,7 @@ app.post("/delete-database", (req, res) => {
     if (!dbNameForDel) {
         return res.status(400).json({ error: "Database name required" });
     }
+
     const systemDBs = [
         "mysql",
         "information_schema",
@@ -362,10 +317,12 @@ app.post("/delete-database", (req, res) => {
             error: "System databases cannot be deleted"
         });
     }
+
     const validName = /^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/;
     if (!validName.test(dbNameForDel)) {
         return res.status(400).json({ error: "Invalid database name" });
     }
+
     const safeDbName = mysql.escapeId(dbNameForDel);
     const sql = `DROP DATABASE IF EXISTS ${safeDbName}`;
     db.query(sql, err => {
@@ -375,6 +332,7 @@ app.post("/delete-database", (req, res) => {
                 error: "Database deletion failed"
             });
         }
+
         res.json({
             message: "Database deleted successfully"
         });
@@ -388,6 +346,7 @@ app.get("/databases", (req, res) => {
         "performance_schema",
         "sys",
     ];
+
     db.query("SHOW DATABASES", (err, results) => {
         if (err) {
             console.error(err);
@@ -400,18 +359,22 @@ app.get("/databases", (req, res) => {
         res.json(userDatabases);
     });
 });
+
 // Create a new database logic
 app.post("/create-database", (req, res) => {
     const { dbName } = req.body;
     if (!dbName) {
         return res.status(400).json({ error: "Database name required" });
     }
+
     const validName = /^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/;
     if (!validName.test(dbName)) {
         return res.status(400).json({ error: "Invalid database name" });
     }
+
     const safeDbName = mysql.escapeId(dbName);
     const sql = `CREATE DATABASE IF NOT EXISTS ${safeDbName}`;
+
     db.query(sql, (err) => {
         if (err) {
             console.error(err);
@@ -420,6 +383,7 @@ app.post("/create-database", (req, res) => {
         res.json({ message: "Database created successfully" });
     });
 });
+
 app.listen(3000, () => {
     console.log("Server running on port 3000");
 });

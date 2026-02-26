@@ -803,6 +803,7 @@ async function updateOldData(dbName, tableName, newData) {
                 tableName: tableName,
                 columns: newData.ColumnName,
                 values: newData.newColumnData,
+                pkColumnName: newData.pkColumnName,
                 pkValue: newData.pkValue
             })
         });
@@ -830,7 +831,8 @@ function getChangeData(dbName, tableName, tableTemplate) {
     let newData = {
         "ColumnName": [],
         "newColumnData": [],
-        "pkValue": []
+        "pkColumnName": "",
+        "pkValue": ""
     };
     let targetElement;
     tableTemplate.addEventListener("dblclick", (event) => {
@@ -838,10 +840,11 @@ function getChangeData(dbName, tableName, tableTemplate) {
         if (targetElement.tagName === "INPUT") {
             targetElement.removeAttribute("readonly");
             targetElement.style.border = "2px solid #ff0";
-            if (newData.pkValue.length < 1) {
+            if (newData.pkValue.length === 0 && newData.pkColumnName.length === 0) {
                 let dataRow = targetElement.closest(".dataRow");
                 let pkVal = dataRow.querySelector(".PK").value;
-                newData.pkValue.push(pkVal);
+                newData.pkColumnName = dataRow.querySelector(".PK").name;
+                newData.pkValue = pkVal;
             }
         }
         targetElement.addEventListener("change", () => {
@@ -875,11 +878,8 @@ function getChangeData(dbName, tableName, tableTemplate) {
 }
 
 function DeleteRow(dbName, tableName) {
-
     document.querySelectorAll(".deleteRow").forEach(btn => {
-
         btn.onclick = async (event) => {
-
             const row = event.target.closest(".dataRow");
             const pkInput = row.querySelector(".PK");
 
@@ -889,6 +889,7 @@ function DeleteRow(dbName, tableName) {
             }
 
             const pkValue = pkInput.value;
+            const pkColumnName = pkInput.name;
 
             const response = await fetch("http://localhost:3000/delete-row", {
                 method: "POST",
@@ -898,6 +899,7 @@ function DeleteRow(dbName, tableName) {
                 body: JSON.stringify({
                     databaseName: dbName,
                     tableName: tableName,
+                    pkColumnName: pkColumnName,
                     pkValue: pkValue
                 }),
             });
