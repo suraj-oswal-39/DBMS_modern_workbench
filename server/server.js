@@ -11,6 +11,78 @@ const db = mysql.createConnection({
     port: 3306
 });
 
+// update existing data in row based on primary key
+app.post("/update-data", (req, res) => {
+
+    const { databaseName, tableName, columns, values, pkValue } = req.body;
+
+    if (!databaseName || !tableName || !columns || !values || !pkValue) {
+        return res.status(400).json({ error: "Missing parameters" });
+    }
+
+    if (!Array.isArray(columns) || !Array.isArray(values)) {
+        return res.status(400).json({ error: "Invalid data format" });
+    }
+
+    if (columns.length !== values.length) {
+        return res.status(400).json({ error: "Columns and values mismatch" });
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(databaseName) ||
+        !/^[a-zA-Z0-9_]+$/.test(tableName)) {
+        return res.status(400).json({ error: "Invalid name" });
+    }
+
+    const safeDb = mysql.escapeId(databaseName);
+    const safeTable = mysql.escapeId(tableName);
+
+    // Step 1: Find primary key column dynamically
+    const pkQuery = `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+        WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = ?
+        AND CONSTRAINT_NAME = 'PRIMARY'
+    `;
+
+    db.query(pkQuery, [databaseName, tableName], (err, results) => {
+
+        if (err) return res.status(500).json({ error: err.message });
+
+        if (results.length === 0) {
+            return res.status(400).json({ error: "Primary key not found" });
+        }
+
+        const pkColumn = mysql.escapeId(results[0].COLUMN_NAME);
+
+        // Step 2: Build SET clause dynamically
+        const setClause = columns
+            .map(col => `${mysql.escapeId(col)} = ?`)
+            .join(", ");
+
+        const updateQuery = `
+            UPDATE ${safeDb}.${safeTable}
+            SET ${setClause}
+            WHERE ${pkColumn} = ?
+        `;
+
+        const queryValues = [...values, pkValue];
+
+        db.query(updateQuery, queryValues, (err2, result) => {
+
+            if (err2) {
+                return res.status(500).json({ error: err2.message });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(400).json({ error: "No row updated" });
+            }
+
+            res.json({ message: "Row updated successfully" });
+        });
+    });
+});
+
 // insert data in new whole row
 app.post("/insert-row", (req, res) => {
 

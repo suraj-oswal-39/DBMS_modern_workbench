@@ -1,7 +1,7 @@
 console.log("JavaScript file is linked successfully.");
 
-let NameOfDatabase = "";
-let NameOfTable = "";
+// let NameOfDatabase = "";
+// let NameOfTable = "";
 let isOpen = false;
 let isLight = false;
 
@@ -144,13 +144,13 @@ function deleteDatabases(dbNameForDel, dbSvgForRemove) {
         });
 }
 
-function fetchTables(SvgGridTemplate, NameOfDatabase) {
-    if (!NameOfDatabase) {
+function fetchTables(SvgGridTemplate, dbName) {
+    if (!dbName) {
         console.log("No database selected");
         return;
     }
 
-    fetch(`http://localhost:3000/Tables?databaseName=${encodeURIComponent(NameOfDatabase)}`)
+    fetch(`http://localhost:3000/Tables?databaseName=${encodeURIComponent(dbName)}`)
         .then(res => res.json())
         .then(data => {
             data.forEach(function (Tb) {
@@ -610,24 +610,24 @@ function deleteRowSvgAdd() {
     });
 }
 
-async function fetchTableData(tableTemplate, NameOfDatabase, NameOfTable) {
+async function fetchTableData(tableTemplate, dbName, tableName) {
 
     const columnNames = tableTemplate.querySelector(".columnNames");
     const tableData = tableTemplate.querySelector(".tableData");
     const addDataRow = document.querySelector(".addDataRow");
 
-    if (!NameOfDatabase) {
+    if (!dbName) {
         console.log("No database selected");
         return;
     }
 
-    if (!NameOfTable) {
+    if (!tableName) {
         console.log("No table selected");
         return;
     }
 
     const metaResponse = await fetch(
-        `http://localhost:3000/TableMeta?databaseName=${NameOfDatabase}&tableName=${NameOfTable}`
+        `http://localhost:3000/TableMeta?databaseName=${dbName}&tableName=${tableName}`
     );
 
     const metaData = await metaResponse.json();
@@ -646,7 +646,7 @@ async function fetchTableData(tableTemplate, NameOfDatabase, NameOfTable) {
 
 
     const dataResponse = await fetch(
-        `http://localhost:3000/TableData?databaseName=${NameOfDatabase}&tableName=${NameOfTable}`
+        `http://localhost:3000/TableData?databaseName=${dbName}&tableName=${tableName}`
     );
 
     // append column name 
@@ -663,11 +663,9 @@ async function fetchTableData(tableTemplate, NameOfDatabase, NameOfTable) {
         if (colMeta.IS_NULLABLE === "NO") {
             label += " (NN)";
         }
-        let newInput = document.createElement("input");
-        newInput.type = "text";
-        newInput.value = label;
-        newInput.readOnly = true;
-        columnNames.appendChild(newInput);
+        let p = document.createElement("p");
+        p.textContent = label;
+        columnNames.appendChild(p);
     });
 
     const data = await dataResponse.json();
@@ -713,10 +711,13 @@ async function fetchTableData(tableTemplate, NameOfDatabase, NameOfTable) {
     });
 
     deleteRowSvgAdd();
-
+    const insertData = document.querySelector(".insertData");
     // add new row
     addDataRow.addEventListener("click", () => {
-        addDataRow.disabled = true;
+        // addDataRow.disabled = true;
+        // addDataRow.style.background = "linear-gradient(var(--color3), var(--color3)) padding-box, linear-gradient(135deg, var(--color3), var(--color3)) border-box";
+        addDataRow.style.display = "none";
+        insertData.style.display = "block";
         let newDiv = document.createElement("div");
         newDiv.setAttribute("class", "dataRow");
         let div = document.createElement("div");
@@ -751,30 +752,103 @@ async function fetchTableData(tableTemplate, NameOfDatabase, NameOfTable) {
             newDiv.appendChild(newInput);
         });
         tableData.appendChild(newDiv);
-        DeleteRow(NameOfDatabase, NameOfTable);
+        DeleteRow(dbName, tableName);
     });
 
-    DeleteRow(NameOfDatabase, NameOfTable);
+    DeleteRow(dbName, tableName);
 }
 
-async function insertNewData(NameOfDatabase, NameOfTable, tableTemplate) {
+async function insertNewData(dbName, tableName, newData) {
+    try {
+        const response = await fetch("http://localhost:3000/insert-row", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                databaseName: dbName,
+                tableName: tableName,
+                columns: newData.ColumnName,
+                values: newData.newColumnData
+            })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+            outputWindow(data.error);
+            const dataRow = targetElement.closest(".dataRow");
+            dataRow.remove();
+            // newData.ColumnName.length = 0;
+            // newData.newColumnData.length = 0;
+            console.log(newData);
+            return;
+        } else if (data.message) {
+            outputWindow(data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
+    } catch (err) {
+        let errorMsg = err.message + "\n\n" + err.stack;
+        outputWindow(errorMsg);
+    }
+};
+
+async function updateOldData(dbName, tableName, newData) {
+    console.log(newData);
+    try {
+        const response = await fetch("http://localhost:3000/update-data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                databaseName: dbName,
+                tableName: tableName,
+                columns: newData.ColumnName,
+                values: newData.newColumnData,
+                pkValue: newData.pkValue
+            })
+        });
+
+        const data = await response.json();
+        if (data.error) {
+            outputWindow(data.error);
+            // newData.ColumnName.length = 0;
+            // newData.newColumnData.length = 0;
+            console.log(newData);
+            return;
+        } else if (data.message) {
+            outputWindow(data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
+    } catch (err) {
+        let errorMsg = err.message + "\n\n" + err.stack;
+        outputWindow(errorMsg);
+    }
+};
+
+function getChangeData(dbName, tableName, tableTemplate) {
     let newData = {
         "ColumnName": [],
         "newColumnData": [],
+        "pkValue": []
     };
-    const insertData = document.querySelector(".insertData");
     let targetElement;
     tableTemplate.addEventListener("dblclick", (event) => {
         targetElement = event.target;
         if (targetElement.tagName === "INPUT") {
             targetElement.removeAttribute("readonly");
             targetElement.style.border = "2px solid #ff0";
+            if (newData.pkValue.length < 1) {
+                let dataRow = targetElement.closest(".dataRow");
+                let pkVal = dataRow.querySelector(".PK").value;
+                newData.pkValue.push(pkVal);
+            }
         }
         targetElement.addEventListener("change", () => {
             if (newData.ColumnName.includes(targetElement.name)) return;
             newData.ColumnName.push(targetElement.name);
             let value = targetElement.value;
-            
+
             if (targetElement.value.match(/\d{1,2}\s\w+\s\d{4}/)) {
                 const parsedDate = new Date(targetElement.value);
                 if (!isNaN(parsedDate)) {
@@ -783,44 +857,63 @@ async function insertNewData(NameOfDatabase, NameOfTable, tableTemplate) {
                 }
             } else {
                 newData.newColumnData.push(value);
-            }            
+            }
+            console.log(newData);
         });
     });
 
-    insertData.addEventListener("click", async () => {
-        try {
-            const response = await fetch("http://localhost:3000/insert-row", {
+    const insertData = document.querySelector(".insertData");
+    const changeData = document.querySelector(".changeData");
+
+    insertData.addEventListener("click", () => {
+        insertNewData(dbName, tableName, newData);
+    });
+
+    changeData.addEventListener("click", () => {
+        updateOldData(dbName, tableName, newData);
+    });
+}
+
+function DeleteRow(dbName, tableName) {
+
+    document.querySelectorAll(".deleteRow").forEach(btn => {
+
+        btn.onclick = async (event) => {
+
+            const row = event.target.closest(".dataRow");
+            const pkInput = row.querySelector(".PK");
+
+            if (!pkInput) {
+                console.log("Primary key not found");
+                return;
+            }
+
+            const pkValue = pkInput.value;
+
+            const response = await fetch("http://localhost:3000/delete-row", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify({
-                    databaseName: NameOfDatabase,
-                    tableName: NameOfTable,
-                    columns: newData.ColumnName,
-                    values: newData.newColumnData
-                })
+                    databaseName: dbName,
+                    tableName: tableName,
+                    pkValue: pkValue
+                }),
             });
 
             const data = await response.json();
+
             if (data.error) {
                 outputWindow(data.error);
-                const dataRow = targetElement.closest(".dataRow");
-                dataRow.remove();
-                // newData.ColumnName.length = 0;
-                // newData.newColumnData.length = 0;
-                console.log(newData);
                 return;
-            } else if (data.message) {
+            } else {
                 outputWindow(data.message);
-                setTimeout(() => {
-                    location.reload();
-                }, 2000);
+                row.remove();
             }
-        } catch (err) {
-            let errorMsg = err.message + "\n\n" + err.stack;
-            outputWindow(errorMsg);
-        }
+        };
     });
-};
+}
 
 function initDatabaseView($location, $rootScope) {
     const nameInput = document.getElementById("nameInput");
@@ -948,7 +1041,7 @@ function initDatabaseView($location, $rootScope) {
         console.log("Clicked DB:", svg.id.replace(/Svg$/, ""));
 
         const dbName = svg.id.replace(/Svg$/, "");
-        NameOfDatabase = dbName;
+        // NameOfDatabase = dbName;
 
         $rootScope.$apply(() => {
             $location.path(`/table/${dbName}`);
@@ -1051,7 +1144,7 @@ function initTableView($location, $rootScope, dbName) {
         console.log("Clicked Tb:", svg.id.replace(/Svg$/, ""));
 
         const tableName = svg.id.replace(/Svg$/, "");
-        NameOfTable = tableName;
+        // NameOfTable = tableName;
 
         $rootScope.$apply(() => {
             $location.path(`/tableDataView/${dbName}/${tableName}`);
@@ -1197,47 +1290,6 @@ function initTableView($location, $rootScope, dbName) {
     settingOpen();
 }
 
-function DeleteRow(NameOfDatabase, NameOfTable) {
-
-    document.querySelectorAll(".deleteRow").forEach(btn => {
-
-        btn.onclick = async (event) => {
-
-            const row = event.target.closest(".dataRow");
-            const pkInput = row.querySelector(".PK");
-
-            if (!pkInput) {
-                console.log("Primary key not found");
-                return;
-            }
-
-            const pkValue = pkInput.value;
-
-            const response = await fetch("http://localhost:3000/delete-row", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    databaseName: NameOfDatabase,
-                    tableName: NameOfTable,
-                    pkValue: pkValue
-                }),
-            });
-
-            const data = await response.json();
-
-            if (data.error) {
-                outputWindow(data.error);
-                return;
-            } else {
-                outputWindow(data.message);
-                row.remove();
-            }
-        };
-    });
-}
-
 function initTableDataView(dbName, tableName) {
     console.log("this is table data view page = " + dbName + " and " + tableName);
     const h3Tag = document.querySelector(".DBTabletTitle");
@@ -1274,5 +1326,5 @@ function initTableDataView(dbName, tableName) {
 
     settingOpen();
 
-    insertNewData(dbName, tableName, tableTemplate);
+    getChangeData(dbName, tableName, tableTemplate);
 }
