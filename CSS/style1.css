@@ -220,6 +220,7 @@ hr {
     left: 37vw;
     top: 24vh;
     will-change: transform;
+    z-index: 2;
 }
 
 .message {

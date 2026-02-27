@@ -74,3 +74,9 @@
 .insertData {
     display: none;
 }
+
+.deleteColumn {
+    display: flex;
+    height: stretch;
+    align-items: center;
+}

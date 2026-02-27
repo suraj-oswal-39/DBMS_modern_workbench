@@ -11,20 +11,104 @@ const db = mysql.createConnection({
     port: 3306
 });
 
-// fetch full structured table schema
-app.get("/TableSchema", (req, res) => {
+// Delete column safely (drop constraints first)
+app.get("/DeleteColumn", async (req, res) => {
 
-    const { databaseName, tableName } = req.query;
+    const { databaseName, tableName, columnName } = req.query;
 
-    if (!databaseName || !tableName) {
+    if (!databaseName || !tableName || !columnName) {
         return res.status(400).json({ error: "Missing parameters" });
     }
 
     if (!/^[a-zA-Z0-9_]+$/.test(databaseName) ||
-        !/^[a-zA-Z0-9_]+$/.test(tableName)) {
+        !/^[a-zA-Z0-9_]+$/.test(tableName) ||
+        !/^[a-zA-Z0-9_]+$/.test(columnName)) {
         return res.status(400).json({ error: "Invalid name" });
     }
 
+    const safeDb = mysql.escapeId(databaseName);
+    const safeTable = mysql.escapeId(tableName);
+    const safeColumn = mysql.escapeId(columnName);
+
+    try {
+
+        // 1️⃣ Check PRIMARY KEY
+        const pkQuery = `
+            SELECT CONSTRAINT_NAME
+            FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+            WHERE TABLE_SCHEMA = ?
+            AND TABLE_NAME = ?
+            AND COLUMN_NAME = ?
+            AND CONSTRAINT_NAME = 'PRIMARY'
+        `;
+
+        const [pkResult] = await db.promise().query(pkQuery, [databaseName, tableName, columnName]);
+
+        if (pkResult.length > 0) {
+            await db.promise().query(
+                `ALTER TABLE ${safeDb}.${safeTable} DROP PRIMARY KEY`
+            );
+        }
+
+        // 2️⃣ Check FOREIGN KEY
+        const fkQuery = `
+            SELECT CONSTRAINT_NAME
+            FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+            WHERE TABLE_SCHEMA = ?
+            AND TABLE_NAME = ?
+            AND COLUMN_NAME = ?
+            AND REFERENCED_TABLE_NAME IS NOT NULL
+        `;
+
+        const [fkResult] = await db.promise().query(fkQuery, [databaseName, tableName, columnName]);
+
+        for (let fk of fkResult) {
+            await db.promise().query(
+                `ALTER TABLE ${safeDb}.${safeTable} DROP FOREIGN KEY ${mysql.escapeId(fk.CONSTRAINT_NAME)}`
+            );
+        }
+
+        // 3️⃣ Check UNIQUE indexes
+        const uniqueQuery = `
+            SELECT INDEX_NAME
+            FROM INFORMATION_SCHEMA.STATISTICS
+            WHERE TABLE_SCHEMA = ?
+            AND TABLE_NAME = ?
+            AND COLUMN_NAME = ?
+            AND NON_UNIQUE = 0
+            AND INDEX_NAME != 'PRIMARY'
+        `;
+
+        const [uniqueResult] = await db.promise().query(uniqueQuery, [databaseName, tableName, columnName]);
+
+        for (let index of uniqueResult) {
+            await db.promise().query(
+                `ALTER TABLE ${safeDb}.${safeTable} DROP INDEX ${mysql.escapeId(index.INDEX_NAME)}`
+            );
+        }
+
+        // 4️⃣ Finally drop column
+        await db.promise().query(
+            `ALTER TABLE ${safeDb}.${safeTable} DROP COLUMN ${safeColumn}`
+        );
+
+        res.json({ message: "Column deleted successfully" });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// fetch full structured table schema
+app.get("/TableSchema", (req, res) => {
+    const { databaseName, tableName } = req.query;
+    if (!databaseName || !tableName) {
+        return res.status(400).json({ error: "Missing parameters" });
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(databaseName) ||
+        !/^[a-zA-Z0-9_]+$/.test(tableName)) {
+        return res.status(400).json({ error: "Invalid name" });
+    }
     const sql = `
         SELECT 
             c.COLUMN_NAME,
@@ -49,43 +133,29 @@ app.get("/TableSchema", (req, res) => {
         AND c.TABLE_NAME = ?
         ORDER BY c.ORDINAL_POSITION
     `;
-
     db.query(sql, [databaseName, tableName], (err, results) => {
-
     if (err) {
         return res.status(500).json({ error: err.message });
     }
-
     const columns = results.map(col => {
-
         const isPrimary = col.CONSTRAINT_TYPE === "PRIMARY KEY";
         const isUnique = col.CONSTRAINT_TYPE === "UNIQUE";
-
         return {
             columnName: col.COLUMN_NAME,
-
             dataType: col.DATA_TYPE.toUpperCase(),
-
             size:
                 col.CHARACTER_MAXIMUM_LENGTH ||
                 col.NUMERIC_PRECISION ||
                 null,
-
             primaryKey: isPrimary,
-
             // PRIMARY KEY automatically means UNIQUE
             unique: isPrimary || isUnique,
-
             notNull: col.IS_NULLABLE === "NO",
-
             unsigned: col.COLUMN_TYPE.includes("unsigned"),
-
             autoIncrement: col.EXTRA.includes("auto_increment"),
-
             defaultValue: col.COLUMN_DEFAULT
         };
     });
-
     // return ONLY columns
     res.json(columns);
 });
@@ -93,43 +163,32 @@ app.get("/TableSchema", (req, res) => {
 
 // update existing data in row based on primary key
 app.post("/update-data", (req, res) => {
-
     const { databaseName, tableName, columns, values, pkColumnName, pkValue } = req.body;
-
     if (!databaseName || !tableName || !columns || !values || !pkColumnName || pkValue === undefined) {
         return res.status(400).json({ error: "Missing parameters" });
     }
-
     if (!Array.isArray(columns) || !Array.isArray(values)) {
         return res.status(400).json({ error: "Invalid data format" });
     }
-
     if (columns.length !== values.length) {
         return res.status(400).json({ error: "Columns and values mismatch" });
     }
-
     if (!/^[a-zA-Z0-9_]+$/.test(databaseName) ||
         !/^[a-zA-Z0-9_]+$/.test(tableName)) {
         return res.status(400).json({ error: "Invalid name" });
     }
-
     const safeDb = mysql.escapeId(databaseName);
     const safeTable = mysql.escapeId(tableName);
-
     const setClause = columns
         .map(col => `${mysql.escapeId(col)} = ?`)
         .join(", ");
-
     const safePkColumn = mysql.escapeId(pkColumnName);
-
     const updateQuery = `
         UPDATE ${safeDb}.${safeTable}
         SET ${setClause}
         WHERE ${safePkColumn} = ?
     `;
-
     const queryValues = [...values, pkValue];
-
     db.query(updateQuery, queryValues, (err2, result) => {
         if (err2) {
             return res.status(500).json({ error: err2.message });
@@ -143,45 +202,34 @@ app.post("/update-data", (req, res) => {
 
 // insert data in new whole row
 app.post("/insert-row", (req, res) => {
-
     const { databaseName, tableName, columns, values } = req.body;
-
     if (!databaseName || !tableName || !columns || !values) {
         return res.status(400).json({ error: "Missing parameters" });
     }
-
     if (!Array.isArray(columns) || !Array.isArray(values)) {
         return res.status(400).json({ error: "Invalid data format" });
     }
-
     if (columns.length !== values.length) {
         return res.status(400).json({ error: "Columns and values mismatch" });
     }
-
     if (!/^[a-zA-Z0-9_]+$/.test(databaseName) ||
         !/^[a-zA-Z0-9_]+$/.test(tableName)) {
         return res.status(400).json({ error: "Invalid name" });
     }
-
     const safeDb = mysql.escapeId(databaseName);
     const safeTable = mysql.escapeId(tableName);
-
     const escapedColumns = columns.map(col => mysql.escapeId(col)).join(", ");
-
     const placeholders = columns.map(() => "?").join(", ");
-
     const insertQuery = `
         INSERT INTO ${safeDb}.${safeTable}
         (${escapedColumns})
         VALUES (${placeholders})
     `;
-
     db.query(insertQuery, values, (err, result) => {
 
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-
         res.json({ message: "Row inserted successfully" });
     });
 });
@@ -189,7 +237,6 @@ app.post("/insert-row", (req, res) => {
 // delete data of whole row
 app.post("/delete-row", (req, res) => {
     const { databaseName, tableName, pkColumnName, pkValue } = req.body;
-
     console.log(databaseName, tableName, pkValue);
     if (!databaseName || !tableName || !pkValue || !pkColumnName) {
         return res.status(400).json({ error: "Missing parameters" });
@@ -198,28 +245,23 @@ app.post("/delete-row", (req, res) => {
         !/^[a-zA-Z0-9_]+$/.test(tableName)) {
         return res.status(400).json({ error: "Invalid name" });
     }
-
     const safeDb = mysql.escapeId(databaseName);
     const safeTable = mysql.escapeId(tableName);
     const safePkColumn = mysql.escapeId(pkColumnName);
-
     const deleteQuery = `
         DELETE FROM ${safeDb}.${safeTable}
         WHERE ${safePkColumn} = ?
     `;
-
     db.query(deleteQuery, [pkValue], (err2) => {
         if (err2) {
             return res.status(500).json({ error: err2.message });
         }
-
         res.json({ message: "Row deleted successfully" });
     });
 });
 
 app.get("/TableMeta", (req, res) => {
     const { databaseName, tableName } = req.query;
-
     const sql = `
         SELECT 
             c.COLUMN_NAME,
@@ -240,7 +282,6 @@ app.get("/TableMeta", (req, res) => {
         AND c.TABLE_NAME = ?
         ORDER BY c.ORDINAL_POSITION
     `;
-
     db.query(sql, [databaseName, tableName], (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(results);
@@ -253,21 +294,17 @@ app.get("/TableData", (req, res) => {
     if (!databaseName || !/^[a-zA-Z0-9_]+$/.test(databaseName)) {
         return res.status(400).json({ error: "Invalid database name" });
     }
-
     if (!tableName || !/^[a-zA-Z0-9_]+$/.test(tableName)) {
         return res.status(400).json({ error: "Invalid table name" });
     }
-
     const safeDbName = mysql.escapeId(databaseName);
     const safeTableName = mysql.escapeId(tableName);
     const sql = `SELECT * FROM ${safeDbName}.${safeTableName}`;
-
     db.query(sql, (err, results) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: "Table data fetch query failed" });
         }
-
         res.json(results);
     });
 });
@@ -277,12 +314,10 @@ app.post("/execute", (req, res) => {
     if (!query) {
         return res.status(400).json({ error: "Query is empty" });
     }
-
     db.query(query, (err, result) => {
         if (err) {
             return res.json({ error: err.message });
         }
-
         res.json({ result });
     });
 });
@@ -293,10 +328,8 @@ app.post("/create-table", (req, res) => {
     if (!databaseName || !tableName || !columns.length) {
         return res.status(400).json({ error: "Missing table data" });
     }
-
     const safeDb = mysql.escapeId(databaseName);
     const safeTable = mysql.escapeId(tableName);
-
     let columnDefinitions = columns.map(col => {
         let type = col.dataType.replace(/\(.*\)/, "");
         let size = col.size ? `(${col.size})` : "";
@@ -309,25 +342,21 @@ app.post("/create-table", (req, res) => {
         if (col.expression) sql += ` DEFAULT '${col.expression}'`;
         return sql;
     });
-
     // Add PRIMARY KEY separately
     const pkColumn = columns.find(col => col.primaryKey);
     if (pkColumn) {
         columnDefinitions.push(`PRIMARY KEY (${mysql.escapeId(pkColumn.columnName)})`);
     }
-
     const sql = `
         CREATE TABLE ${safeDb}.${safeTable} (
             ${columnDefinitions.join(",\n")}
         )
     `;
-
     db.query(sql, (err) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: err.message });
         }
-
         res.json({ message: "Table created successfully" });
     });
 });
@@ -339,10 +368,8 @@ app.post("/delete-Table", (req, res) => {
     if (!TbName || !databaseName) {
         return res.status(400).json({ error: "table and database required" });
     }
-
     const safeDb = mysql.escapeId(databaseName);
     const safeTb = mysql.escapeId(TbName);
-
     const sql = `DROP TABLE IF EXISTS ${safeDb}.${safeTb}`;
     db.query(sql, err => {
         if (err) {
@@ -351,7 +378,6 @@ app.post("/delete-Table", (req, res) => {
                 error: "table deletion failed"
             });
         }
-
         res.json({
             message: "table deleted successfully"
         });
@@ -364,10 +390,8 @@ app.get("/Tables", (req, res) => {
     if (!databaseName || !/^[a-zA-Z0-9_]+$/.test(databaseName)) {
         return res.status(400).json({ error: "Invalid database name" });
     }
-
     const safeDbName = mysql.escapeId(databaseName);
     const sql = `SHOW TABLES FROM ${safeDbName}`;
-
     db.query(sql, (err, results) => {
         if (err) {
             console.error(err);
@@ -383,7 +407,6 @@ app.post("/delete-database", (req, res) => {
     if (!dbNameForDel) {
         return res.status(400).json({ error: "Database name required" });
     }
-
     const systemDBs = [
         "mysql",
         "information_schema",
@@ -398,12 +421,10 @@ app.post("/delete-database", (req, res) => {
             error: "System databases cannot be deleted"
         });
     }
-
     const validName = /^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/;
     if (!validName.test(dbNameForDel)) {
         return res.status(400).json({ error: "Invalid database name" });
     }
-
     const safeDbName = mysql.escapeId(dbNameForDel);
     const sql = `DROP DATABASE IF EXISTS ${safeDbName}`;
     db.query(sql, err => {
@@ -413,12 +434,12 @@ app.post("/delete-database", (req, res) => {
                 error: "Database deletion failed"
             });
         }
-
         res.json({
             message: "Database deleted successfully"
         });
     });
 });
+
 //fetch databases logic
 app.get("/databases", (req, res) => {
     const systemDBs = [
@@ -427,13 +448,11 @@ app.get("/databases", (req, res) => {
         "performance_schema",
         "sys",
     ];
-
     db.query("SHOW DATABASES", (err, results) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: "Database query failed" });
         }
-
         const userDatabases = results.filter(
             db => !systemDBs.includes(db.Database)
         );
@@ -447,15 +466,12 @@ app.post("/create-database", (req, res) => {
     if (!dbName) {
         return res.status(400).json({ error: "Database name required" });
     }
-
     const validName = /^[a-zA-Z_][a-zA-Z0-9_]{0,63}$/;
     if (!validName.test(dbName)) {
         return res.status(400).json({ error: "Invalid database name" });
     }
-
     const safeDbName = mysql.escapeId(dbName);
     const sql = `CREATE DATABASE IF NOT EXISTS ${safeDbName}`;
-
     db.query(sql, (err) => {
         if (err) {
             console.error(err);
