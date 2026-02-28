@@ -1,6 +1,8 @@
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -9,6 +11,192 @@ const db = mysql.createConnection({
     user: "root",
     password: "suraj3690",
     port: 3306
+});
+
+app.get("/export-pdf", async (req, res) => {
+
+    const { databaseName, tableName } = req.query;
+
+    if (!databaseName || !tableName) {
+        return res.status(400).json({ error: "Missing parameters" });
+    }
+
+    const safeDb = mysql.escapeId(databaseName);
+    const safeTable = mysql.escapeId(tableName);
+
+    try {
+
+        const [rows] = await db.promise().query(
+            `SELECT * FROM ${safeDb}.${safeTable}`
+        );
+
+        const doc = new PDFDocument({ margin: 40, size: "A4" });
+
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename=${tableName}.pdf`
+        );
+
+        doc.pipe(res);
+
+        // ================= TITLE =================
+        doc
+            .font("Helvetica-Bold")
+            .fontSize(18)
+            .fillColor("black")
+            .text(`Table: ${tableName}`);
+
+        doc.moveDown(1);
+
+        if (rows.length === 0) {
+            doc.fontSize(12).text("No data available");
+            doc.end();
+            return;
+        }
+
+        const columns = Object.keys(rows[0]);
+
+        const pageWidth =
+            doc.page.width - doc.page.margins.left - doc.page.margins.right;
+
+        const columnWidth = pageWidth / columns.length;
+
+        const cellPadding = 4;
+
+        let y = doc.y;
+
+        // ================= DRAW HEADER FUNCTION =================
+        function drawHeader() {
+
+            let maxHeaderHeight = 4;
+
+            // Calculate dynamic header height
+            columns.forEach(column => {
+
+                const headerHeight = doc.heightOfString(
+                    column,
+                    {
+                        width: columnWidth - cellPadding * 6,
+                        align: "center"
+                    }
+                );
+
+                if (headerHeight + 4 > maxHeaderHeight) {
+                    maxHeaderHeight = headerHeight + 4;
+                }
+            });
+
+            columns.forEach((column, i) => {
+
+                const x = doc.page.margins.left + i * columnWidth;
+
+                // Blue background
+                doc
+                    .rect(x, y, columnWidth, maxHeaderHeight)
+                    .fill("#2a6099");
+
+                // Border
+                doc
+                    .rect(x, y, columnWidth, maxHeaderHeight)
+                    .stroke();
+
+                // Header text
+                doc
+                    .fillColor("white")
+                    .font("Helvetica-Bold")
+                    .fontSize(12)
+                    .text(
+                        column,
+                        x + cellPadding,
+                        y + (maxHeaderHeight / 3) - 3,
+                        {
+                            width: columnWidth - cellPadding * 2,
+                            align: "center"
+                        }
+                    );
+            });
+
+            y += maxHeaderHeight;
+        }
+
+        drawHeader();
+
+        // ================= BODY =================
+
+        rows.forEach((row, rowIndex) => {
+
+            let maxRowHeight = 20;
+
+            // Calculate dynamic height
+            columns.forEach(column => {
+
+                const text = row[column] == null ? "" : String(row[column]);
+
+                const textHeight = doc.heightOfString(
+                    text,
+                    {
+                        width: columnWidth - cellPadding * 2,
+                        align: "center"
+                    }
+                );
+
+                if (textHeight + 10 > maxRowHeight) {
+                    maxRowHeight = textHeight + 10;
+                }
+            });
+
+            // Page break BEFORE drawing row
+            if (y + maxRowHeight > doc.page.height - 40) {
+                doc.addPage();
+                y = doc.page.margins.top;
+                drawHeader();
+                doc.moveDown(0.5);
+            }
+
+            columns.forEach((column, colIndex) => {
+
+                const x =
+                    doc.page.margins.left +
+                    colIndex * columnWidth;
+
+                const isEven = rowIndex % 2 === 0;
+
+                // Row background
+                doc
+                    .rect(x, y, columnWidth, maxRowHeight)
+                    .fill(isEven ? "white" : "#dee6ef");
+
+                doc
+                    .rect(x, y, columnWidth, maxRowHeight)
+                    .stroke();
+
+                const value =
+                    row[column] == null ? "" : String(row[column]);
+
+                doc
+                    .fillColor("black")
+                    .font("Helvetica")
+                    .fontSize(12)
+                    .text(
+                        value,
+                        x + cellPadding,
+                        y + 8,
+                        {
+                            width: columnWidth - cellPadding * 2,
+                            align: "center"
+                        }
+                    );
+            });
+
+            y += maxRowHeight;
+        });
+
+        doc.end();
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // // Update table structure (rename, add, drop, modify columns)

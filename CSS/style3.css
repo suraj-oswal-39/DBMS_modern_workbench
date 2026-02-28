@@ -104,6 +104,12 @@
     padding-bottom: 1rem;
 }
 
+.rowContainer {
+    overflow-y: auto;
+    max-height: 19rem;
+    padding-bottom: 0.2rem;
+}
+
 .row {
     display: flex;
     flex-wrap: wrap;

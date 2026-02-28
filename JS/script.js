@@ -285,7 +285,7 @@ function OptionSelection() {
 
         const option = event.target.closest(".dataTypeList li");
         if (!option) return;
-
+        if (rowContainer.style) rowContainer.removeAttribute("style"); 
         event.stopPropagation();
 
         const row = option.closest(".row");
@@ -1437,7 +1437,7 @@ function initTableView($location, $rootScope, dbName) {
     rowContainer.addEventListener("click", function (event) {
         btn = event.target.closest(".dataType");
         if (!btn) return;
-
+        rowContainer.style.overflowY = "visible";
         dataTypeList = btn.querySelector(".dataTypeList");
         dataTypeList.style.opacity = "1";
         dataTypeList.style.width = "7rem";
@@ -1454,6 +1454,7 @@ function initTableView($location, $rootScope, dbName) {
 
         openLists.forEach((list) => {
             list.removeAttribute("style");
+            if (rowContainer.style) rowContainer.removeAttribute("style"); 
         });
     });
 
@@ -1596,6 +1597,14 @@ function initTableDataView(dbName, tableName) {
 
     getChangeData(dbName, tableName, tableTemplate);
 
+    const printTable = document.querySelector(".printTable");
+    printTable.onclick = () => {
+        window.open(
+        `http://localhost:3000/export-pdf?databaseName=${dbName}&tableName=${tableName}`,
+        "_blank"
+        );
+    }
+
     // const editTableColumn = document.querySelector(".editTableColumn");
     // const fromDisplay2 = document.querySelector(".fromDisplay2");
     // const CloseCross2 = document.querySelector(".CloseCross2");
@@ -1715,6 +1724,154 @@ function initTableDataView(dbName, tableName) {
     // });
 
 }
+
+// async function printTableData(dbName, tableName) {
+
+//     const columnNames = tableTemplate.querySelector(".columnNames");
+//     const tableData = tableTemplate.querySelector(".tableData");
+//     const addDataRow = document.querySelector(".addDataRow");
+
+//     if (!dbName) {
+//         console.log("No database selected");
+//         return;
+//     }
+
+//     if (!tableName) {
+//         console.log("No table selected");
+//         return;
+//     }
+
+//     const metaResponse = await fetch(
+//         `http://localhost:3000/TableMeta?databaseName=${dbName}&tableName=${tableName}`
+//     );
+
+//     const metaData = await metaResponse.json();
+
+//     const pkColumns = metaData
+//         .filter(col => col.CONSTRAINT_TYPE === "PRIMARY KEY")
+//         .map(col => col.COLUMN_NAME);
+
+//     const fkColumns = metaData
+//         .filter(col => col.CONSTRAINT_TYPE === "FOREIGN KEY")
+//         .map(col => col.COLUMN_NAME);
+
+//     const nnColumns = metaData
+//         .filter(col => col.IS_NULLABLE === "NO")
+//         .map(col => col.COLUMN_NAME);
+
+
+//     const dataResponse = await fetch(
+//         `http://localhost:3000/TableData?databaseName=${dbName}&tableName=${tableName}`
+//     );
+
+//     // append column name 
+//     const columnList = metaData.map(col => col.COLUMN_NAME);
+//     columnList.forEach(colName => {
+//         let label = colName;
+//         const colMeta = metaData.find(c => c.COLUMN_NAME === colName);
+//         if (colMeta.CONSTRAINT_TYPE === "PRIMARY KEY") {
+//             label += " (PK)";
+//         }
+//         if (colMeta.CONSTRAINT_TYPE === "FOREIGN KEY") {
+//             label += " (FK)";
+//         }
+//         if (colMeta.IS_NULLABLE === "NO") {
+//             label += " (NN)";
+//         }
+//         let p = document.createElement("p");
+//         p.textContent = label;
+//         columnNames.appendChild(p);
+//     });
+
+//     const data = await dataResponse.json();
+
+//     // append column's data
+//     data.forEach(row => {
+//         let newDiv = document.createElement("div");
+//         newDiv.setAttribute("class", "dataRow");
+//         Object.values(row).forEach((value, index) => {
+//             let displayValue = value;
+//             if (typeof value === "string" && value.includes("T") && value.endsWith("Z")) {
+//                 const date = new Date(value);
+//                 displayValue = date.toLocaleString("en-IN", {
+//                     year: "numeric",
+//                     month: "short",
+//                     day: "2-digit",
+//                     hour: "2-digit",
+//                     minute: "2-digit",
+//                     second: "2-digit"
+//                 });
+//             }
+//             let newInput = document.createElement("input");
+//             newInput.setAttribute("type", "text");
+//             newInput.setAttribute("value", displayValue);
+//             let label;
+//             if (pkColumns.includes(Object.keys(data[0])[index])) {
+//                 label = "PK";
+//                 newInput.classList.add(label);
+//             }
+//             if (fkColumns.includes(Object.keys(data[0])[index])) {
+//                 label = "FK";
+//                 newInput.classList.add(label);
+//             }
+//             if (nnColumns.includes(Object.keys(data[0])[index])) {
+//                 label = "NN";
+//                 newInput.classList.add(label);
+//             }
+//             newInput.name = Object.keys(data[0])[index];
+//             newInput.readOnly = true;
+//             newDiv.appendChild(newInput);
+//         });
+//         tableData.appendChild(newDiv);
+//     });
+
+//     deleteRowSvgAdd();
+//     const insertData = document.querySelector(".insertData");
+//     const changeData = document.querySelector(".changeData");
+//     // add new row
+//     addDataRow.addEventListener("click", () => {
+//         changeData.style.display = "none";
+//         addDataRow.style.display = "none";
+//         insertData.style.display = "block";
+//         let newDiv = document.createElement("div");
+//         newDiv.setAttribute("class", "dataRow");
+//         let div = document.createElement("div");
+//         div.innerHTML = `
+//                     <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+//                         <path id="Vector" d="M14 16H20M21 10V9C21 7.89543 20.1046 7 19 7H5C3.89543 7 3 7.89543 3 9V11C3 12.1046 3.89543 13 5 13H11" stroke="var(--color4)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+//                     </svg>
+//                 `;
+//         div.classList.add("deleteRow");
+//         div.title = "remove row";
+//         newDiv.appendChild(div);
+//         columnList.forEach(colName => {
+//             let label;
+//             const colMeta = metaData.find(c => c.COLUMN_NAME === colName);
+//             let newInput = document.createElement("input");
+//             newInput.type = "text";
+//             newInput.value = "";
+//             newInput.name = colName;
+//             if (colMeta.CONSTRAINT_TYPE === "PRIMARY KEY") {
+//                 label = "PK";
+//                 newInput.classList.add(label);
+//             }
+//             if (colMeta.CONSTRAINT_TYPE === "FOREIGN KEY") {
+//                 label = "FK";
+//                 newInput.classList.add(label);
+//             }
+//             if (colMeta.IS_NULLABLE === "NO") {
+//                 label = "NN";
+//                 newInput.classList.add(label);
+//             }
+//             newInput.readOnly = true;
+//             newDiv.appendChild(newInput);
+//         });
+//         tableData.appendChild(newDiv);
+//         DeleteRow(dbName, tableName);
+//     });
+
+//     DeleteRow(dbName, tableName);
+// }
 
 // async function updateColumns(dbName, originalTable) {
 //     const tableNameInput = document.querySelector("#tableNameInput");
