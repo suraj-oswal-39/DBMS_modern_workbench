@@ -587,6 +587,138 @@ app.get("/TableData", (req, res) => {
     });
 });
 
+app.get("/SelectedTableMeta", async (req, res) => {
+
+    try {
+
+        const raw = req.query.selectQueryStructure;
+        if (!raw) {
+            return res.status(400).json({ error: "Missing query structure" });
+        }
+
+        const parsed = JSON.parse(raw);
+
+        const { databaseName, from } = parsed;
+        console.log(databaseName, from);
+        if (!databaseName || !from) {
+            return res.status(400).json({ error: "Missing database or table" });
+        }
+
+        // extract table name (db.table)
+        const tableName = from.includes(".")
+            ? from.split(".")[1]
+            : from;
+
+        if (!/^[a-zA-Z0-9_]+$/.test(databaseName) ||
+            !/^[a-zA-Z0-9_]+$/.test(tableName)) {
+            return res.status(400).json({ error: "Invalid name" });
+        }
+
+        const sql = `
+            SELECT 
+                c.COLUMN_NAME,
+                c.DATA_TYPE,
+                c.IS_NULLABLE,
+                t.CONSTRAINT_TYPE
+            FROM INFORMATION_SCHEMA.COLUMNS c
+            LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE k
+                ON c.TABLE_SCHEMA = k.TABLE_SCHEMA
+                AND c.TABLE_NAME = k.TABLE_NAME
+                AND c.COLUMN_NAME = k.COLUMN_NAME
+            LEFT JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS t
+                ON k.CONSTRAINT_NAME = t.CONSTRAINT_NAME
+                AND k.TABLE_SCHEMA = t.TABLE_SCHEMA
+                AND k.TABLE_NAME = t.TABLE_NAME
+            WHERE c.TABLE_SCHEMA = ?
+            AND c.TABLE_NAME = ?
+            ORDER BY c.ORDINAL_POSITION
+        `;
+
+        const [results] = await db.promise().query(sql, [databaseName, tableName]);
+
+        res.json(results);
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+
+});
+
+app.get("/SelectedTableData", async (req, res) => {
+
+    try {
+
+        const raw = req.query.selectQueryStructure;
+        if (!raw) {
+            return res.status(400).json({ error: "Missing query structure" });
+        }
+
+        const parsed = JSON.parse(raw);
+
+        let {
+            databaseName,
+            select,
+            from,
+            where,
+            groupBy,
+            having,
+            orderBy,
+            limit
+        } = parsed;
+
+        if (!databaseName || !from) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+
+        const tableName = from.includes(".")
+            ? from.split(".")[1]
+            : from;
+
+        if (!/^[a-zA-Z0-9_]+$/.test(databaseName) ||
+            !/^[a-zA-Z0-9_]+$/.test(tableName)) {
+            return res.status(400).json({ error: "Invalid name" });
+        }
+
+        const safeDb = mysql.escapeId(databaseName);
+        const safeTable = mysql.escapeId(tableName);
+
+        // Default select
+        if (!select || select.trim() === "") {
+            select = "*";
+        }
+
+        let sql = `SELECT ${select} FROM ${safeDb}.${safeTable}`;
+
+        if (where && where.trim() !== "") {
+            sql += ` WHERE ${where}`;
+        }
+
+        if (groupBy && groupBy.trim() !== "") {
+            sql += ` GROUP BY ${groupBy}`;
+        }
+
+        if (having && having.trim() !== "") {
+            sql += ` HAVING ${having}`;
+        }
+
+        if (orderBy && orderBy.trim() !== "") {
+            sql += ` ORDER BY ${orderBy}`;
+        }
+
+        if (limit && Number(limit) > 0) {
+            sql += ` LIMIT ${Number(limit)}`;
+        }
+
+        const [results] = await db.promise().query(sql);
+
+        res.json(results);
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+
+});
+
 app.post("/execute", (req, res) => {
     const query = req.body.query;
     if (!query) {

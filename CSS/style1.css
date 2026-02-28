@@ -120,7 +120,8 @@ input::placeholder {
 .changeData,
 .insertData,
 .printTable,
-.selectQuery {
+.selectQuery,
+.RunSelectQuery {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -143,7 +144,8 @@ input::placeholder {
 .changeData:hover,
 .insertData:hover,
 .printTable:hover,
-.selectQuery:hover {
+.selectQuery:hover,
+.RunSelectQuery:hover {
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,
         linear-gradient(135deg, var(--color1), var(--color2)) border-box;
@@ -156,7 +158,8 @@ input::placeholder {
 .changeData:active,
 .insertData:active,
 .printTable:active,
-.selectQuery:active {
+.selectQuery:active,
+.RunSelectQuery:active {
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,
         linear-gradient(135deg, var(--color6), var(--color6)) border-box;

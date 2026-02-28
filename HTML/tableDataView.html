@@ -2,46 +2,6 @@
     <header>
         <h2>DBMS Workbench</h2>
 
-        <button type="button" class="selectQuery"> Search...
-            <div class="selectQueryBox">
-                <div class="inputBox1">
-                    <label for="Select" class="inputLabel">Select</label>
-                    <input type="text" id="Select" name="Select" class="inputSearch"
-                        placeholder="choose column name or write all" />
-                </div>
-                <div class="inputBox2">
-                    <label for="From" class="inputLabel">Form</label>
-                    <input type="text" id="From" name="From" class="inputSearch"
-                        placeholder="enter table name" />
-                </div>
-                <div class="inputBox3">
-                    <label for="Where" class="inputLabel">Where</label>
-                    <input type="text" id="Where" name="Where" class="inputSearch"
-                        placeholder="write condition" />
-                </div>
-                <div class="inputBox4">
-                    <label for="GroupBy" class="inputLabel">Group By</label>
-                    <input type="text" id="GroupBy" name="GroupBy" class="inputSearch"
-                        placeholder="enter column name" />
-                </div>
-                <div class="inputBox5">
-                    <label for="Having" class="inputLabel">Having</label>
-                    <input type="text" id="Having" name="Having" class="inputSearch"
-                        placeholder="write condition" />
-                </div>
-                <div class="inputBox6">
-                    <label for="OrderBy" class="inputLabel">Order By</label>
-                    <input type="text" id="OrderBy" name="OrderBy" class="inputSearch"
-                        placeholder="column ASC|DESC" />
-                </div>
-                <div class="inputBox7">
-                    <label for="Limit" class="inputLabel">Limit</label>
-                    <input type="text" id="Limit" name="Limit" class="inputSearch"
-                        placeholder="enter limit number" />
-                </div>
-            </div>
-        </button>
-
         <!-- SELECT column1, column2
         FROM table_name
         WHERE condition
@@ -51,6 +11,49 @@
         LIMIT number; -->
 
         <div class="topLeftBtns">
+
+            <button type="button" class="RunSelectQuery">Run</button>
+
+            <button type="button" class="selectQuery"> Search
+                <div class="selectQueryBox">
+                    <div class="inputBox1">
+                        <label for="Select" class="inputLabel">Select</label>
+                        <input type="text" id="Select" name="Select" class="inputSearch"
+                            placeholder="choose column name or write 'all'" autocomplete="off" />
+                    </div>
+                    <div class="inputBox2">
+                        <label for="From" class="inputLabel">Form</label>
+                        <input type="text" id="From" name="From" class="inputSearch"
+                            placeholder="enter table name" autocomplete="off" />
+                    </div>
+                    <div class="inputBox3">
+                        <label for="Where" class="inputLabel">Where</label>
+                        <input type="text" id="Where" name="Where" class="inputSearch"
+                            placeholder="write condition" autocomplete="off" />
+                    </div>
+                    <div class="inputBox4">
+                        <label for="GroupBy" class="inputLabel">Group By</label>
+                        <input type="text" id="GroupBy" name="GroupBy" class="inputSearch"
+                            placeholder="enter column name" autocomplete="off" />
+                    </div>
+                    <div class="inputBox5">
+                        <label for="Having" class="inputLabel">Having</label>
+                        <input type="text" id="Having" name="Having" class="inputSearch"
+                            placeholder="write condition" autocomplete="off" />
+                    </div>
+                    <div class="inputBox6">
+                        <label for="OrderBy" class="inputLabel">Order By</label>
+                        <input type="text" id="OrderBy" name="OrderBy" class="inputSearch"
+                            placeholder="column ASC | DESC" autocomplete="off" />
+                    </div>
+                    <div class="inputBox7">
+                        <label for="Limit" class="inputLabel">Limit</label>
+                        <input type="number" id="Limit" name="Limit" class="inputSearch"
+                            placeholder="enter limit number" autocomplete="off" />
+                    </div>
+                </div>
+            </button>
+
             <button type="button" class="SqlQuery">Query</button>
 
             <button type="button" class="outputScreenButton">Output</button>
