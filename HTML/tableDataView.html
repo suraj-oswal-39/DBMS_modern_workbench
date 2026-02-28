@@ -2,23 +2,53 @@
     <header>
         <h2>DBMS Workbench</h2>
 
-        <div class="searchBar">
-            <input type="text" placeholder="Search…" id="svgSearchInput" autocomplete="off" />
-            <svg width="32px" height="32px" viewBox="0 -0.5 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"
-                class="searchSvg">
-                <defs>
-                    <linearGradient id="searchGrow" x1="100%" y1="100%" x2="0%" y2="0%">
-                        <stop offset="0%" class="red" />
-                        <stop offset="100%" class="yellow" />
-                    </linearGradient>
-                </defs>
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M5.5 10.7655C5.50003 8.01511 7.44296 5.64777 10.1405 5.1113C12.8381 4.57483 15.539 6.01866 16.5913 8.55977C17.6437 11.1009 16.7544 14.0315 14.4674 15.5593C12.1804 17.0871 9.13257 16.7866 7.188 14.8415C6.10716 13.7604 5.49998 12.2942 5.5 10.7655Z"
-                    stroke="url(#searchGrow)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                <path d="M17.029 16.5295L21.45 20.90055" stroke="url(#searchGrow)" stroke-width="1.5"
-                    stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-        </div>
+        <button type="button" class="selectQuery"> Search...
+            <div class="selectQueryBox">
+                <div class="inputBox1">
+                    <label for="Select" class="inputLabel">Select</label>
+                    <input type="text" id="Select" name="Select" class="inputSearch"
+                        placeholder="choose column name or write all" />
+                </div>
+                <div class="inputBox2">
+                    <label for="From" class="inputLabel">Form</label>
+                    <input type="text" id="From" name="From" class="inputSearch"
+                        placeholder="enter table name" />
+                </div>
+                <div class="inputBox3">
+                    <label for="Where" class="inputLabel">Where</label>
+                    <input type="text" id="Where" name="Where" class="inputSearch"
+                        placeholder="write condition" />
+                </div>
+                <div class="inputBox4">
+                    <label for="GroupBy" class="inputLabel">Group By</label>
+                    <input type="text" id="GroupBy" name="GroupBy" class="inputSearch"
+                        placeholder="enter column name" />
+                </div>
+                <div class="inputBox5">
+                    <label for="Having" class="inputLabel">Having</label>
+                    <input type="text" id="Having" name="Having" class="inputSearch"
+                        placeholder="write condition" />
+                </div>
+                <div class="inputBox6">
+                    <label for="OrderBy" class="inputLabel">Order By</label>
+                    <input type="text" id="OrderBy" name="OrderBy" class="inputSearch"
+                        placeholder="column ASC|DESC" />
+                </div>
+                <div class="inputBox7">
+                    <label for="Limit" class="inputLabel">Limit</label>
+                    <input type="text" id="Limit" name="Limit" class="inputSearch"
+                        placeholder="enter limit number" />
+                </div>
+            </div>
+        </button>
+
+        <!-- SELECT column1, column2
+        FROM table_name
+        WHERE condition
+        GROUP BY column
+        HAVING condition
+        ORDER BY column ASC|DESC
+        LIMIT number; -->
 
         <div class="topLeftBtns">
             <button type="button" class="SqlQuery">Query</button>
@@ -27,7 +57,7 @@
 
             <button type="button" class="settingBtn">Setting</button>
         </div>
-        
+
     </header>
 
     <hr>
@@ -40,7 +70,7 @@
             <button type="button" class="insertData">Insert Data</button>
             <button type="button" class="changeData">Update Data</button>
             <!-- <button type="button" class="editTableColumn">Edit Column</button> -->
-             <button type="button" class="printTable">Print Table</button>
+            <button type="button" class="printTable">Print Table</button>
         </div>
         <section class="columnNames"></section>
         <section class="tableData"></section>
