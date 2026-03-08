@@ -560,9 +560,9 @@ function openOutputScreen(outputScreen) {
 
 function settingOpen() {
     const settingBtn = document.querySelector(".settingBtn");
-    const settingMenu = document.querySelector(".settingMenu");
     const themeBtn = document.querySelector(".themeBtn");
     const themeTitle = document.querySelector(".themeBtn p");
+    const settingMenu = document.querySelector(".settingMenu");
     settingBtn.onclick = () => {
         if (!isOpen) {
             settingMenu.style.right = 0 + "%";
@@ -1521,14 +1521,12 @@ function initTableDataView(dbName, tableName) {
     console.log("this is table data view page = " + dbName + " and " + tableName);
     const h3Tag = document.querySelector(".DBTabletTitle");
     h3Tag.textContent = `Data from ${tableName} table in ${dbName} database`;
-
     const routingContainer = document.querySelector(".routingContainer");
     const popUpWindow = document.querySelector(".popUpWindow");;
     const textarea = document.getElementById("sqlEditor");
     const lineNumbers = document.getElementById("lineNumbers");
     const outputScreen = document.querySelector('.outputScreen');
     const popUpQueryWindow = document.querySelector('.popUpQueryWindow');
-
     const tableTemplate = document.querySelector(".tableTemplate");
     fetchTableData(tableTemplate, dbName, tableName);
 
@@ -1665,7 +1663,8 @@ function shortcutKeysHandler(SvgGridTemplateStr, routingContainer) {
         }
     });
     document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape") {
+        const popUpQueryWindow = document.querySelector(".popUpQueryWindow");
+        if (event.key === "Escape" && popUpQueryWindow.style.display === "grid") {
             event.preventDefault();
             const queryBox = document.querySelector(".queryBox");
             queryBox.blur();
@@ -1687,10 +1686,31 @@ function shortcutKeysHandler(SvgGridTemplateStr, routingContainer) {
         // Ignore if user typing inside input/textarea
         const activeTag = document.activeElement.tagName;
         if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
-        if (event.key === "Escape") {
+        const outputScreen = document.querySelector('.outputScreen');
+        if (event.key === "Escape" && outputScreen.style.display === "block") {
             event.preventDefault();
             const outputScreenClose = document.querySelector(".outputScreenClose");
             outputScreenClose.onclick();
+        }
+    });
+    document.addEventListener("keydown", function (event) {
+        // Ignore if user typing inside input/textarea
+        const activeTag = document.activeElement.tagName;
+        if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
+        if (event.altKey && event.key.toLowerCase() === "s" && !isOpen) {
+            event.preventDefault();
+            const settingBtn = document.querySelector(".settingBtn");
+            settingBtn.onclick();
+        }
+    });
+    document.addEventListener("keydown", function (event) {
+        // Ignore if user typing inside input/textarea
+        const activeTag = document.activeElement.tagName;
+        if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
+        if (event.key === "Escape" && isOpen) {
+            event.preventDefault();
+            const settingBtn = document.querySelector(".settingBtn");
+            settingBtn.onclick();
         }
     });
 
