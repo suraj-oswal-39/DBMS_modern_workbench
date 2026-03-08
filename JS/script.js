@@ -2,6 +2,7 @@ console.log("JavaScript file is linked successfully.");
 
 let isOpen = false;
 let isLight = false;
+let pageName = "";
 
 function outputWindow(outputMsg) {
     const result = document.querySelector(".result");
@@ -428,7 +429,7 @@ function queryRunner(routingContainer) {
     const SqlQuery = document.querySelector(".SqlQuery");
     const executeBtn = document.querySelector(".execute");
     const cancelBtn = document.querySelector(".cancel");
-            
+
     SqlQuery.onclick = () => {
         popUpQueryWindow.style.display = "grid";
         routingContainer.style.filter = "blur(3px)";
@@ -1073,7 +1074,7 @@ async function ExecuteSelectQuery(tableTemplate, dbName, tableName, selectedCol,
     const insertData = document.querySelector(".insertData");
     const changeData = document.querySelector(".changeData");
     // add new row
-    addDataRow.addEventListener("click", () => {
+    addDataRow.onclick = () => {
         changeData.style.display = "none";
         addDataRow.style.display = "none";
         insertData.style.display = "block";
@@ -1112,12 +1113,14 @@ async function ExecuteSelectQuery(tableTemplate, dbName, tableName, selectedCol,
         });
         tableData.appendChild(newDiv);
         DeleteRow(dbName, tableName);
-    });
+    }
 
     DeleteRow(dbName, tableName);
 };
 
 function initDatabaseView($location, $rootScope) {
+    pageName = "";
+    pageName = "DatabaseView";
     const nameInput = document.getElementById("nameInput");
     const addSvg = document.querySelector(".addSvg");
     const tooltip = document.querySelector(".tooltip");
@@ -1173,7 +1176,7 @@ function initDatabaseView($location, $rootScope) {
         const activeTag = document.activeElement.tagName;
         if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
 
-        if (event.ctrlKey && event.key.toLowerCase() === "d") {
+        if (event.altKey && event.key.toLowerCase() === "d" && pageName === "DatabaseView") {
             event.preventDefault();
             // trigger same logic as click
             addSvg.onclick();
@@ -1184,7 +1187,7 @@ function initDatabaseView($location, $rootScope) {
 
     // add (create) database on enter keydown event 
     nameInput.addEventListener("keydown", function (event) {
-        if (event.ctrlKey && event.key === "Enter") {
+        if (event.ctrlKey && event.key === "Enter" && pageName === "DatabaseView") {
 
             event.preventDefault();
 
@@ -1231,6 +1234,14 @@ function initDatabaseView($location, $rootScope) {
     CloseCross.onclick = () => {
         removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay);
     };
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && NameInput.style.width === "10rem" && pageName === "DatabaseView") {
+            event.preventDefault();
+            nameInput.blur();
+            CloseCross.onclick();
+        }
+    });
 
     // Delete database on click event
     SvgGridTemplate.addEventListener("click", function (event) {
@@ -1291,6 +1302,8 @@ function initDatabaseView($location, $rootScope) {
 }
 
 function initTableView($location, $rootScope, dbName) {
+    pageName = "";
+    pageName = "TableView";
     const addSvg = document.querySelector(".addSvg");
     const routingContainer = document.querySelector(".routingContainer");
     const SvgGridTemplate = document.querySelector(".SvgGridTemplate");
@@ -1483,12 +1496,18 @@ function initTableView($location, $rootScope, dbName) {
 
     resetBtn.onclick = () => {
         let selectedDataTypeList = document.querySelectorAll(".selectedDataType");
-
         selectedDataTypeList.forEach((selectedDT) => {
             selectedDT.innerText = "Select Data Type";
-            if (dataTypeList.style) {
-                dataTypeList.removeAttribute("style");
-            }
+            let openLists = document.querySelectorAll(".dataTypeList");
+            openLists.forEach((list) => {
+                if (list.hasAttribute("style")) list.removeAttribute("style");
+            });
+        });
+        let exp = document.querySelectorAll(".expression");
+        exp.forEach((expression) => {
+            expression.value = ""
+            expression.placeholder = "Enter Default Value / Expression";
+            if (expression.hasAttribute("disabled")) expression.removeAttribute("disabled");
         });
     };
 
@@ -1513,11 +1532,68 @@ function initTableView($location, $rootScope, dbName) {
 
     settingOpen();
 
+    document.addEventListener("keydown", function (event) {
+        // Ignore if user typing inside input/textarea
+        const activeTag = document.activeElement.tagName;
+        if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
+
+        if (event.altKey && event.key.toLowerCase() === "t" && pageName === "TableView") {
+            event.preventDefault();
+            // trigger same logic as click
+            addSvg.onclick();
+        }
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && fromDisplay2.style.display === "flex" && pageName === "TableView") {
+            event.preventDefault();
+            // trigger same logic as click
+            const tableNameInput = document.getElementById("tableNameInput");
+            if (document.activeElement === tableNameInput) tableNameInput.blur();
+            const columnNames = document.querySelectorAll(".columnNames");
+            columnNames.forEach((columnName) => {
+                if (document.activeElement === columnName) columnName.blur();
+            });
+            CloseCross2.onclick();
+        }
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.altKey && event.shiftKey && event.key.toLowerCase() === "r" && pageName === "TableView") {
+            event.preventDefault();
+            console.log("done");
+            const tableNameInput = document.getElementById("tableNameInput");
+            if (document.activeElement === tableNameInput) tableNameInput.blur();
+            const columnNames = document.querySelectorAll(".columnNames");
+            columnNames.forEach((columnName) => {
+                if (document.activeElement === columnName) columnName.blur();
+            });
+            resetBtn.onclick();
+            let tableCreation = document.querySelector("#tableCreation");
+            tableCreation.reset();
+        }
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.ctrlKey && event.key === "Enter" && pageName === "TableView") {
+            event.preventDefault();
+            const tableNameInput = document.getElementById("tableNameInput");
+            if (document.activeElement === tableNameInput) tableNameInput.blur();
+            const columnNames = document.querySelectorAll(".columnNames");
+            columnNames.forEach((columnName) => {
+                if (document.activeElement === columnName) columnName.blur();
+            });
+            createBtn.onclick();
+        }
+    });
+
     let SvgGridTemplateStr = ".SvgGridTemplate";
     shortcutKeysHandler(SvgGridTemplateStr, routingContainer);
 }
 
 function initTableDataView(dbName, tableName) {
+    pageName = "";
+    pageName = "TableDataView";
     console.log("this is table data view page = " + dbName + " and " + tableName);
     const h3Tag = document.querySelector(".DBTabletTitle");
     h3Tag.textContent = `Data from ${tableName} table in ${dbName} database`;
@@ -1620,6 +1696,16 @@ function initTableDataView(dbName, tableName) {
         ExecuteSelectQuery(tableTemplate, dbName, tableName, selectedCol, selectedTable, whereCondition, selectedGroupBy, haveCondition, selectedOrderBy, selectedLimit);
     }
 
+    document.addEventListener("keydown", function (event) {
+        // Ignore if user typing inside input/textarea
+        const activeTag = document.activeElement.tagName;
+        if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
+        if (event.altKey && event.key === "p") {
+            event.preventDefault();
+            printTable.click();
+        }
+    });
+
     let SvgGridTemplateStr = "";
     shortcutKeysHandler(SvgGridTemplateStr, routingContainer);
 }
@@ -1631,7 +1717,7 @@ function shortcutKeysHandler(SvgGridTemplateStr, routingContainer) {
         const activeTag = document.activeElement.tagName;
         if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
 
-        if (event.altKey && event.key.toLowerCase() === "/") {
+        if (event.altKey && event.key.toLowerCase() === "/" && (pageName === "DatabaseView" || pageName === "TableView")) {
             event.preventDefault();
             // trigger same logic as click
             enableSvgSearch(SvgGridTemplateStr);
@@ -1650,7 +1736,7 @@ function shortcutKeysHandler(SvgGridTemplateStr, routingContainer) {
             const SqlQuery = document.querySelector(".SqlQuery");
             SqlQuery.onclick();
             const queryBox = document.querySelector(".queryBox");
-            queryBox.focus(); 
+            queryBox.focus();
         }
     });
     document.addEventListener("keydown", function (event) {
