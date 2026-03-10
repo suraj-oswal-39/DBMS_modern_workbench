@@ -184,7 +184,7 @@ input::placeholder {
 }
 
 .themeBtn {
-    background-color: var(--color8);
+    background-color: transparent;
     outline: none;
     border: none;
     width: 100%;
