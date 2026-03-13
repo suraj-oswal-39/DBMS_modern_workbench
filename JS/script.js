@@ -1158,9 +1158,7 @@ function initDatabaseView($location, $rootScope) {
 
     // open input field on click event
     addSvg.onclick = () => {
-        addSvg.style = `background:
-            linear-gradient(#060000, #060000) padding-box,
-            linear-gradient(145deg, #ffff00, #ff0000) border-box;`;
+        addSvg.style = `background: linear-gradient(var(--color3), var(--color3)) padding-box, linear-gradient(145deg, var(--color1), var(--color2)) border-box;`;
         tooltip.style.opacity = "1";
         red.style.stopColor = "#ff0000";
         yellow.style.stopColor = "#ffff00";
