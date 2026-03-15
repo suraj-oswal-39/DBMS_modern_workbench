@@ -1,6 +1,7 @@
 console.log("JavaScript file is linked successfully.");
 
 let isOpen = false;
+let isOpen2 = false;
 let isLight = false;
 let pageName = "";
 
@@ -559,7 +560,7 @@ function openOutputScreen(outputScreen) {
     };
 }
 
-function settingOpen() {
+function settingToggle() {
     const settingBtn = document.querySelector(".settingBtn");
     const themeBtn = document.querySelector(".themeBtn");
     const themeTitle = document.querySelector(".themeBtn p");
@@ -1118,6 +1119,22 @@ async function ExecuteSelectQuery(tableTemplate, dbName, tableName, selectedCol,
     DeleteRow(dbName, tableName);
 };
 
+function keyListToggle() {
+    const keyList = document.querySelector(".keyList");
+    const shortcutKey = document.querySelector(".shortcutKey");
+    console.log("run");
+    shortcutKey.onclick = () => {
+        console.log("click");
+        if (!isOpen2) {
+            keyList.style.right = 0 + "%";
+            isOpen2 = !isOpen2;
+        } else {
+            keyList.removeAttribute("style");
+            isOpen2 = !isOpen2;
+        }
+    };
+}
+
 function initDatabaseView($location, $rootScope) {
     pageName = "";
     pageName = "DatabaseView";
@@ -1293,7 +1310,8 @@ function initDatabaseView($location, $rootScope) {
 
     openOutputScreen(outputScreen);
 
-    settingOpen();
+    settingToggle();
+    keyListToggle();
 
     let SvgGridTemplateStr = ".SvgGridTemplate";
     shortcutKeysHandler(SvgGridTemplateStr, routingContainer);
@@ -1528,7 +1546,8 @@ function initTableView($location, $rootScope, dbName) {
 
     openOutputScreen(outputScreen);
 
-    settingOpen();
+    settingToggle();
+    keyListToggle();
 
     document.addEventListener("keydown", function (event) {
         // Ignore if user typing inside input/textarea
@@ -1624,7 +1643,8 @@ function initTableDataView(dbName, tableName) {
 
     openOutputScreen(outputScreen);
 
-    settingOpen();
+    settingToggle();
+    keyListToggle();
 
     getChangeData(dbName, tableName, tableTemplate);
 
@@ -1797,5 +1817,24 @@ function shortcutKeysHandler(SvgGridTemplateStr, routingContainer) {
             settingBtn.onclick();
         }
     });
-
+    document.addEventListener("keydown", function (event) {
+        // Ignore if user typing inside input/textarea
+        const activeTag = document.activeElement.tagName;
+        if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
+        if (event.altKey && event.key.toLowerCase() === "h" && !isOpen) {
+            event.preventDefault();
+            const shortcutKey = document.querySelector(".shortcutKey");
+            shortcutKey.onclick();
+        }
+    });
+    document.addEventListener("keydown", function (event) {
+        // Ignore if user typing inside input/textarea
+        const activeTag = document.activeElement.tagName;
+        if (activeTag === "INPUT" || activeTag === "TEXTAREA") return;
+        if (event.key === "Escape" && isOpen2) {
+            event.preventDefault();
+            const shortcutKey = document.querySelector(".shortcutKey");
+            shortcutKey.onclick();
+        }
+    });
 }

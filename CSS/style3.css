@@ -168,23 +168,23 @@
     z-index: 999;
 }
 
-li {
+.dataTypeList li {
     width: 6rem;
     text-align: center;
     padding: 0.3rem;
 }
 
-li:hover {
+.dataTypeList li:hover {
     background-color: var(--color7);
     width: 100%;
 }
 
-li[value="INT"]:hover {
+.dataTypeList li[value="INT"]:hover {
     border-top-left-radius: 0.2rem;
     border-top-right-radius: 0.2rem;
 }
 
-li[value="BOOLEAN"]:hover {
+.dataTypeList li[value="BOOLEAN"]:hover {
     border-bottom-left-radius: 0.2rem;
     border-bottom-right-radius: 0.2rem;
 }

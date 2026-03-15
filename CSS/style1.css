@@ -121,7 +121,8 @@ input::placeholder {
 .insertData,
 .printTable,
 .selectQuery,
-.RunSelectQuery {
+.RunSelectQuery,
+.shortcutKey {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -135,6 +136,7 @@ input::placeholder {
     width: 4rem;
     height: stretch;
     cursor: default;
+    outline: none;
 }
 
 .SqlQuery:hover,
@@ -145,7 +147,8 @@ input::placeholder {
 .insertData:hover,
 .printTable:hover,
 .selectQuery:hover,
-.RunSelectQuery:hover {
+.RunSelectQuery:hover,
+.shortcutKey:hover {
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,
         linear-gradient(135deg, var(--color1), var(--color2)) border-box;
@@ -159,13 +162,14 @@ input::placeholder {
 .insertData:active,
 .printTable:active,
 .selectQuery:active,
-.RunSelectQuery:active {
+.RunSelectQuery:active,
+.shortcutKey:active {
     background:
         linear-gradient(var(--color3), var(--color3)) padding-box,
         linear-gradient(135deg, var(--color6), var(--color6)) border-box;
 }
 
-.settingMenu {
+.settingMenu, .keyList {
     position: fixed;
     right: -100%;
     top: 16vh;
@@ -372,4 +376,16 @@ hr {
     overflow-y: auto;
     overflow-x: hidden;
     max-height: 70vh;
+}
+
+.keyList {
+    overflow-y: hidden;
+}
+
+.keyInfo {
+    overflow-y: auto;
+}
+
+.keyInfo li {
+    padding: 1rem;
 }
