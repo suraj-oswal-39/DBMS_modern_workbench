@@ -116,6 +116,10 @@ function createDatabases(newDBname) {
     })
         .then(res => res.json())
         .then(data => {
+            if (data.error) {
+                outputWindow(data.error);
+                return;
+            }
             outputWindow(data.message);
             setTimeout(() => {
                 location.reload();
@@ -135,6 +139,10 @@ function deleteDatabases(dbNameForDel, dbSvgForRemove) {
     })
         .then(res => res.json())
         .then(data => {
+            if (data.error) {
+                outputWindow(data.error);
+                return;
+            }
             outputWindow(data.message);
             dbSvgForRemove.remove();
         })
@@ -212,6 +220,10 @@ function deleteTables(realTbNameForDel, TbSvgForRemove, dbName) {
     })
         .then(res => res.json())
         .then(data => {
+            if (data.error) {
+                outputWindow(data.error);
+                return;
+            }
             outputWindow(data.message);
             TbSvgForRemove.remove();
         })
@@ -1011,7 +1023,9 @@ async function ExecuteSelectQuery(tableTemplate, dbName, tableName, selectedCol,
     // append column name 
     columnNames.innerHTML = "";
     const columnList = metaData.map(col => col.COLUMN_NAME);
+
     columnList.forEach(colName => {
+        if (!selectedCol.includes(colName)) return;
         let label = colName;
         const colMeta = metaData.find(c => c.COLUMN_NAME === colName);
         if (colMeta.CONSTRAINT_TYPE === "PRIMARY KEY") {
@@ -1122,7 +1136,6 @@ async function ExecuteSelectQuery(tableTemplate, dbName, tableName, selectedCol,
 function keyListToggle() {
     const keyList = document.querySelector(".keyList");
     const shortcutKey = document.querySelector(".shortcutKey");
-    console.log("run");
     shortcutKey.onclick = () => {
         console.log("click");
         if (!isOpen2) {
@@ -1758,7 +1771,8 @@ function shortcutKeysHandler(SvgGridTemplateStr, routingContainer) {
         }
     });
     document.addEventListener("keydown", function (event) {
-        if (event.ctrlKey && event.key === "Enter") {
+        const popUpQueryWindow = document.querySelector(".popUpQueryWindow");
+        if (event.ctrlKey && event.key === "Enter" && popUpQueryWindow.hasAttribute("style") && popUpQueryWindow.style.display === "grid") {
             event.preventDefault();
             const queryBox = document.querySelector(".queryBox");
             queryBox.blur();
