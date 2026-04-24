@@ -633,7 +633,7 @@ function DeleteRow(dbName, tableName) {
             const pkInput = row.querySelector(".PK");
 
             if (!pkInput) {
-                console.log("Primary key not found");
+                outputWindow("Primary key not found");
                 return;
             }
 
@@ -1020,12 +1020,23 @@ async function ExecuteSelectQuery(tableTemplate, dbName, tableName, selectedCol,
         `http://localhost:3000/SelectedTableData?selectQueryStructure=${encodeURIComponent(JSON.stringify(selectQueryStructure))}`
     );
 
+    const data = await dataResponse.json();
+    if (data.error) {
+        let msg = "Error executing query!\n\n" + data.error +
+        "\n\nYour SQL Query:\n" + `SELECT ${selectedCol}\nFROM ${selectedTable}\n${whereCondition ? "WHERE " + whereCondition : ""}\n${selectedGroupBy ? "GROUP BY " + selectedGroupBy : ""}\n${haveCondition ? "HAVING " + haveCondition : ""}\n${selectedOrderBy ? "ORDER BY " + selectedOrderBy : ""}\n${selectedLimit ? "LIMIT " + selectedLimit : ""}`;
+        outputWindow(msg);
+        return;
+    } else if (data.length === 0) {
+        outputWindow("Query executed successfully but data not found.\n\nYour SQL Query:\n" + `SELECT ${selectedCol}\nFROM ${selectedTable}\n${whereCondition ? "WHERE " + whereCondition : ""}\n${selectedGroupBy ? "GROUP BY " + selectedGroupBy : ""}\n${haveCondition ? "HAVING " + haveCondition : ""}\n${selectedOrderBy ? "ORDER BY " + selectedOrderBy : ""}\n${selectedLimit ? "LIMIT " + selectedLimit : ""}`);
+        return;
+    }
+
     // append column name 
     columnNames.innerHTML = "";
     const columnList = metaData.map(col => col.COLUMN_NAME);
-
     columnList.forEach(colName => {
-        if (!selectedCol.includes(colName)) return;
+        // console.log(selectedCol, colName);
+        if (!selectedCol.includes(colName) && selectedCol !== "*") return;
         let label = colName;
         const colMeta = metaData.find(c => c.COLUMN_NAME === colName);
         if (colMeta.CONSTRAINT_TYPE === "PRIMARY KEY") {
@@ -1042,8 +1053,6 @@ async function ExecuteSelectQuery(tableTemplate, dbName, tableName, selectedCol,
         columnNames.appendChild(p);
     });
 
-    const data = await dataResponse.json();
-    console.log(data);
     // append column's data
     tableData.innerHTML = "";
     data.forEach(row => {
