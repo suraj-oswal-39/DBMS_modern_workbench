@@ -93,15 +93,15 @@ It is designed to simulate features similar to database tools like MySQL Workben
 4. Configure database:
 
    * Create MySQL database
-   * Update connection details in backend (server/server.js)
+   * Update connection details in backend (/server/server.js)
 
-5. Run the server:
+5. Run the server on Visual Studio Code terminal:
 
    ```
-   node server.js
+   cd server; node server.js
    ```
 
-6. Open in browser:
+6. Open in Visual Studio Code:
 
    ```
    Click on "Go Live" at the bottom bar in Visual Studio Code 
