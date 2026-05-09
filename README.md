@@ -102,10 +102,7 @@ It is designed to simulate features similar to database tools like MySQL Workben
    ```
 
 6. Open in Visual Studio Code:
-
-   ```
-   Click on "Go Live" at the bottom bar in Visual Studio Code 
-   ```
+    * Click on ```Go Live``` at the bottom bar in Visual Studio Code
 
 ---
 
