@@ -93,7 +93,7 @@ It is designed to simulate features similar to database tools like MySQL Workben
 4. Configure database:
 
    * Create MySQL database
-   * Update connection details in backend (/server/server.js)
+   * Update connection details in backend ```/server/server.js```
 
 5. Run the server on Visual Studio Code terminal:
 
