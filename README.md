@@ -76,7 +76,7 @@ It is designed to simulate features similar to database tools like MySQL Workben
 
    * Node.js
    * MySQL
-   * Visual Studio Code with the live server extension
+   * Visual Studio Code with the ```live server``` extension
 
 2. Clone the repository:
 
