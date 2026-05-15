@@ -22,6 +22,20 @@
 
     <div class="fromDisplay">
 
+        <svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"
+            class="RunDBCreation">
+            <defs>
+                <linearGradient id="RunDBCreation" x1="100%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" class="red" />
+                    <stop offset="100%" class="yellow" />
+                </linearGradient>
+            </defs>
+            <path
+                d="M5.92 24.096q0 1.088 0.928 1.728 0.512 0.288 1.088 0.288 0.448 0 0.896-0.224l16.16-8.064q0.48-0.256 0.8-0.736t0.288-1.088-0.288-1.056-0.8-0.736l-16.16-8.064q-0.448-0.224-0.896-0.224-0.544 0-1.088 0.288-0.928 0.608-0.928 1.728v16.16z"
+                fill="url(#RunDBCreation)">
+            </path>
+        </svg>
+
         <form id="NameInput">
             <input type="text" id="nameInput" name="name" placeholder="Enter Database Name">
         </form>
@@ -38,12 +52,12 @@
                 d="M 0 9.6 L 9.6 9.6 L 9.6 0 L 14.4 0 L 14.4 9.6 L 24 9.6 L 24 14.4 L 14.4 14.4 L 14.4 24 L 9.6 24 L 9.6 14.4 L 0 14.4 Z"
                 fill="url(#CloseSvgGrow)" stroke="none" />
         </svg>
-        
+
     </div>
 
     <div class="popUpWindow">
         <p class="message"></p>
-        
+
         <button class="no">No</button>
         <button class="yes">Delete</button>
     </div>
@@ -122,7 +136,7 @@
                     <input type="checkbox" id="nn0" name="nn" value="nn0" hidden />
                     <label for="nn0" class="btn NN">Not Null</label>
 
-                    <input type="checkbox" id="uq0" name="uq" value="uq0" hidden/>
+                    <input type="checkbox" id="uq0" name="uq" value="uq0" hidden />
                     <label for="uq0" class="btn">Unique</label>
 
                     <input type="checkbox" id="us0" name="us" value="us0" hidden />
@@ -132,7 +146,8 @@
                     <label for="ai0" class="btn Ai">Auto Increment</label>
 
                     <div class="defaultValueDiv">
-                        <input type="text" class="expression" name="expression" placeholder="Enter Default Value / Expression" />
+                        <input type="text" class="expression" name="expression"
+                            placeholder="Enter Default Value / Expression" />
                     </div>
 
                 </div>
@@ -154,7 +169,7 @@
     <div class="outputScreen">
         <p class="popUpTitle">Output
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="24px" height="24px" viewBox="0 0 24 24"
-            pointer-events="all" class="outputScreenClose">
+                pointer-events="all" class="outputScreenClose">
                 <defs>
                     <linearGradient id="outputScreenCloseSvgGrow" x1="100%" y1="100%" x2="0%" y2="0%">
                         <stop offset="0%" class="red" />
@@ -166,18 +181,18 @@
                     fill="url(#outputScreenCloseSvgGrow)" stroke="none" />
             </svg>
         </p>
-        
+
         <p class="result"></p>
     </div>
 
     <div class="settingMenu">
         <p style="text-align: center; padding: 0.5rem 0rem; font-weight: bold;">Settings</p>
-        
+
         <button type="button" class="themeBtn">
             <img src="/SVG/sunSvg.svg" class="sunSvg" />
             <p>Theme</p>
         </button>
-        
+
     </div>
 
     <div class="keyList">
@@ -192,7 +207,7 @@
             <li>Settings open → Alt + S</li>
             <li>Settings close → Esc</li>
             <li>Database form open → Alt + D</li>
-            <li>Database create →  Ctrl + Enter</li>
+            <li>Database create → Ctrl + Enter</li>
             <li>Database form close → Esc</li>
             <li>Table form open → Alt + T</li>
             <li>Table form close → Esc</li>

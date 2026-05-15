@@ -22,8 +22,8 @@ function NoBtn(noBtn, routingContainer, popUpWindow) {
     };
 }
 
-function removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay) {
-    [nameInput, addSvg, tooltip, red, yellow, routingContainer, CloseCross, NameInput, fromDisplay].forEach(el => {
+function removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay, RunDBCreation) {
+    [nameInput, addSvg, tooltip, red, yellow, routingContainer, CloseCross, NameInput, fromDisplay, RunDBCreation].forEach(el => {
         if (el && el.style) el.removeAttribute("style");
     });
 }
@@ -1023,7 +1023,7 @@ async function ExecuteSelectQuery(tableTemplate, dbName, tableName, selectedCol,
     const data = await dataResponse.json();
     if (data.error) {
         let msg = "Error executing query!\n\n" + data.error +
-        "\n\nYour SQL Query:\n" + `SELECT ${selectedCol}\nFROM ${selectedTable}\n${whereCondition ? "WHERE " + whereCondition : ""}\n${selectedGroupBy ? "GROUP BY " + selectedGroupBy : ""}\n${haveCondition ? "HAVING " + haveCondition : ""}\n${selectedOrderBy ? "ORDER BY " + selectedOrderBy : ""}\n${selectedLimit ? "LIMIT " + selectedLimit : ""}`;
+            "\n\nYour SQL Query:\n" + `SELECT ${selectedCol}\nFROM ${selectedTable}\n${whereCondition ? "WHERE " + whereCondition : ""}\n${selectedGroupBy ? "GROUP BY " + selectedGroupBy : ""}\n${haveCondition ? "HAVING " + haveCondition : ""}\n${selectedOrderBy ? "ORDER BY " + selectedOrderBy : ""}\n${selectedLimit ? "LIMIT " + selectedLimit : ""}`;
         outputWindow(msg);
         return;
     } else if (data.length === 0) {
@@ -1178,6 +1178,7 @@ function initDatabaseView($location, $rootScope) {
     const outputScreen = document.querySelector('.outputScreen');
     const popUpQueryWindow = document.querySelector('.popUpQueryWindow');
     const fromDisplay = document.querySelector('.fromDisplay');
+    const RunDBCreation = document.querySelector(".RunDBCreation");
 
     textarea.addEventListener("input", function () {
         updateLineNumbers(textarea, lineNumbers);
@@ -1206,6 +1207,7 @@ function initDatabaseView($location, $rootScope) {
         NameInput.style.opacity = 1;
         NameInput.style.width = "10rem";
         CloseCross.style.opacity = 1;
+        RunDBCreation.style.opacity = 1;
     };
 
     document.addEventListener("keydown", function (event) {
@@ -1220,6 +1222,47 @@ function initDatabaseView($location, $rootScope) {
             // focus input automatically
             nameInput.focus();
         }
+    });
+
+    RunDBCreation.addEventListener("click", () => {
+        let newDBname = document.getElementById("nameInput").value.trim();
+        let tooltipNodeList = document.querySelectorAll(".tooltip");
+
+        if (newDBname === "") {
+            outputWindow("Database name cannot be empty!");
+            return
+        }
+
+        const invalidPattern = /(^[0-9])|[\s\-@#%&*!]|[^\x00-\x7F]/;
+
+        if (invalidPattern.test(newDBname)) {
+            let errorMsg =
+                "Invalid database name!\n\n" +
+                "Rules:\n" +
+                "- Must NOT start with a number\n" +
+                "- No spaces\n" +
+                "- No hyphens (-)\n" +
+                "- No special characters (@ # % & * !)\n" +
+                "- No emoji or unicode characters";
+            outputWindow(errorMsg);
+            removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay, RunDBCreation);
+            newDBname = "";
+            return;
+        }
+
+        const existingDBNames = Array.from(tooltipNodeList).map(oneTooltip => oneTooltip.textContent);
+
+        if (existingDBNames.includes(newDBname)) {
+            outputWindow("Database name already exists!");
+            newDBname = "";
+            return;
+        }
+
+        createDatabases(newDBname);
+        
+        newDBname = "";
+        
+        removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay, RunDBCreation);
     });
 
     // add (create) database on enter keydown event 
@@ -1248,7 +1291,8 @@ function initDatabaseView($location, $rootScope) {
                     "- No special characters (@ # % & * !)\n" +
                     "- No emoji or unicode characters";
                 outputWindow(errorMsg);
-                removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay);
+                removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay, RunDBCreation);
+                newDBname = "";
                 return;
             }
 
@@ -1256,6 +1300,7 @@ function initDatabaseView($location, $rootScope) {
 
             if (existingDBNames.includes(newDBname)) {
                 outputWindow("Database name already exists!");
+                newDBname = "";
                 return;
             }
 
@@ -1263,13 +1308,13 @@ function initDatabaseView($location, $rootScope) {
 
             newDBname = "";
 
-            removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay);
+            removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay, RunDBCreation);
         }
     });
 
     // Close input field on click event
     CloseCross.onclick = () => {
-        removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay);
+        removeStyle1(nameInput, addSvg, tooltip, red, yellow, NameInput, routingContainer, CloseCross, fromDisplay, RunDBCreation);
     };
 
     document.addEventListener("keydown", function (event) {

@@ -133,6 +133,13 @@ input:-webkit-autofill:active {
     transition: opacity 1s linear 1s;
 }
 
+.RunDBCreation {
+    width: 3rem;
+    height: 3rem;
+    opacity: 0;
+    transition: opacity 0.2s linear 1.5s;
+}
+
 .CloseCross .red,
 .CloseCross .yellow,
 .crossDelete .red,
@@ -140,21 +147,25 @@ input:-webkit-autofill:active {
 .CloseCross2 .red,
 .CloseCross2 .yellow,
 .outputScreenClose .red,
-.outputScreenClose .yellow {
+.outputScreenClose .yellow,
+.RunDBCreation .red,
+.RunDBCreation .yellow {
     stop-color: var(--color6);
 }
 
 .CloseCross:hover .red,
 .crossDelete:hover .red,
 .CloseCross2:hover .red,
-.outputScreenClose:hover .red {
+.outputScreenClose:hover .red,
+.RunDBCreation:hover .red {
     stop-color: var(--color2);
 }
 
 .CloseCross:hover .yellow,
 .crossDelete:hover .yellow,
 .CloseCross2:hover .yellow,
-.outputScreenClose:hover .yellow {
+.outputScreenClose:hover .yellow,
+.RunDBCreation:hover .yellow {
     stop-color: var(--color1);
 }
 
