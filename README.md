@@ -76,7 +76,7 @@ It is designed to simulate features similar to database tools like MySQL Workben
 
    * Node.js
    * MySQL
-   * Visual Studio Code with the live server extension
+   * Visual Studio Code with the ```live server``` extension
 
 2. Clone the repository:
 
@@ -93,7 +93,7 @@ It is designed to simulate features similar to database tools like MySQL Workben
 4. Configure database:
 
    * Create MySQL database
-   * Update connection details in backend (/server/server.js)
+   * Update connection details in backend ```/server/server.js```
 
 5. Run the server on Visual Studio Code terminal:
 
@@ -102,10 +102,7 @@ It is designed to simulate features similar to database tools like MySQL Workben
    ```
 
 6. Open in Visual Studio Code:
-
-   ```
-   Click on "Go Live" at the bottom bar in Visual Studio Code 
-   ```
+    * Click on ```Go Live``` at the bottom bar in Visual Studio Code
 
 ---
 
